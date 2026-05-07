@@ -1,0 +1,405 @@
+/**
+ * components/QuestionnaireRunner.jsx
+ *
+ * Full-screen questionnaire runner. Identical UX to SleepDiaries
+ * QuestionnaireModal but designed as a pushed screen (not a modal).
+ *
+ * Props:
+ *   questionnaire   {object}  — from data/questionnaires.js
+ *   onComplete      {function(answers, score)} — called on finish
+ *   onBack          {function} — called on back/close
+ */
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import {
+  View, Text, TouchableOpacity, ScrollView,
+  StyleSheet, Pressable, SafeAreaView, Platform,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FONTS, SIZES, COLOURS } from '../theme/typography';
+import ScreenBackground from './ScreenBackground';
+
+const C = {
+  primary:      COLOURS.purple,
+  primaryLight: COLOURS.purpleLight,
+  progressFill: '#7B52B0',
+};
+
+const pad = (n) => String(n).padStart(2, '0');
+
+// ─── Option list ───────────────────────────────────────────────────────────────
+const OptionListInput = ({ value, onChange, options }) => (
+  <View style={s.scaleCol}>
+    {options.map((opt) => {
+      const sel = value === opt.value;
+      return (
+        <TouchableOpacity
+          key={opt.value}
+          style={[s.scaleBtn, sel ? { backgroundColor: C.primary, borderColor: C.primary } : { borderColor: 'rgba(255,255,255,0.9)' }]}
+          onPress={() => onChange(opt.value)}
+          activeOpacity={0.8}
+        >
+          {'value' in opt && typeof opt.value === 'number' && opt.value <= 10 && (
+            <Text style={[s.scaleBtnValue, { color: sel ? '#fff' : C.primary }]}>{opt.value}</Text>
+          )}
+          <Text style={[s.scaleBtnLabel, { color: sel ? '#fff' : C.primary }]}>{opt.label}</Text>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+);
+
+// ─── 0-10 slider-style ─────────────────────────────────────────────────────────
+const Scale010Input = ({ value, onChange }) => {
+  const cur = value ?? 5;
+  return (
+    <View style={s.scale010Container}>
+      <View style={s.scale010Row}>
+        {Array.from({ length: 11 }, (_, i) => {
+          const sel = cur === i;
+          return (
+            <TouchableOpacity key={i} style={[s.scale010Btn, sel && { backgroundColor: C.primary }]} onPress={() => onChange(i)} activeOpacity={0.7}>
+              <Text style={[s.scale010BtnText, { color: sel ? '#fff' : C.primary }]}>{i}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <View style={s.scale010Labels}>
+        <Text style={s.scale010Anchor}>Strongly disagree</Text>
+        <Text style={s.scale010Anchor}>Strongly agree</Text>
+      </View>
+    </View>
+  );
+};
+
+// ─── Yes/No ───────────────────────────────────────────────────────────────────
+const YesNoInput = ({ value, onChange }) => (
+  <View style={s.yesNoRow}>
+    {['yes', 'no'].map((opt) => {
+      const sel = value === opt;
+      return (
+        <TouchableOpacity key={opt}
+          style={[s.yesNoBtn, sel ? { backgroundColor: C.primary, borderColor: C.primary } : { borderColor: 'rgba(255,255,255,0.9)' }]}
+          onPress={() => onChange(opt)} activeOpacity={0.8}>
+          <Text style={[s.yesNoText, { color: sel ? '#fff' : C.primary }]}>{opt === 'yes' ? 'Yes' : 'No'}</Text>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+);
+
+// ─── Time stepper ─────────────────────────────────────────────────────────────
+const TimeInput = ({ value, onChange }) => {
+  const { hour, minute } = value ?? { hour: 23, minute: 0 };
+  const intervalRef = useRef(null);
+  const valueRef    = useRef(value ?? { hour: 23, minute: 0 });
+  useEffect(() => { valueRef.current = value ?? { hour: 23, minute: 0 }; }, [value]);
+
+  const adjust = useCallback((field, delta) => {
+    const p = valueRef.current;
+    if (field === 'hour')   onChange({ ...p, hour:   (p.hour   + delta + 24) % 24 });
+    if (field === 'minute') onChange({ ...p, minute: (p.minute + delta + 60) % 60 });
+  }, [onChange]);
+
+  const startLong = useCallback((field, delta) => {
+    adjust(field, delta);
+    intervalRef.current = setInterval(() => adjust(field, delta), 150);
+  }, [adjust]);
+  const stopLong = useCallback(() => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } }, []);
+  useEffect(() => () => stopLong(), []);
+
+  return (
+    <View style={s.stepperWrapper}>
+      <View style={s.timeRow}>
+        {[['hour', 1, 1], ['minute', 5, 1]].map(([field, tapDelta, holdDelta], i) => (
+          <React.Fragment key={field}>
+            {i === 1 && <Text style={[s.timeSep, { color: C.primary }]}>:</Text>}
+            <View style={s.stepperCol}>
+              <Pressable style={[s.stepBtn, { backgroundColor: C.primaryLight }]}
+                onPress={() => adjust(field, tapDelta)}
+                onLongPress={() => startLong(field, holdDelta)}
+                onPressOut={stopLong} delayLongPress={300}>
+                <Ionicons name="caret-up" size={20} color={C.primary} />
+              </Pressable>
+              <Text style={[s.stepValue, { color: C.primary }]}>{pad(field === 'hour' ? hour : minute)}</Text>
+              <Pressable style={[s.stepBtn, { backgroundColor: C.primaryLight }]}
+                onPress={() => adjust(field, -tapDelta)}
+                onLongPress={() => startLong(field, -holdDelta)}
+                onPressOut={stopLong} delayLongPress={300}>
+                <Ionicons name="caret-down" size={20} color={C.primary} />
+              </Pressable>
+            </View>
+          </React.Fragment>
+        ))}
+      </View>
+      <Text style={[s.stepHint, { color: C.primary }]}>hold for ±1 min</Text>
+    </View>
+  );
+};
+
+// ─── Number/Duration stepper ──────────────────────────────────────────────────
+const NumberInput = ({ value, onChange, min = 0, max = 99, unit = '' }) => {
+  const v = value ?? min;
+  const intervalRef = useRef(null);
+  const valueRef    = useRef(v);
+  useEffect(() => { valueRef.current = value ?? min; }, [value]);
+  const adjust = useCallback((delta) => { const next = Math.min(Math.max(valueRef.current + delta, min), max); onChange(next); }, [onChange, min, max]);
+  const startLong = useCallback((delta) => { adjust(delta); intervalRef.current = setInterval(() => adjust(delta), 150); }, [adjust]);
+  const stopLong  = useCallback(() => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } }, []);
+  useEffect(() => () => stopLong(), []);
+  return (
+    <View style={s.numberRow}>
+      <Pressable style={[s.numBtn, { borderColor: C.primary }]} onPress={() => adjust(-1)} onLongPress={() => startLong(-1)} onPressOut={stopLong} delayLongPress={300}>
+        <Ionicons name="remove" size={24} color={C.primary} />
+      </Pressable>
+      <Text style={[s.numValue, { color: C.primary }]}>{v}</Text>
+      <Pressable style={[s.numBtn, { borderColor: C.primary }]} onPress={() => adjust(1)} onLongPress={() => startLong(1)} onPressOut={stopLong} delayLongPress={300}>
+        <Ionicons name="add" size={24} color={C.primary} />
+      </Pressable>
+      {!!unit && <Text style={[s.numUnit, { color: C.primary }]}>{unit}</Text>}
+    </View>
+  );
+};
+
+// ─── Progress bar ─────────────────────────────────────────────────────────────
+const ProgressBar = ({ current, total }) => (
+  <View style={s.progressRow}>
+    <View style={s.progressIcon}>
+      <Ionicons name="clipboard-outline" size={20} color={C.primary} />
+    </View>
+    <View style={s.progressTrack}>
+      <View style={[s.progressFill, { width: `${(current / total) * 100}%` }]} />
+    </View>
+    <Text style={s.progressLabel}>{current}/{total}</Text>
+  </View>
+);
+
+// ─── Result screen ────────────────────────────────────────────────────────────
+const ResultScreen = ({ questionnaire, score, onClose }) => {
+  const interpretation = questionnaire.interpret(score);
+  let scoreDisplay = '', scoreMax = '';
+  if (typeof score === 'object' && score !== null) {
+    if (score.msf_sc !== undefined) {
+      const h = Math.floor(score.msf_sc); const m = Math.round((score.msf_sc % 1) * 60);
+      scoreDisplay = `${pad(h)}:${pad(m)}`; scoreMax = 'MSFsc';
+    } else scoreDisplay = JSON.stringify(score);
+  } else {
+    scoreDisplay = String(score);
+    const maxScore = questionnaire.maxScore ?? null;
+    scoreMax = maxScore !== null ? `/ ${maxScore}` : '';
+  }
+  return (
+    <View style={s.resultContainer}>
+      <View style={s.resultCard}>
+        <Text style={s.resultTitle}>{questionnaire.shortTitle} complete</Text>
+        <View style={[s.scoreBadge, { backgroundColor: interpretation.color + '18', borderColor: interpretation.color }]}>
+          <Text style={[s.scoreNumber, { color: interpretation.color }]}>{scoreDisplay}</Text>
+          {!!scoreMax && <Text style={[s.scoreMax, { color: interpretation.color }]}>{scoreMax}</Text>}
+        </View>
+        <Text style={[s.interpretLabel, { color: interpretation.color }]}>{interpretation.label}</Text>
+        <Text style={s.interpretDesc}>{interpretation.description}</Text>
+        <Text style={s.referenceText}>{questionnaire.reference}</Text>
+      </View>
+      <TouchableOpacity style={[s.nextBtn, { backgroundColor: C.primary }]} onPress={onClose}>
+        <Text style={s.nextBtnText}>Done</Text>
+        <Ionicons name="checkmark" size={22} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+// ─── Build initial answers ────────────────────────────────────────────────────
+const buildInitialAnswers = (items) => {
+  const a = {};
+  for (const item of items) {
+    switch (item.type) {
+      case 'time':         a[item.id] = item.defaultValue ?? { hour: 23, minute: 0 }; break;
+      case 'duration_min': a[item.id] = item.defaultValue ?? 0; break;
+      case 'number':       a[item.id] = item.defaultValue ?? (item.min ?? 0); break;
+      case 'scale_0_10':   a[item.id] = item.defaultValue ?? 5; break;
+      default:             a[item.id] = null; break;
+    }
+  }
+  return a;
+};
+
+const isAnswered = (item, value) => {
+  if (item.type === 'time' || item.type === 'duration_min' || item.type === 'number' || item.type === 'scale_0_10') return value !== null && value !== undefined;
+  if (item.type === 'yes_no') return value === 'yes' || value === 'no';
+  return value !== null && value !== undefined;
+};
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+export default function QuestionnaireRunner({ questionnaire, onComplete, onBack }) {
+  const insets = useSafeAreaInsets();
+  const [answers, setAnswers]           = useState(() => buildInitialAnswers(questionnaire?.items ?? []));
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [result, setResult]             = useState(null);
+
+  useEffect(() => {
+    setAnswers(buildInitialAnswers(questionnaire?.items ?? []));
+    setCurrentIndex(0);
+    setResult(null);
+  }, [questionnaire]);
+
+  const items = questionnaire?.items ?? [];
+  const total = items.length;
+  const item  = items[currentIndex];
+  const currentValue = answers[item?.id];
+  const canProceed   = item ? isAnswered(item, currentValue) : false;
+
+  const handleNext = async () => {
+    if (!canProceed) return;
+    if (currentIndex < total - 1) {
+      setCurrentIndex((i) => i + 1);
+    } else {
+      const score = questionnaire.score(answers);
+      setResult({ score });
+    }
+  };
+
+  const handleDone = () => {
+    if (result) onComplete(answers, result.score);
+  };
+
+  const setAnswer = (id, val) => setAnswers((prev) => ({ ...prev, [id]: val }));
+
+  if (!questionnaire) return null;
+
+  return (
+    <View style={[s.root, { paddingTop: insets.top }]}>
+      <ScreenBackground />
+
+      {/* Header */}
+      <View style={s.header}>
+        <TouchableOpacity onPress={onBack} style={s.closeBtn}>
+          <Ionicons name="close" size={26} color={COLOURS.primaryDark} />
+        </TouchableOpacity>
+        <Text style={s.headerTitle}>{questionnaire.shortTitle}</Text>
+        <View style={{ width: 34 }} />
+      </View>
+
+      {result ? (
+        <ResultScreen questionnaire={questionnaire} score={result.score} onClose={handleDone} />
+      ) : (
+        <>
+          <ProgressBar current={currentIndex + 1} total={total} />
+          <ScrollView style={s.scroll} contentContainerStyle={s.scrollContent} keyboardShouldPersistTaps="handled">
+            {currentIndex === 0 && (
+              <View style={s.instructionsBox}>
+                <Text style={s.instructionsText}>{questionnaire.instructions}</Text>
+              </View>
+            )}
+            <Text style={s.itemNumber}>Item {item?.number} of {total}</Text>
+            <Text style={s.itemText}>{item?.text}</Text>
+            {item?.hint && (
+              <View style={s.hintBox}>
+                <Ionicons name="information-circle-outline" size={16} color={C.primary} />
+                <Text style={s.hintText}>{item.hint}</Text>
+              </View>
+            )}
+            <View style={s.inputArea}>
+              {['scale_0_3','scale_0_4','scale_1_10','single_choice','frequency_3','frequency_4'].includes(item?.type) && (
+                <OptionListInput value={currentValue} onChange={(v) => setAnswer(item.id, v)} options={item.options} />
+              )}
+              {item?.type === 'scale_0_10' && (
+                <Scale010Input value={currentValue} onChange={(v) => setAnswer(item.id, v)} />
+              )}
+              {item?.type === 'yes_no' && (
+                <YesNoInput value={currentValue} onChange={(v) => setAnswer(item.id, v)} />
+              )}
+              {item?.type === 'time' && (
+                <TimeInput value={currentValue} onChange={(v) => setAnswer(item.id, v)} />
+              )}
+              {(item?.type === 'duration_min' || item?.type === 'number') && (
+                <NumberInput value={currentValue} onChange={(v) => setAnswer(item.id, v)} min={item.min} max={item.max} unit={item.unit} />
+              )}
+            </View>
+          </ScrollView>
+
+          <View style={[s.navRow, { paddingBottom: insets.bottom + 12 }]}>
+            <TouchableOpacity style={s.backBtn} onPress={() => currentIndex > 0 ? setCurrentIndex((i) => i - 1) : onBack()}>
+              <Ionicons name="chevron-back" size={22} color={C.primary} />
+              <Text style={s.backBtnText}>Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[s.nextBtn, !canProceed && s.nextBtnDisabled, { backgroundColor: C.primary }]}
+              onPress={handleNext} disabled={!canProceed}>
+              <Text style={s.nextBtnText}>{currentIndex < total - 1 ? 'Next' : 'Finish'}</Text>
+              <Ionicons name="chevron-forward" size={22} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  root:   { flex: 1, backgroundColor: 'transparent' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
+  headerTitle: { fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
+  closeBtn: { padding: 4 },
+
+  progressRow:  { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, gap: 10 },
+  progressIcon: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  progressTrack: { flex: 1, height: 28, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', backgroundColor: COLOURS.cardBg, overflow: 'hidden' },
+  progressFill:  { height: '100%', borderRadius: 14, backgroundColor: C.progressFill },
+  progressLabel: { fontSize: 16, fontFamily: FONTS.heading, color: C.primary, minWidth: 40, textAlign: 'right' },
+
+  scroll:        { flex: 1 },
+  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
+  instructionsBox: { backgroundColor: COLOURS.cardBg, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', padding: 16, marginTop: 16, marginBottom: 8 },
+  instructionsText: { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: '#3B1F6A', lineHeight: 24 },
+  itemNumber: { fontSize: SIZES.label, fontFamily: FONTS.body, color: C.primaryLight, textTransform: 'uppercase', marginTop: 20, marginBottom: 6 },
+  itemText:   { fontSize: 20, fontFamily: FONTS.heading, color: C.primary, lineHeight: 28, marginBottom: 12 },
+  hintBox:    { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: 'rgba(237,224,250,0.7)', borderRadius: 10, padding: 12, marginBottom: 16 },
+  hintText:   { flex: 1, fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: C.primary, lineHeight: 22 },
+  inputArea:  { alignItems: 'stretch' },
+
+  scaleCol:       { gap: 10 },
+  scaleBtn:       { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 13, borderRadius: 12, borderWidth: 1, backgroundColor: COLOURS.cardBg },
+  scaleBtnValue:  { fontSize: 20, fontFamily: FONTS.heading, minWidth: 26, textAlign: 'center' },
+  scaleBtnLabel:  { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, flex: 1 },
+
+  scale010Container: { width: '100%', gap: 10 },
+  scale010Row:       { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
+  scale010Btn:       { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: 'rgba(107,63,160,0.3)', alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  scale010BtnText:   { fontSize: 17, fontFamily: FONTS.heading },
+  scale010Labels:    { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
+  scale010Anchor:    { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },
+
+  yesNoRow: { flexDirection: 'row', gap: 20, marginTop: 8, justifyContent: 'center' },
+  yesNoBtn: { width: 130, height: 56, borderRadius: 28, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  yesNoText: { fontSize: 20, fontFamily: FONTS.body },
+
+  stepperWrapper: { alignItems: 'center', gap: 10 },
+  stepHint:   { fontSize: 12, fontFamily: FONTS.bodyMedium, opacity: 0.5 },
+  timeRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
+  stepperCol: { alignItems: 'center', gap: 12 },
+  stepBtn:    { width: 52, height: 44, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  stepValue:  { fontSize: 40, fontFamily: FONTS.heading, minWidth: 52, textAlign: 'center' },
+  timeSep:    { fontSize: 40, fontFamily: FONTS.heading, marginTop: -12 },
+
+  numberRow: { flexDirection: 'row', alignItems: 'center', gap: 20, justifyContent: 'center' },
+  numBtn:    { width: 52, height: 52, borderRadius: 26, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  numValue:  { fontSize: 48, fontFamily: FONTS.heading, minWidth: 60, textAlign: 'center' },
+  numUnit:   { fontSize: 16, fontFamily: FONTS.bodyMedium, marginLeft: 4 },
+
+  navRow:          { flexDirection: 'row', paddingHorizontal: 24, paddingTop: 12, gap: 12 },
+  backBtn:         { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 14, paddingVertical: 14, gap: 4, backgroundColor: COLOURS.cardBg },
+  backBtnText:     { fontSize: SIZES.body, fontFamily: FONTS.body, color: C.primary },
+  nextBtn:         { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 14, paddingVertical: 14, gap: 4 },
+  nextBtnDisabled: { opacity: 0.35 },
+  nextBtnText:     { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
+
+  resultContainer: { flex: 1, padding: 24, justifyContent: 'center', gap: 20 },
+  resultCard:      { backgroundColor: COLOURS.cardBg, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', padding: 28, alignItems: 'center', gap: 12 },
+  resultTitle:     { fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
+  scoreBadge:      { flexDirection: 'row', alignItems: 'baseline', gap: 4, borderWidth: 1.5, borderRadius: 16, paddingHorizontal: 24, paddingVertical: 10, marginVertical: 4 },
+  scoreNumber:     { fontSize: 52, fontFamily: FONTS.heading },
+  scoreMax:        { fontSize: 22, fontFamily: FONTS.bodyMedium },
+  interpretLabel:  { fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading },
+  interpretDesc:   { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24 },
+  referenceText:   { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, textAlign: 'center', lineHeight: 20, marginTop: 4 },
+});

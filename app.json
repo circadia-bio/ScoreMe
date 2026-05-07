@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "ScoreMe",
+    "slug": "scoreme",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#C8DFF5"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.circadia.scoreme"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#C8DFF5"
+      },
+      "package": "com.circadia.scoreme"
+    },
+    "scheme": "scoreme",
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    }
+  }
+}
