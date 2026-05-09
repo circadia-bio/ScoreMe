@@ -10,20 +10,27 @@
  * Screens handle their own paddingLeft to clear the sidebar.
  */
 import { Tabs, useRouter, usePathname } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS, COLOURS } from '../../theme/typography';
 import { useLayout } from '../../theme/responsive';
 import DesktopBackground from '../../components/DesktopBackground';
 import DesktopSidebar from '../../components/DesktopSidebar';
+import OnboardingModal from '../../components/OnboardingModal';
 import { DesktopExportModal } from '../export';
+import { hasSeenOnboarding } from '../../storage/storage';
 
 export default function TabLayout() {
   const { isDesktop } = useLayout();
   const router        = useRouter();
   const pathname      = usePathname();
-  const [showExport, setShowExport] = useState(false);
+  const [showExport,     setShowExport]     = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    hasSeenOnboarding().then(seen => { if (!seen) setShowOnboarding(true); });
+  }, []);
 
   const activeTab =
     pathname.includes('participants')   ? 'participants'   :
@@ -68,11 +75,17 @@ export default function TabLayout() {
           </View>
         </View>
         <DesktopExportModal visible={showExport} onClose={() => setShowExport(false)} />
+        <OnboardingModal visible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
       </View>
     );
   }
 
-  return tabs;
+  return (
+    <>
+      {tabs}
+      <OnboardingModal visible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
+    </>
+  );
 }
 
 const s = StyleSheet.create({
