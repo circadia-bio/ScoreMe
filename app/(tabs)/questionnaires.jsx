@@ -19,7 +19,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
-import { QUESTIONNAIRES } from '../../data/questionnaires';
+import { QUESTIONNAIRES, compileQuestionnaire } from '../../data/questionnaires';
 import { loadCustomQuestionnaires, saveCustomQuestionnaire, deleteCustomQuestionnaire } from '../../storage/storage';
 
 async function importJSON(onDone) {
@@ -32,6 +32,7 @@ async function importJSON(onDone) {
       Alert.alert('Invalid questionnaire', 'The JSON must have at minimum: id, title, items[].');
       return;
     }
+    compileQuestionnaire(parsed); // build score() and interpret() from declarative fields
     await saveCustomQuestionnaire(parsed);
     onDone();
     Alert.alert('Imported!', `"${parsed.title}" added to your library.`);
@@ -40,26 +41,25 @@ async function importJSON(onDone) {
   }
 }
 
-// Derive score bands by probing interpret() across the full score range
+// Get score bands — prefer declarative scoreBands, fall back to probing interpret()
 function getScoreBands(q) {
+  // Use declarative bands if available (sorted correctly for display)
+  if (Array.isArray(q.scoreBands) && q.scoreBands.length > 0) {
+    return q.scoreBandDirection === 'desc'
+      ? [...q.scoreBands].sort((a, b) => b.min - a.min) // highest first for desc scales
+      : [...q.scoreBands].sort((a, b) => a.min - b.min);
+  }
+  // Fall back: probe interpret() for imported questionnaires without declarative bands
   if (!q.interpret || typeof q.maxScore !== 'number') return null;
   const bands = [];
   const seen  = new Set();
-  // Probe from 0 to maxScore to collect unique bands in order
   for (let s = 0; s <= q.maxScore; s++) {
     try {
       const r = q.interpret(s);
-      if (!seen.has(r.label)) {
-        seen.add(r.label);
-        bands.push({ ...r, minScore: s });
-      }
+      if (!seen.has(r.label)) { seen.add(r.label); bands.push({ ...r, min: s }); }
     } catch { /* skip */ }
   }
-  // Attach maxScore to each band (next band's min - 1, or overall max)
-  return bands.map((b, i) => ({
-    ...b,
-    maxScore: i < bands.length - 1 ? bands[i + 1].minScore - 1 : q.maxScore,
-  }));
+  return bands.map((b, i) => ({ ...b, max: i < bands.length - 1 ? bands[i + 1].min - 1 : q.maxScore }));
 }
 
 // Infer item type label
@@ -148,17 +148,44 @@ function DetailPanel({ q }) {
           <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, flex: 1 }}>{q.title}</Text>
           {q.beta && <View style={qr.betaChip}><Text style={qr.betaText}>BETA</Text></View>}
         </View>
-        <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.shortTitle}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.shortTitle}</Text>
+          {q.version && q.version !== q.shortTitle && (
+            <View style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.version}</Text>
+            </View>
+          )}
+          {q.timeframe && (
+            <View style={{ backgroundColor: 'rgba(224,122,32,0.10)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.accent }}>{q.timeframe}</Text>
+            </View>
+          )}
+        </View>
       </View>
 
-      {/* Quick stats row */}
+      {/* What it measures */}
+      {q.construct && (
+        <>
+          <Text style={dp.sectionLabel}>WHAT IT MEASURES</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark, marginBottom: 6 }}>{q.construct}</Text>
+              {q.constructDescription && (
+                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 24 }}>{q.constructDescription}</Text>
+              )}
+            </View>
+          </BlurView>
+        </>
+      )}
+
+      {/* Quick stats */}
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {[
-          { icon: 'list-outline',          label: 'Items',  value: q.items?.length ?? '?' },
-          { icon: 'shapes-outline',        label: 'Format', value: itemTypes(q.items ?? []) },
+          { icon: 'list-outline',   label: 'Items',     value: String(q.items?.length ?? '?') },
+          { icon: 'shapes-outline', label: 'Format',    value: itemTypes(q.items ?? []) },
           ...(typeof q.maxScore === 'number' ? [{ icon: 'bar-chart-outline', label: 'Max score', value: String(q.maxScore) }] : []),
         ].map(({ icon, label, value }) => (
-          <BlurView key={label} intensity={36} tint="light" style={{ flex: 1, borderRadius: 12, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 2 }}>
+          <BlurView key={label} intensity={36} tint="light" style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}>
             <View style={{ backgroundColor: 'rgba(255,255,255,0.50)', padding: 12, gap: 4, alignItems: 'center' }}>
               <Ionicons name={icon} size={18} color={COLOURS.primary} />
               <Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>{label}</Text>
@@ -169,57 +196,105 @@ function DetailPanel({ q }) {
       </View>
 
       {/* Instructions */}
-      {q.instructions ? <>
-        <Text style={dp.sectionLabel}>INSTRUCTIONS</Text>
-        <BlurView intensity={36} tint="light" style={dp.card}>
-          <View style={dp.cardInner}>
-            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, lineHeight: 26 }}>{q.instructions}</Text>
-          </View>
-        </BlurView>
-      </> : null}
+      {q.instructions && (
+        <>
+          <Text style={dp.sectionLabel}>INSTRUCTIONS</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, lineHeight: 26 }}>{q.instructions}</Text>
+            </View>
+          </BlurView>
+        </>
+      )}
 
-      {/* Scoring bands */}
-      {bands && bands.length > 0 ? <>
-        <Text style={dp.sectionLabel}>SCORING</Text>
-        <BlurView intensity={36} tint="light" style={dp.card}>
-          <View style={dp.cardInner}>
-            {bands.map((b, i) => (
-              <View key={b.label} style={[dp.bandRow, i < bands.length - 1 && dp.bandDivider]}>
-                <View style={[dp.bandDot, { backgroundColor: b.color }]} />
-                <View style={{ flex: 1, gap: 2 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{b.label}</Text>
-                    <View style={{ backgroundColor: b.color + '18', borderWidth: 1, borderColor: b.color, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}>
-                      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: b.color }}>{b.minScore}–{b.maxScore}</Text>
+      {/* Scoring note */}
+      {q.scoringNote && (
+        <>
+          <Text style={dp.sectionLabel}>SCORING METHOD</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 24 }}>{q.scoringNote}</Text>
+            </View>
+          </BlurView>
+        </>
+      )}
+
+      {/* Score bands */}
+      {bands && bands.length > 0 && (
+        <>
+          <Text style={dp.sectionLabel}>SCORE INTERPRETATION</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              {bands.map((b, i) => (
+                <View key={b.label} style={[dp.bandRow, i < bands.length - 1 && dp.bandDivider]}>
+                  <View style={[dp.bandDot, { backgroundColor: b.color }]} />
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{b.label}</Text>
+                      <View style={{ backgroundColor: b.color + '18', borderWidth: 1, borderColor: b.color, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}>
+                        <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: b.color }}>{b.min}–{b.max}</Text>
+                      </View>
                     </View>
+                    <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 20 }}>{b.description}</Text>
                   </View>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 20 }}>{b.description}</Text>
                 </View>
-              </View>
-            ))}
-          </View>
-        </BlurView>
-      </> : null}
+              ))}
+            </View>
+          </BlurView>
+        </>
+      )}
+
+      {/* Languages */}
+      {q.languages && q.languages.length > 0 && (
+        <>
+          <Text style={dp.sectionLabel}>VALIDATED LANGUAGES</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={[dp.cardInner, { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }]}>
+              {q.languages.map(lang => (
+                <View key={lang} style={{ backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 }}>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark }}>{lang}</Text>
+                </View>
+              ))}
+            </View>
+          </BlurView>
+        </>
+      )}
 
       {/* Reference */}
-      {q.reference ? <>
-        <Text style={dp.sectionLabel}>REFERENCE</Text>
-        <BlurView intensity={36} tint="light" style={dp.card}>
-          <View style={dp.cardInner}>
-            <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.reference}</Text>
-          </View>
-        </BlurView>
-      </> : null}
+      {q.reference && (
+        <>
+          <Text style={dp.sectionLabel}>REFERENCE</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.reference}</Text>
+            </View>
+          </BlurView>
+        </>
+      )}
 
-      {/* Copyright / credit */}
-      {q.credit && q.credit !== q.reference ? <>
-        <Text style={dp.sectionLabel}>CREDIT</Text>
-        <BlurView intensity={36} tint="light" style={dp.card}>
-          <View style={dp.cardInner}>
-            <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.credit}</Text>
-          </View>
-        </BlurView>
-      </> : null}
+      {/* Credit */}
+      {q.credit && q.credit !== q.reference && (
+        <>
+          <Text style={dp.sectionLabel}>CREDIT</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.credit}</Text>
+            </View>
+          </BlurView>
+        </>
+      )}
+
+      {/* Copyright */}
+      {q.copyright && (
+        <>
+          <Text style={dp.sectionLabel}>COPYRIGHT</Text>
+          <BlurView intensity={36} tint="light" style={dp.card}>
+            <View style={dp.cardInner}>
+              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.copyright}</Text>
+            </View>
+          </BlurView>
+        </>
+      )}
 
     </ScrollView>
   );
