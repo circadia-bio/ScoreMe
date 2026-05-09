@@ -176,6 +176,7 @@ const ProgressBar = ({ current, total }) => (
 
 // ─── Result screen ────────────────────────────────────────────────────────────
 const ResultScreen = ({ questionnaire, score, onClose }) => {
+  const insets = useSafeAreaInsets();
   const interpretation = questionnaire.interpret(score);
   let scoreDisplay = '', scoreMax = '';
   if (typeof score === 'object' && score !== null) {
@@ -185,26 +186,52 @@ const ResultScreen = ({ questionnaire, score, onClose }) => {
     } else scoreDisplay = JSON.stringify(score);
   } else {
     scoreDisplay = String(score);
-    const maxScore = questionnaire.maxScore ?? null;
-    scoreMax = maxScore !== null ? `/ ${maxScore}` : '';
+    scoreMax = questionnaire.maxScore != null ? `/ ${questionnaire.maxScore}` : '';
   }
+
   return (
-    <View style={s.resultContainer}>
-      <View style={s.resultCard}>
-        <Text style={s.resultTitle}>{questionnaire.shortTitle} complete</Text>
-        <View style={[s.scoreBadge, { backgroundColor: interpretation.color + '18', borderColor: interpretation.color }]}>
-          <Text style={[s.scoreNumber, { color: interpretation.color }]}>{scoreDisplay}</Text>
-          {!!scoreMax && <Text style={[s.scoreMax, { color: interpretation.color }]}>{scoreMax}</Text>}
+    <ScrollView
+      contentContainerStyle={[s.resultScroll, { paddingBottom: insets.bottom + 32 }]}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Score badge */}
+      <View style={[s.resultBadgeWrap, { borderColor: interpretation.color + '40', backgroundColor: interpretation.color + '0C' }]}>
+        <View style={[s.resultScoreRow]}>
+          <Text style={[s.resultScoreNum, { color: interpretation.color }]}>{scoreDisplay}</Text>
+          {!!scoreMax && <Text style={[s.resultScoreMax, { color: interpretation.color }]}>{scoreMax}</Text>}
         </View>
-        <Text style={[s.interpretLabel, { color: interpretation.color }]}>{interpretation.label}</Text>
-        <Text style={s.interpretDesc}>{interpretation.description}</Text>
-        <Text style={s.referenceText}>{questionnaire.reference}</Text>
+        <Text style={[s.resultLabel, { color: interpretation.color }]}>{interpretation.label}</Text>
       </View>
-      <TouchableOpacity style={[s.nextBtn, { backgroundColor: C.primary }]} onPress={onClose}>
-        <Text style={s.nextBtnText}>Done</Text>
-        <Ionicons name="checkmark" size={22} color="#fff" />
+
+      {/* Interpretation card */}
+      <View style={s.resultCard}>
+        <View style={s.resultCardHeader}>
+          <Ionicons name="checkmark-circle" size={18} color={interpretation.color} />
+          <Text style={[s.resultCardTitle, { color: interpretation.color }]}>Interpretation</Text>
+        </View>
+        <Text style={s.resultDesc}>{interpretation.description}</Text>
+      </View>
+
+      {/* Meta */}
+      <View style={s.resultCard}>
+        <View style={s.resultCardHeader}>
+          <Ionicons name="clipboard-outline" size={18} color={COLOURS.primary} />
+          <Text style={[s.resultCardTitle, { color: COLOURS.primaryDark }]}>{questionnaire.title}</Text>
+        </View>
+        {questionnaire.construct && (
+          <Text style={s.resultMeta}>{questionnaire.construct}</Text>
+        )}
+        {questionnaire.reference && (
+          <Text style={s.resultRef}>{questionnaire.reference}</Text>
+        )}
+      </View>
+
+      {/* Done button — fixed size, not flex-fill */}
+      <TouchableOpacity style={s.doneBtn} onPress={onClose} activeOpacity={0.85}>
+        <Ionicons name="checkmark" size={20} color="#fff" />
+        <Text style={s.doneBtnText}>Done</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -393,13 +420,18 @@ const s = StyleSheet.create({
   nextBtnDisabled: { opacity: 0.35 },
   nextBtnText:     { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
 
-  resultContainer: { flex: 1, padding: 24, justifyContent: 'center', gap: 20 },
-  resultCard:      { backgroundColor: COLOURS.cardBg, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', padding: 28, alignItems: 'center', gap: 12 },
-  resultTitle:     { fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
-  scoreBadge:      { flexDirection: 'row', alignItems: 'baseline', gap: 4, borderWidth: 1.5, borderRadius: 16, paddingHorizontal: 24, paddingVertical: 10, marginVertical: 4 },
-  scoreNumber:     { fontSize: 52, fontFamily: FONTS.heading },
-  scoreMax:        { fontSize: 22, fontFamily: FONTS.bodyMedium },
-  interpretLabel:  { fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading },
-  interpretDesc:   { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24 },
-  referenceText:   { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, textAlign: 'center', lineHeight: 20, marginTop: 4 },
+  resultScroll:      { padding: 24, gap: 16 },
+  resultBadgeWrap:    { borderRadius: 20, borderWidth: 1.5, padding: 28, alignItems: 'center', gap: 8 },
+  resultScoreRow:     { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
+  resultScoreNum:     { fontSize: 64, fontFamily: FONTS.heading, lineHeight: 72 },
+  resultScoreMax:     { fontSize: 22, fontFamily: FONTS.bodyMedium },
+  resultLabel:        { fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading },
+  resultCard:         { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, padding: 16, gap: 8 },
+  resultCardHeader:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  resultCardTitle:    { fontSize: SIZES.body, fontFamily: FONTS.body },
+  resultDesc:         { fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 24 },
+  resultMeta:         { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary },
+  resultRef:          { fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, lineHeight: 18, marginTop: 2 },
+  doneBtn:            { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 28, alignSelf: 'stretch' },
+  doneBtnText:        { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
 });
