@@ -1,14 +1,10 @@
 /**
  * components/OnboardingModal.jsx
  *
- * First-run modal sheet. Shown once over the main tabs.
- * Three short slides — swipe or tap Next. Dismiss with Get started.
+ * First-run onboarding — centred square modal, shown once over the tabs.
  */
 import React, { useState, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet,
-  Modal, Animated,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
@@ -35,8 +31,8 @@ const STEPS = [
 ];
 
 export default function OnboardingModal({ visible, onDismiss }) {
-  const [step, setStep] = useState(0);
-  const fadeAnim  = useRef(new Animated.Value(1)).current;
+  const [step, setStep]   = useState(0);
+  const fadeAnim          = useRef(new Animated.Value(1)).current;
 
   const animateTo = (nextStep) => {
     Animated.timing(fadeAnim, { toValue: 0, duration: 160, useNativeDriver: true }).start(() => {
@@ -54,46 +50,31 @@ export default function OnboardingModal({ visible, onDismiss }) {
   const isLast  = step === STEPS.length - 1;
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onDismiss}
-      statusBarTranslucent
-    >
-      {/* Dimmed backdrop — tap to dismiss */}
-      <TouchableOpacity
-        style={s.backdrop}
-        activeOpacity={1}
-        onPress={onDismiss}
-      />
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss} statusBarTranslucent>
+      {/* Backdrop */}
+      <View style={s.backdrop}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onDismiss} />
 
-      {/* Sheet */}
-      <View style={s.sheet}>
-        <BlurView intensity={52} tint="light" style={StyleSheet.absoluteFill} />
-        <View style={s.sheetInner}>
+        {/* Square card */}
+        <View style={s.card}>
+          <BlurView intensity={52} tint="light" style={StyleSheet.absoluteFill} />
 
-      {/* No handle for centred modal */}
-
-          {/* Dismiss */}
+          {/* Close */}
           <TouchableOpacity style={s.closeBtn} onPress={onDismiss} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
             <Ionicons name="close" size={18} color={COLOURS.textMuted} />
           </TouchableOpacity>
 
           {/* Animated content */}
           <Animated.View style={[s.content, { opacity: fadeAnim }]}>
-            {/* Icon */}
             <View style={[s.iconWrap, { backgroundColor: current.color + '12', borderColor: current.color + '30' }]}>
-              <Ionicons name={current.icon} size={34} color={current.color} />
+              <Ionicons name={current.icon} size={32} color={current.color} />
             </View>
-
             <Text style={s.title}>{current.title}</Text>
             <Text style={s.body}>{current.body}</Text>
           </Animated.View>
 
-          {/* Dots + actions */}
+          {/* Footer */}
           <View style={s.footer}>
-            {/* Step dots */}
             <View style={s.dots}>
               {STEPS.map((_, i) => (
                 <TouchableOpacity key={i} onPress={() => animateTo(i)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -101,8 +82,6 @@ export default function OnboardingModal({ visible, onDismiss }) {
                 </TouchableOpacity>
               ))}
             </View>
-
-            {/* Buttons */}
             <View style={s.btnRow}>
               {!isLast && (
                 <TouchableOpacity style={s.skipBtn} onPress={onDismiss} activeOpacity={0.7}>
@@ -119,6 +98,7 @@ export default function OnboardingModal({ visible, onDismiss }) {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
       </View>
     </Modal>
   );
@@ -132,60 +112,49 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     padding: 32,
   },
-  sheet: {
-    width: 340,
-    height: 340,
+  card: {
+    width: 340, height: 340,
     borderRadius: 28,
     overflow: 'hidden',
     backgroundColor: 'rgba(238,245,255,0.92)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.9)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
     shadowColor: 'rgba(74,123,181,0.25)',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 1, shadowRadius: 32, elevation: 16,
-  },
-  sheetInner: { flex: 1, padding: 28, gap: 0 },
-
-  handle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: 'rgba(74,123,181,0.25)',
-    alignSelf: 'center', marginBottom: 4,
+    padding: 28,
   },
   closeBtn: {
-    position: 'absolute', top: 20, right: 20,
+    position: 'absolute', top: 16, right: 16,
     width: 28, height: 28, borderRadius: 14,
     backgroundColor: 'rgba(74,123,181,0.08)',
     alignItems: 'center', justifyContent: 'center',
+    zIndex: 1,
   },
-
-  content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+  content: {
+    flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12,
+  },
   iconWrap: {
     width: 60, height: 60, borderRadius: 16,
-    borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
   title: { fontSize: 18, fontFamily: FONTS.heading, color: COLOURS.primaryDark, textAlign: 'center' },
-  body:  { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 22, paddingHorizontal: 4 },
-
+  body:  { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 22 },
   footer: { gap: 10 },
   dots:   { flexDirection: 'row', justifyContent: 'center', gap: 8 },
   dot:       { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(74,123,181,0.20)' },
   dotActive: { width: 24 },
-
   btnRow:  { flexDirection: 'row', gap: 10 },
   skipBtn: {
-    flex: 1, paddingVertical: 14, alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 14,
+    flex: 1, paddingVertical: 12, alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
   },
   skipText: { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary },
   nextBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 14, paddingHorizontal: 28, borderRadius: 14,
+    paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12,
     shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1, shadowRadius: 12, elevation: 5,
   },
   nextText: { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
-
-  logo: { width: 120, height: 42, alignSelf: 'center', opacity: 0.55, marginTop: 4 },
 });
