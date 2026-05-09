@@ -10,17 +10,20 @@
  * Screens handle their own paddingLeft to clear the sidebar.
  */
 import { Tabs, useRouter, usePathname } from 'expo-router';
+import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS, COLOURS } from '../../theme/typography';
 import { useLayout } from '../../theme/responsive';
 import DesktopBackground from '../../components/DesktopBackground';
 import DesktopSidebar from '../../components/DesktopSidebar';
+import { DesktopExportModal } from '../export';
 
 export default function TabLayout() {
   const { isDesktop } = useLayout();
   const router        = useRouter();
   const pathname      = usePathname();
+  const [showExport, setShowExport] = useState(false);
 
   const activeTab =
     pathname.includes('participants')   ? 'participants'   :
@@ -57,13 +60,14 @@ export default function TabLayout() {
               if (tab === 'participants')   router.push('/(tabs)/participants');
               if (tab === 'questionnaires') router.push('/(tabs)/questionnaires');
             }}
-            onExport={() => router.push('/export')}
+            onExport={() => isDesktop ? setShowExport(true) : router.push('/export')}
           />
           {/* desktopContent: flex 1, screens render here */}
           <View style={s.desktopContent}>
             {tabs}
           </View>
         </View>
+        <DesktopExportModal visible={showExport} onClose={() => setShowExport(false)} />
       </View>
     );
   }
