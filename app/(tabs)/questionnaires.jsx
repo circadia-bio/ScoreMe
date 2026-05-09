@@ -85,9 +85,13 @@ function itemTypes(items) {
   return [...new Set(items.map(i => typeLabel(i.type)))].join(', ');
 }
 
-// ─── Custom pill toggle ────────────────────────────────────────────────────────────
+// ─── Custom pill toggle ──────────────────────────────────────────────────────
 function Toggle({ value, onValueChange }) {
   const anim = React.useRef(new Animated.Value(value ? 1 : 0)).current;
+  React.useEffect(() => {
+    // Snap immediately on mount, animate on subsequent changes
+    anim.setValue(value ? 1 : 0);
+  }, []);
   React.useEffect(() => {
     Animated.spring(anim, { toValue: value ? 1 : 0, useNativeDriver: false, speed: 40, bounciness: 4 }).start();
   }, [value]);
@@ -369,7 +373,7 @@ const mr = StyleSheet.create({
   lockBadge:{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(74,123,181,0.06)', alignItems: 'center', justifyContent: 'center' },
 });
 
-// ─── Section header with toggle-all ──────────────────────────────────────────────
+// ─── Section header with toggle-all ──────────────────────────────────────────
 function SectionHeader({ label, qs, disabledQs, onToggleAll }) {
   const allOn = qs.every(q => !disabledQs.has(q.id));
   return (
@@ -377,12 +381,13 @@ function SectionHeader({ label, qs, disabledQs, onToggleAll }) {
       <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>
         {label} ({qs.length})
       </Text>
-      <TouchableOpacity onPress={() => onToggleAll(!allOn)} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }} activeOpacity={0.7}>
+      {/* Plain View — no outer TouchableOpacity; only the Toggle itself is tappable */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>
           {allOn ? 'Disable all' : 'Enable all'}
         </Text>
         <Toggle value={allOn} onValueChange={() => onToggleAll(!allOn)} />
-      </TouchableOpacity>
+      </View>
     </View>
   );
 }
