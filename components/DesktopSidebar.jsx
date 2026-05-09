@@ -5,7 +5,7 @@
  * Tap the wordmark to open the About sheet.
  */
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking, Image } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -35,13 +35,8 @@ function AboutModal({ visible, onClose }) {
               <Ionicons name="close" size={20} color={COLOURS.textMuted} />
             </TouchableOpacity>
 
-            {/* Logo pill */}
-            <View style={am.logoPill}>
-              <View style={am.logoIcon}>
-                <Ionicons name="document-text" size={22} color="#fff" />
-              </View>
-              <Text style={am.logoText}>Score<Text style={{ color: COLOURS.accent }}>Me</Text></Text>
-            </View>
+            {/* Logo */}
+            <Image source={require('../assets/images/logo.png')} style={am.logo} resizeMode="contain" />
 
             {/* Meta */}
             <Text style={am.version}>v{version}</Text>
@@ -75,9 +70,7 @@ const am = StyleSheet.create({
   sheet:       { width: 300, borderRadius: 24, overflow: 'hidden', backgroundColor: 'rgba(238,245,255,0.97)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12 },
   inner:       { padding: 28, alignItems: 'center', gap: 6 },
   closeBtn:    { position: 'absolute', top: 16, right: 16, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center', zIndex: 1 },
-  logoPill:    { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
-  logoIcon:    { width: 40, height: 40, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center' },
-  logoText:    { fontFamily: FONTS.heading, fontSize: 28, color: COLOURS.primaryDark, letterSpacing: -0.3 },
+  logo:       { width: 160, height: 60, marginBottom: 4 },
   version:     { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },
   copy:        { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark },
   licence:     { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },

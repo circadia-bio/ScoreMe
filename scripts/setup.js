@@ -18,14 +18,16 @@ const SLEEP_ROOT = path.resolve(ROOT, '..', 'SleepDiaries');
 
 const copies = [
   // fonts
-  { src: 'assets/fonts/Livvic-Bold.ttf',    dst: 'assets/fonts/Livvic-Bold.ttf'    },
-  { src: 'assets/fonts/Afacad-Bold.ttf',    dst: 'assets/fonts/Afacad-Bold.ttf'    },
-  { src: 'assets/fonts/Afacad-Medium.ttf',  dst: 'assets/fonts/Afacad-Medium.ttf'  },
-  { src: 'assets/fonts/Afacad-Regular.ttf', dst: 'assets/fonts/Afacad-Regular.ttf' },
+  { src: 'assets/fonts/Livvic-Bold.ttf',         dst: 'assets/fonts/Livvic-Bold.ttf'         },
+  { src: 'assets/fonts/Afacad-Bold.ttf',         dst: 'assets/fonts/Afacad-Bold.ttf'         },
+  { src: 'assets/fonts/Afacad-Medium.ttf',       dst: 'assets/fonts/Afacad-Medium.ttf'       },
+  { src: 'assets/fonts/Afacad-Regular.ttf',      dst: 'assets/fonts/Afacad-Regular.ttf'      },
+  // images
+  { src: 'assets/images/logo.png',               dst: 'assets/images/logo.png'               },
   // icon & splash (optional — ScoreMe can use its own later)
-  { src: 'assets/favicon.png',              dst: 'assets/favicon.png'              },
-  { src: 'assets/icon.png',                 dst: 'assets/icon.png'                 },
-  { src: 'assets/splash-icon.png',          dst: 'assets/splash-icon.png'          },
+  { src: 'assets/favicon.png',                   dst: 'assets/favicon.png'                   },
+  { src: 'assets/icon.png',                      dst: 'assets/icon.png'                      },
+  { src: 'assets/splash-icon.png',               dst: 'assets/splash-icon.png'               },
 ];
 
 let ok = 0, skip = 0, fail = 0;
