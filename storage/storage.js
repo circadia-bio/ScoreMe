@@ -15,6 +15,7 @@ const KEYS = {
   participants: 'scoreme:participants',
   customQs:     'scoreme:custom_qs',
   disabledQs:   'scoreme:disabled_qs',
+  onboarded:    'scoreme:onboarded',
 };
 
 // ─── Participants ──────────────────────────────────────────────────────────────
@@ -76,6 +77,16 @@ export async function saveResult(participantId, questionnaireId, answers, score)
   participants[idx].results[questionnaireId] = result;
   await saveParticipants(participants);
   return result;
+}
+
+// ─── Onboarding ──────────────────────────────────────────────────────────────
+export async function hasSeenOnboarding() {
+  try { return !!(await AsyncStorage.getItem(KEYS.onboarded)); }
+  catch { return false; }
+}
+
+export async function markOnboardingComplete() {
+  await AsyncStorage.setItem(KEYS.onboarded, '1');
 }
 
 // ─── Disabled questionnaires ──────────────────────────────────────────────────

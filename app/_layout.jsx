@@ -48,6 +48,7 @@ export default function RootLayout() {
   const content = (
     <SafeAreaProvider>
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index"             options={{ animation: 'fade' }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="participant/[id]"  options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="score/[pid]/[qid]" options={{ animation: 'slide_from_bottom' }} />
