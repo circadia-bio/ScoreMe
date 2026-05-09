@@ -2,7 +2,7 @@
  * app/(tabs)/participants.jsx — Participant management
  *
  * Desktop: music-log split pattern. Scoring opens inline in the right panel.
- * Mobile/tablet: compact cards + modal sheet.
+ * Mobile/tablet: compact cards + FAB.
  */
 import React, { useState, useCallback } from 'react';
 import {
@@ -302,13 +302,10 @@ export default function ParticipantsScreen() {
   return (
     <View style={{ flex: 1 }}>
       <ScreenBackground />
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12 }}>
+      <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12 }}>
         <Text style={{ fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Participants</Text>
-        <TouchableOpacity style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowAdd(true)}>
-          <Ionicons name="add" size={24} color="#fff" />
-        </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         {participants.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 64, gap: 10 }}>
             <Ionicons name="person-add-outline" size={52} color={COLOURS.textMuted} />
@@ -345,6 +342,15 @@ export default function ParticipantsScreen() {
         })}
       </ScrollView>
 
+      {/* FAB */}
+      <TouchableOpacity
+        style={[ms.fab, { bottom: insets.bottom + 24 }]}
+        onPress={() => setShowAdd(true)}
+        activeOpacity={0.85}
+      >
+        <Ionicons name="person-add" size={22} color="#fff" />
+      </TouchableOpacity>
+
       <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowAdd(false)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           <ScreenBackground />
@@ -363,4 +369,19 @@ export default function ParticipantsScreen() {
 
 const ms = StyleSheet.create({
   card: { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, padding: 16, gap: 10 },
+  fab:  {
+    position: 'absolute',
+    right: 24,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: COLOURS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: 'rgba(74,123,181,0.45)',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 8,
+  },
 });
