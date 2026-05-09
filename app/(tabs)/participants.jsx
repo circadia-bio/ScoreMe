@@ -1,7 +1,7 @@
 /**
  * app/(tabs)/participants.jsx — Participant management
  *
- * Desktop: music-log split pattern.
+ * Desktop: music-log split pattern. Scoring opens inline in the right panel.
  * Mobile/tablet: compact cards + modal sheet.
  */
 import React, { useState, useCallback } from 'react';
@@ -14,10 +14,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
-import ScreenBackground from '../../components/ScreenBackground';
+import ScreenBackground    from '../../components/ScreenBackground';
+import QuestionnaireRunner from '../../components/QuestionnaireRunner';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
-import { loadParticipants, addParticipant, deleteParticipant } from '../../storage/storage';
+import { loadParticipants, addParticipant, deleteParticipant, saveResult } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
@@ -167,6 +168,7 @@ export default function ParticipantsScreen() {
   const [participants, setParticipants] = useState([]);
   const [selectedId,   setSelectedId]   = useState(null);
   const [showAdd,      setShowAdd]      = useState(false);
+  const [scoringQid,   setScoringQid]   = useState(null); // desktop inline scoring
   const [newName,      setNewName]      = useState('');
   const [newNotes,     setNewNotes]     = useState('');
   const [adding,       setAdding]       = useState(false);
@@ -187,19 +189,26 @@ export default function ParticipantsScreen() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {
         await deleteParticipant(p.id);
-        if (selectedId === p.id) setSelectedId(null);
+        if (selectedId === p.id) { setSelectedId(null); setScoringQid(null); }
         load();
       }},
     ]);
   };
 
-  const selected = participants.find(p => p.id === selectedId) ?? null;
+  const selected  = participants.find(p => p.id === selectedId) ?? null;
+  const scoringQ  = QUESTIONNAIRES.find(q => q.id === scoringQid) ?? null;
+
+  const handleScore = (qid) => setScoringQid(qid);
+  const handleScoringComplete = async (answers, score) => {
+    await saveResult(selectedId, scoringQid, answers, score);
+    setScoringQid(null);
+    load();
+  };
 
   // ── Desktop ──────────────────────────────────────────────────────────────────
   if (isDesktop) {
     return (
       <View style={{ flex: 1 }}>
-        {/* Glass card — left half */}
         <View style={{
           position: 'absolute', left: 0, right: '50%', top: 12, bottom: 12,
           borderRadius: 20,
@@ -216,7 +225,7 @@ export default function ParticipantsScreen() {
                 <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Participants</Text>
                 <TouchableOpacity
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: showAdd ? 'rgba(74,123,181,0.18)' : 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8 }}
-                  onPress={() => { setShowAdd(!showAdd); setSelectedId(null); }}
+                  onPress={() => { setShowAdd(!showAdd); setSelectedId(null); setScoringQid(null); }}
                 >
                   <Ionicons name={showAdd ? 'close' : 'add'} size={18} color={COLOURS.primary} />
                   <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: COLOURS.primary }}>{showAdd ? 'Cancel' : 'Add'}</Text>
@@ -231,14 +240,14 @@ export default function ParticipantsScreen() {
               {participants.map(p => (
                 <ParticipantRow key={p.id} p={p}
                   selected={!showAdd && selectedId === p.id}
-                  onPress={() => { setShowAdd(false); setSelectedId(selectedId === p.id ? null : p.id); }}
+                  onPress={() => { setShowAdd(false); setScoringQid(null); setSelectedId(selectedId === p.id ? null : p.id); }}
                   onDelete={() => handleDelete(p)}
                 />
               ))}
             </ScrollView>
           </View>
 
-          {/* Right col */}
+          {/* Right col — add form / runner / detail */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, marginRight: 12 }}>
             {showAdd ? (
               <View style={{ padding: 28 }}>
@@ -249,8 +258,18 @@ export default function ParticipantsScreen() {
                   </View>
                 </BlurView>
               </View>
+            ) : scoringQ && selected ? (
+              <QuestionnaireRunner
+                questionnaire={scoringQ}
+                onComplete={handleScoringComplete}
+                onBack={() => setScoringQid(null)}
+              />
             ) : (
-              <DetailPanel p={selected} onScore={qid => selected && router.push(`/score/${selected.id}/${qid}`)} onClose={() => setSelectedId(null)} />
+              <DetailPanel
+                p={selected}
+                onScore={handleScore}
+                onClose={() => setSelectedId(null)}
+              />
             )}
           </View>
         </View>

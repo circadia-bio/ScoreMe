@@ -2,11 +2,7 @@
  * app/(tabs)/index.jsx — Dashboard
  *
  * Desktop: music-log split pattern.
- *   - position:absolute glass card left:0 right:'50%' top:12 bottom:12
- *   - flex row, left col uses paddingLeft = SIDEBAR_TOTAL to clear the sidebar
- *   - right col is the detail panel
- *
- * Mobile/tablet: ScreenBackground + compact cards.
+ * On desktop, scoring opens inline in the right panel instead of navigating.
  */
 import React, { useState, useCallback } from 'react';
 import {
@@ -18,10 +14,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
-import ScreenBackground from '../../components/ScreenBackground';
+import ScreenBackground      from '../../components/ScreenBackground';
+import QuestionnaireRunner   from '../../components/QuestionnaireRunner';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
-import { loadParticipants } from '../../storage/storage';
+import { loadParticipants, saveResult } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
@@ -192,17 +189,25 @@ export default function DashboardScreen() {
   const [participants, setParticipants] = useState([]);
   const [refreshing,   setRefreshing]   = useState(false);
   const [selectedId,   setSelectedId]   = useState(null);
+  const [scoringQid,   setScoringQid]   = useState(null); // desktop inline scoring
 
   const load = useCallback(async () => { setParticipants(await loadParticipants()); }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
   const onRefresh = useCallback(async () => { setRefreshing(true); await load(); setRefreshing(false); }, [load]);
   const selected = participants.find(p => p.id === selectedId) ?? null;
+  const scoringQ = QUESTIONNAIRES.find(q => q.id === scoringQid) ?? null;
+
+  const handleScore = (qid) => setScoringQid(qid);
+  const handleScoringComplete = async (answers, score) => {
+    await saveResult(selectedId, scoringQid, answers, score);
+    setScoringQid(null);
+    load();
+  };
 
   // ── Desktop ──────────────────────────────────────────────────────────────────
   if (isDesktop) {
     return (
       <View style={{ flex: 1 }}>
-        {/* Glass card — left half, position absolute, music-log style */}
         <View style={{
           position: 'absolute', left: 0, right: '50%', top: 12, bottom: 12,
           borderRadius: 20,
@@ -212,7 +217,7 @@ export default function DashboardScreen() {
         }} />
 
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          {/* Left col: paddingLeft clears the sidebar pill */}
+          {/* Left col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, overflow: 'hidden' }}>
             <ScrollView
               contentContainerStyle={{ paddingTop: 24, paddingBottom: 40, paddingLeft: SIDEBAR_TOTAL + 20, paddingRight: 20 }}
@@ -222,7 +227,6 @@ export default function DashboardScreen() {
               <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Dashboard</Text>
               <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginBottom: 20 }}>Research Questionnaire Scorer</Text>
 
-              {/* Stats */}
               <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
                 {[
                   { icon: 'people',           label: 'Participants', value: participants.length },
@@ -257,14 +261,30 @@ export default function DashboardScreen() {
                   </TouchableOpacity>
                 </View>
               ) : participants.map(p => (
-                <ParticipantRow key={p.id} p={p} selected={selectedId === p.id} onPress={() => setSelectedId(selectedId === p.id ? null : p.id)} />
+                <ParticipantRow
+                  key={p.id} p={p}
+                  selected={selectedId === p.id}
+                  onPress={() => { setScoringQid(null); setSelectedId(selectedId === p.id ? null : p.id); }}
+                />
               ))}
             </ScrollView>
           </View>
 
-          {/* Right col */}
+          {/* Right col — detail OR inline runner */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, marginRight: 12 }}>
-            <DetailPanel p={selected} onScore={qid => selected && router.push(`/score/${selected.id}/${qid}`)} onClose={() => setSelectedId(null)} />
+            {scoringQ && selected ? (
+              <QuestionnaireRunner
+                questionnaire={scoringQ}
+                onComplete={handleScoringComplete}
+                onBack={() => setScoringQid(null)}
+              />
+            ) : (
+              <DetailPanel
+                p={selected}
+                onScore={handleScore}
+                onClose={() => setSelectedId(null)}
+              />
+            )}
           </View>
         </View>
       </View>
