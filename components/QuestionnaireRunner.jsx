@@ -165,7 +165,7 @@ const NumberInput = ({ value, onChange, min = 0, max = 99, unit = '' }) => {
 const ProgressBar = ({ current, total }) => (
   <View style={s.progressRow}>
     <View style={s.progressIcon}>
-      <Ionicons name="clipboard-outline" size={20} color={C.primary} />
+      <Ionicons name="document-text-outline" size={20} color={C.primary} />
     </View>
     <View style={s.progressTrack}>
       <View style={[s.progressFill, { width: `${(current / total) * 100}%` }]} />

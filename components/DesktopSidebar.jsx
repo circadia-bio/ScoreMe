@@ -26,7 +26,7 @@ export default function DesktopSidebar({ activeTab, onNavigate, onExport }) {
       {/* Wordmark */}
       <View style={s.logoRow}>
         <View style={s.logoIcon}>
-          <Ionicons name="moon" size={18} color="#fff" />
+          <Ionicons name="document-text" size={18} color="#fff" />
         </View>
         <Text style={s.logoText}>ScoreMe</Text>
       </View>
@@ -53,7 +53,6 @@ export default function DesktopSidebar({ activeTab, onNavigate, onExport }) {
 
       <View style={{ flex: 1 }} />
 
-      {/* Export */}
       <TouchableOpacity style={s.exportBtn} onPress={onExport} activeOpacity={0.8}>
         <Ionicons name="download-outline" size={18} color={COLOURS.primary} />
         <Text style={s.exportLabel}>Export CSV</Text>
@@ -79,7 +78,6 @@ const s = StyleSheet.create({
     shadowRadius: 24,
     elevation: 6,
     overflow: 'hidden',
-    // paddingTop set dynamically via insets above
     paddingBottom: 24,
     paddingHorizontal: 12,
     zIndex: 10,
