@@ -1,73 +1,77 @@
-# ScoreMe
+# 📋 ScoreMe
 
-**Research questionnaire scorer for Circadia Lab.**
+**A cross-platform research questionnaire scorer for Circadia Lab.**
 
-ScoreMe is a cross-platform app (iOS, Android, web/desktop) for administering and scoring validated clinical and sleep health questionnaires across multiple research participants. It is part of the Circadia Lab toolchain and shares its visual identity with SleepDiaries.
-
----
-
-## Features
-
-- **8 built-in instruments** — ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
-- **Multi-participant management** — add, track, and delete participants; progress rings colour-coded by completion
-- **Step-by-step questionnaire runner** — one item at a time, automatic scoring on completion
-- **Enable/disable instruments** — per-questionnaire toggles, persisted across sessions; group by clinical domain
-- **Custom questionnaire import** — import any instrument as a JSON file following the built-in schema
-- **CSV and JSON export** — CSV for scores-only spreadsheet analysis; JSON for full item-level responses
-- **Desktop split-panel layout** — left participant list, right detail/scoring panel, glassy sidebar navigation
-- **First-run onboarding** — centred modal walkthrough, shown once
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow)](./LICENSE)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2052-000020?logo=expo)](https://expo.dev)
+[![React Native](https://img.shields.io/badge/React%20Native-0.76-61DAFB?logo=react)](https://reactnative.dev)
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-4A7BB5)](https://expo.dev)
 
 ---
 
-## Stack
+## 📖 What is ScoreMe?
 
-| Layer | Technology |
-|---|---|
-| Framework | Expo (SDK 52) + Expo Router |
-| UI | React Native + expo-blur |
-| Persistence | AsyncStorage |
-| Export | expo-sharing + expo-file-system |
-| Fonts | Livvic-Bold, Afacad (shared with SleepDiaries) |
+ScoreMe is a mobile and desktop app for administering and scoring validated clinical and sleep health questionnaires across multiple research participants. It is designed for lab-based or clinic-based research sessions where a researcher needs to collect structured self-report data from a cohort, track completion, and export results for analysis.
+
+It is part of the Circadia Lab toolchain and shares its visual identity with [SleepDiaries](https://github.com/circadia-bio/SleepDiaries).
 
 ---
 
-## Repository layout
+## ✨ Features
+
+- 📋 **8 built-in validated instruments** — ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
+- 👥 **Multi-participant management** — add, track, and delete participants; progress rings colour-coded by completion
+- 🎯 **Step-by-step questionnaire runner** — one item at a time, automatic scoring and interpretation on completion
+- 🔀 **Enable/disable instruments** — per-questionnaire toggles persisted across sessions; group by clinical domain
+- 📥 **Custom questionnaire import** — import any instrument as a JSON file following the built-in schema
+- 📤 **CSV and JSON export** — CSV for scores-only spreadsheet analysis; JSON for full item-level responses with metadata
+- 🖥️ **Desktop split-panel layout** — left participant list, right detail and inline scoring panel, glassmorphic sidebar
+- 🌐 **Cross-platform** — runs as a web app, iOS app, and Android app from the same codebase
+- 🎉 **First-run onboarding** — centred modal walkthrough, shown once on first launch
+
+---
+
+## 🗂️ Project Structure
 
 ```
 ScoreMe/
 ├── app/
-│   ├── _layout.jsx              Root layout — fonts, WebShell, Stack, onboarding gate
-│   ├── index.jsx                Redirect to tabs
+│   ├── _layout.jsx              Root layout — fonts, WebShell, Stack
+│   ├── index.jsx                Redirects to tabs
 │   ├── export.jsx               Export screen + DesktopExportModal
-│   ├── (tabs)/
-│   │   ├── _layout.jsx          Desktop shell; onboarding modal wired here
-│   │   ├── index.jsx            Dashboard
-│   │   ├── participants.jsx     Participant list + FAB + desktop detail panel
-│   │   └── questionnaires.jsx   Questionnaire library + toggles + domain grouping
-│   ├── participant/[id].jsx     Participant detail (mobile)
-│   └── score/[pid]/[qid].jsx   Full-screen questionnaire runner (mobile)
+│   └── (tabs)/
+│       ├── _layout.jsx          Desktop shell; onboarding modal
+│       ├── index.jsx            Dashboard
+│       ├── participants.jsx     Participant list + FAB + detail panel
+│       └── questionnaires.jsx   Questionnaire library + toggles + domain grouping
 ├── components/
-│   ├── QuestionnaireRunner.jsx  Step-by-step runner (shared desktop + mobile)
+│   ├── QuestionnaireRunner.jsx  Step-by-step runner (desktop + mobile)
 │   ├── OnboardingModal.jsx      First-run centred square modal
-│   ├── ScreenBackground.jsx     Blue SVG gradient background (mobile)
+│   ├── ScreenBackground.jsx     SVG gradient background (mobile)
 │   ├── DesktopBackground.jsx    Dot-grid pattern background (desktop)
-│   └── DesktopSidebar.jsx       Sidebar nav + About modal (tap wordmark)
+│   └── DesktopSidebar.jsx       Sidebar nav + About modal
 ├── data/
 │   └── questionnaires.js        8 built-in instruments + compileQuestionnaire()
 ├── storage/
 │   └── storage.js               AsyncStorage CRUD, export helpers, onboarding flag
 ├── theme/
 │   ├── typography.js            FONTS, SIZES, COLOURS
-│   └── responsive.js           useLayout(), SIDEBAR_W, SIDEBAR_TOTAL
+│   └── responsive.js            useLayout(), SIDEBAR_W, SIDEBAR_TOTAL
 └── scripts/
     └── setup.js                 Copies fonts + logo.png from SleepDiaries sibling repo
 ```
 
 ---
 
-## Setup
+## 🚀 Getting Started
 
-ScoreMe shares font assets with its sibling repo **SleepDiaries**. Both repos must sit in the same parent directory:
+### Prerequisites
+
+- Node.js ≥ 18
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- The [SleepDiaries](https://github.com/circadia-bio/SleepDiaries) repo cloned as a sibling directory (for shared font assets)
+
+ScoreMe shares Livvic and Afacad font files with SleepDiaries. Both repos must sit inside the same parent directory:
 
 ```
 GitHub/
@@ -75,25 +79,39 @@ GitHub/
   ScoreMe/         ← this repo
 ```
 
-**Install:**
+### Installation
 
 ```bash
-git clone <this-repo> ScoreMe
+git clone https://github.com/circadia-bio/ScoreMe
 cd ScoreMe
 npm install
-node scripts/setup.js   # copies fonts + logo.png from SleepDiaries
-npx expo start --web
+node scripts/setup.js     # copies fonts + logo.png from SleepDiaries
 ```
 
 > If SleepDiaries is not present, `setup.js` will skip missing files gracefully and the app will fall back to system fonts.
 
+### Run
+
+```bash
+# Web (recommended for development)
+npx expo start --web
+
+# iOS simulator
+npx expo start --ios
+
+# Android emulator
+npx expo start --android
+```
+
 ---
 
-## Custom questionnaires
+## 📥 Custom Questionnaire Import
 
-Any questionnaire can be imported as a JSON file. See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full schema and a step-by-step guide for creating new instruments with LLM assistance.
+Any validated questionnaire can be imported as a `.json` file. ScoreMe compiles scoring and interpretation logic from declarative fields — no code required.
 
-A minimal valid import looks like:
+To import: **Questionnaires tab → Import JSON**.
+
+The minimum required fields are `id`, `title`, and `items`. A complete example:
 
 ```json
 {
@@ -104,13 +122,10 @@ A minimal valid import looks like:
   "construct": "Anxiety screening",
   "timeframe": "Past two weeks",
   "maxScore": 6,
-  "scoringMethod": {
-    "type": "sum",
-    "items": ["gad2_1", "gad2_2"]
-  },
+  "scoringMethod": { "type": "sum", "items": ["gad2_1", "gad2_2"] },
   "scoreBands": [
-    { "min": 0, "max": 2, "label": "Minimal anxiety",    "color": "#2E7D32", "description": "Minimal anxiety symptoms." },
-    { "min": 3, "max": 6, "label": "Possible anxiety",   "color": "#DC2626", "description": "Possible anxiety disorder. Consider further assessment." }
+    { "min": 0, "max": 2, "label": "Minimal anxiety",  "color": "#2E7D32", "description": "Minimal anxiety symptoms." },
+    { "min": 3, "max": 6, "label": "Possible anxiety", "color": "#DC2626", "description": "Possible anxiety disorder. Consider further assessment." }
   ],
   "items": [
     {
@@ -139,36 +154,45 @@ A minimal valid import looks like:
 }
 ```
 
----
-
-## AsyncStorage keys
-
-| Key | Contents |
-|---|---|
-| `scoreme:participants` | JSON array of participant objects |
-| `scoreme:custom_qs` | JSON array of imported questionnaire objects |
-| `scoreme:disabled_qs` | JSON array of disabled questionnaire IDs |
-| `scoreme:onboarded` | `"1"` once onboarding has been dismissed |
+See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full schema reference, all supported item types, and a ready-to-paste LLM prompt for generating new questionnaire files.
 
 ---
 
-## Design tokens
+## 📦 Dependencies
 
-| Token | Value |
-|---|---|
-| Background | `#EEF5FF` |
-| Primary blue | `#4A7BB5` |
-| Primary dark | `#1E3A5F` |
-| Primary light | `#C8DFF5` |
-| Accent orange | `#E07A20` |
-| Card background | `rgba(255,255,255,0.72)` |
-| Card border | `rgba(255,255,255,0.9)` |
-| Heading font | Livvic-Bold |
-| Body font | Afacad-Medium / Afacad-Regular |
+| Package | Version | Purpose |
+|---|---|---|
+| `expo` | ~52 | App framework and build toolchain |
+| `expo-router` | ~4 | File-based navigation |
+| `expo-blur` | ~14 | Glassmorphic BlurView components |
+| `expo-document-picker` | ~12 | JSON import from device |
+| `expo-file-system` | ~17 | File write for CSV/JSON export |
+| `expo-sharing` | ~12 | Share sheet for export |
+| `expo-font` | ~12 | Custom font loading |
+| `@react-native-async-storage/async-storage` | ~2 | Persistent storage |
+| `react-native-safe-area-context` | ~4 | Safe area insets |
+| `@expo/vector-icons` | ~14 | Ionicons icon set |
 
 ---
 
-## Credits
+## 👥 Authors
 
-Lucas França · Mario Leocadio-Miguel  
-© Circadia Lab · MIT Licence · [circadia-lab.uk](https://circadia-lab.uk)
+| Role | Name | Affiliation |
+|---|---|---|
+| Developer / Researcher | Lucas França | Circadia Lab |
+| Researcher | Mario Leocadio-Miguel | Circadia Lab |
+
+---
+
+## 🤝 Related Tools
+
+- 🌙 [**SleepDiaries**](https://github.com/circadia-bio/SleepDiaries) — participant-facing sleep diary app; shares visual identity and font assets with ScoreMe
+- 🔬 [**circadia-bio**](https://github.com/circadia-bio) — the Circadia Lab GitHub organisation
+
+---
+
+## 📄 Licence
+
+Released under the [MIT License](./LICENSE).
+
+Copyright © Lucas França, Mario Leocadio-Miguel, 2025
