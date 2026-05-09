@@ -89,7 +89,7 @@ export default function OnboardingModal({ visible, onDismiss }) {
                 </TouchableOpacity>
               )}
               <TouchableOpacity
-                style={[s.nextBtn, { backgroundColor: current.color, flex: isLast ? 0 : 1 }]}
+                style={[s.nextBtn, { backgroundColor: current.color, flex: isLast ? 1 : 1 }]}
                 onPress={handleNext}
                 activeOpacity={0.85}
               >
@@ -151,8 +151,8 @@ const s = StyleSheet.create({
   },
   skipText: { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary },
   nextBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 12, paddingHorizontal: 24, borderRadius: 12,
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    paddingVertical: 11, borderRadius: 12,
     shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1, shadowRadius: 12, elevation: 5,
   },
