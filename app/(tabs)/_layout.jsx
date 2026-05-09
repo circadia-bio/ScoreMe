@@ -40,7 +40,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index"          options={{ title: 'Dashboard',     tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline"      color={color} size={size} /> }} />
       <Tabs.Screen name="participants"   options={{ title: 'Participants',   tabBarIcon: ({ color, size }) => <Ionicons name="people-outline"    color={color} size={size} /> }} />
-      <Tabs.Screen name="questionnaires" options={{ title: 'Questionnaires', tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} /> }} />
+      <Tabs.Screen name="questionnaires" options={{ title: 'Questionnaires', tabBarIcon: ({ color, size }) => <Ionicons name="document-text-outline" color={color} size={size} /> }} />
     </Tabs>
   );
 
