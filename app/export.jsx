@@ -149,8 +149,7 @@ export default function ExportScreen() {
         </View>
 
         <Text style={s.hint}>
-          CSV exports scores only — one row per participant.{'
-'}JSON exports full responses including all item-level answers and questionnaire metadata.
+          {'CSV exports scores only — one row per participant.\nJSON exports full responses including all item-level answers and questionnaire metadata.'}
         </Text>
 
         {/* Preview */}
