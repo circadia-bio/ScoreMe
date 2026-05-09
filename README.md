@@ -1,150 +1,174 @@
 # ScoreMe
 
-**ScoreMe** is a React Native (Expo) app for researchers to administer and score validated sleep questionnaires across multiple participants. It shares the visual identity of [SleepDiaries](https://github.com/circadia-bio/SleepDiaries) — same fonts, colours, card styles, and step-by-step questionnaire UX — and uses the same JSON questionnaire format, making definitions interoperable between the two apps.
+**Research questionnaire scorer for Circadia Lab.**
+
+ScoreMe is a cross-platform app (iOS, Android, web/desktop) for administering and scoring validated clinical and sleep health questionnaires across multiple research participants. It is part of the Circadia Lab toolchain and shares its visual identity with SleepDiaries.
 
 ---
 
-## Screens
+## Features
 
-| Screen | Description |
+- **8 built-in instruments** — ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
+- **Multi-participant management** — add, track, and delete participants; progress rings colour-coded by completion
+- **Step-by-step questionnaire runner** — one item at a time, automatic scoring on completion
+- **Enable/disable instruments** — per-questionnaire toggles, persisted across sessions; group by clinical domain
+- **Custom questionnaire import** — import any instrument as a JSON file following the built-in schema
+- **CSV and JSON export** — CSV for scores-only spreadsheet analysis; JSON for full item-level responses
+- **Desktop split-panel layout** — left participant list, right detail/scoring panel, glassy sidebar navigation
+- **First-run onboarding** — centred modal walkthrough, shown once
+
+---
+
+## Stack
+
+| Layer | Technology |
 |---|---|
-| **Dashboard** | Stat bar, per-questionnaire coverage heatmap, all participants with colour-coded score badges |
-| **Participants** | Add / delete participants with name and notes |
-| **Participant detail** | All results for one person + launch scoring for any questionnaire |
-| **Questionnaire runner** | Step-by-step scoring (identical UX to SleepDiaries) |
-| **Questionnaire library** | Browse all built-in instruments + import custom JSON |
-| **Export** | Preview all scores and download as CSV |
+| Framework | Expo (SDK 52) + Expo Router |
+| UI | React Native + expo-blur |
+| Persistence | AsyncStorage |
+| Export | expo-sharing + expo-file-system |
+| Fonts | Livvic-Bold, Afacad (shared with SleepDiaries) |
 
 ---
 
-## Built-in questionnaires
+## Repository layout
 
-| ID | Name | Items |
-|---|---|---|
-| `ess` | Epworth Sleepiness Scale | 8 |
-| `isi` | Insomnia Severity Index | 7 |
-| `dbas16` | Dysfunctional Beliefs and Attitudes about Sleep | 16 |
-| `meq` | Morningness–Eveningness Questionnaire | 19 |
-| `psqi` | Pittsburgh Sleep Quality Index | 17 |
-| `rusated` | Ru-SATED Sleep Health Scale | 6 |
-| `stopbang` | STOP-BANG Questionnaire | 8 |
-| `kss` | Karolinska Sleepiness Scale | 1 |
-
----
-
-## Getting started
-
-**Prerequisites:** Node.js ≥ 18, Expo CLI
-
-```bash
-# 1. Copy shared assets from SleepDiaries (fonts + icons)
-node scripts/setup.js
-
-# 2. Install dependencies
-npm install
-
-# 3. Start
-npx expo start          # Opens Expo Go / dev client
-npx expo start --web    # Opens in browser as PWA
+```
+ScoreMe/
+├── app/
+│   ├── _layout.jsx              Root layout — fonts, WebShell, Stack, onboarding gate
+│   ├── index.jsx                Redirect to tabs
+│   ├── export.jsx               Export screen + DesktopExportModal
+│   ├── (tabs)/
+│   │   ├── _layout.jsx          Desktop shell; onboarding modal wired here
+│   │   ├── index.jsx            Dashboard
+│   │   ├── participants.jsx     Participant list + FAB + desktop detail panel
+│   │   └── questionnaires.jsx   Questionnaire library + toggles + domain grouping
+│   ├── participant/[id].jsx     Participant detail (mobile)
+│   └── score/[pid]/[qid].jsx   Full-screen questionnaire runner (mobile)
+├── components/
+│   ├── QuestionnaireRunner.jsx  Step-by-step runner (shared desktop + mobile)
+│   ├── OnboardingModal.jsx      First-run centred square modal
+│   ├── ScreenBackground.jsx     Blue SVG gradient background (mobile)
+│   ├── DesktopBackground.jsx    Dot-grid pattern background (desktop)
+│   └── DesktopSidebar.jsx       Sidebar nav + About modal (tap wordmark)
+├── data/
+│   └── questionnaires.js        8 built-in instruments + compileQuestionnaire()
+├── storage/
+│   └── storage.js               AsyncStorage CRUD, export helpers, onboarding flag
+├── theme/
+│   ├── typography.js            FONTS, SIZES, COLOURS
+│   └── responsive.js           useLayout(), SIDEBAR_W, SIDEBAR_TOTAL
+└── scripts/
+    └── setup.js                 Copies fonts + logo.png from SleepDiaries sibling repo
 ```
 
 ---
 
-## Questionnaire JSON format
+## Setup
 
-Custom questionnaires can be imported via the Questionnaires tab as `.json` files.
-The schema is identical to SleepDiaries — copy definitions directly between projects.
+ScoreMe shares font assets with its sibling repo **SleepDiaries**. Both repos must sit in the same parent directory:
+
+```
+GitHub/
+  SleepDiaries/    ← source of fonts and Circadia logo
+  ScoreMe/         ← this repo
+```
+
+**Install:**
+
+```bash
+git clone <this-repo> ScoreMe
+cd ScoreMe
+npm install
+node scripts/setup.js   # copies fonts + logo.png from SleepDiaries
+npx expo start --web
+```
+
+> If SleepDiaries is not present, `setup.js` will skip missing files gracefully and the app will fall back to system fonts.
+
+---
+
+## Custom questionnaires
+
+Any questionnaire can be imported as a JSON file. See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full schema and a step-by-step guide for creating new instruments with LLM assistance.
+
+A minimal valid import looks like:
 
 ```json
 {
-  "id": "my_scale",
-  "title": "My Custom Scale",
-  "shortTitle": "MCS",
-  "instructions": "Please answer each question honestly.",
-  "reference": "Author et al. (Year). Journal, vol(issue), pp–pp.",
+  "id": "gad2",
+  "title": "Generalised Anxiety Disorder 2-item Scale",
+  "shortTitle": "GAD-2",
+  "domain": "Mental Health",
+  "construct": "Anxiety screening",
+  "timeframe": "Past two weeks",
+  "maxScore": 6,
+  "scoringMethod": {
+    "type": "sum",
+    "items": ["gad2_1", "gad2_2"]
+  },
+  "scoreBands": [
+    { "min": 0, "max": 2, "label": "Minimal anxiety",    "color": "#2E7D32", "description": "Minimal anxiety symptoms." },
+    { "min": 3, "max": 6, "label": "Possible anxiety",   "color": "#DC2626", "description": "Possible anxiety disorder. Consider further assessment." }
+  ],
   "items": [
     {
-      "id": "mcs1",
-      "number": 1,
-      "text": "How often do you feel X?",
-      "type": "single_choice",
+      "id": "gad2_1", "number": 1,
+      "text": "Feeling nervous, anxious, or on edge",
+      "type": "frequency_4",
       "options": [
-        { "value": 0, "label": "Never" },
-        { "value": 1, "label": "Sometimes" },
-        { "value": 2, "label": "Always" }
+        { "value": 0, "label": "Not at all" },
+        { "value": 1, "label": "Several days" },
+        { "value": 2, "label": "More than half the days" },
+        { "value": 3, "label": "Nearly every day" }
+      ]
+    },
+    {
+      "id": "gad2_2", "number": 2,
+      "text": "Not being able to stop or control worrying",
+      "type": "frequency_4",
+      "options": [
+        { "value": 0, "label": "Not at all" },
+        { "value": 1, "label": "Several days" },
+        { "value": 2, "label": "More than half the days" },
+        { "value": 3, "label": "Nearly every day" }
       ]
     }
   ]
 }
 ```
 
-**Supported item types:**
+---
 
-| Type | Description |
+## AsyncStorage keys
+
+| Key | Contents |
 |---|---|
-| `scale_0_3` | 4-option labelled scale (0–3) |
-| `scale_0_4` | 5-option labelled scale (0–4) |
-| `scale_0_10` | 11-point grid (0–10), "strongly disagree → agree" |
-| `scale_1_10` | 10-option labelled scale (1–10) |
-| `single_choice` | Pick one from labelled options with explicit values |
-| `yes_no` | Large Yes / No buttons |
-| `frequency_3` | 3-point frequency (Rarely / Sometimes / Usually) |
-| `frequency_4` | 4-point frequency (Not past month / <once/wk / 1–2×/wk / ≥3×/wk) |
-| `time` | HH:MM stepper with long-press repeat |
-| `duration_min` | Integer minutes stepper |
-| `number` | Integer stepper with min/max/unit |
-
-> **Note:** For programmatic scoring of imported questionnaires, add a `score` function to the definition in `data/questionnaires.js`. Imported-only JSON stores raw answers; scoring can be done externally from the CSV export.
+| `scoreme:participants` | JSON array of participant objects |
+| `scoreme:custom_qs` | JSON array of imported questionnaire objects |
+| `scoreme:disabled_qs` | JSON array of disabled questionnaire IDs |
+| `scoreme:onboarded` | `"1"` once onboarding has been dismissed |
 
 ---
 
-## Project structure
+## Design tokens
 
-```
-ScoreMe/
-├── app/
-│   ├── _layout.jsx               Root layout, font loading, web shell
-│   ├── export.jsx                CSV export screen
-│   ├── (tabs)/
-│   │   ├── _layout.jsx           Tab bar (Dashboard / Participants / Questionnaires)
-│   │   ├── index.jsx             Dashboard
-│   │   ├── participants.jsx      Participant management
-│   │   └── questionnaires.jsx    Questionnaire library + JSON import
-│   ├── participant/[id].jsx      Participant detail & scoring hub
-│   └── score/[pid]/[qid].jsx     Questionnaire runner for a participant
-│
-├── components/
-│   ├── QuestionnaireRunner.jsx   Full step-by-step questionnaire UX
-│   └── ScreenBackground.jsx      Soft-blue SVG gradient (matches SleepDiaries)
-│
-├── data/
-│   └── questionnaires.js         All 8 built-in questionnaire definitions
-│
-├── storage/
-│   └── storage.js                AsyncStorage: participants, results, custom Qs, CSV export
-│
-├── theme/
-│   └── typography.js             FONTS, SIZES, COLOURS (identical to SleepDiaries)
-│
-└── scripts/
-    └── setup.js                  Copies fonts & icons from SleepDiaries sibling repo
-```
+| Token | Value |
+|---|---|
+| Background | `#EEF5FF` |
+| Primary blue | `#4A7BB5` |
+| Primary dark | `#1E3A5F` |
+| Primary light | `#C8DFF5` |
+| Accent orange | `#E07A20` |
+| Card background | `rgba(255,255,255,0.72)` |
+| Card border | `rgba(255,255,255,0.9)` |
+| Heading font | Livvic-Bold |
+| Body font | Afacad-Medium / Afacad-Regular |
 
 ---
 
-## Relationship to SleepDiaries
+## Credits
 
-ScoreMe and SleepDiaries share:
-- Font set: Livvic-Bold, Afacad-Bold/Medium/Regular
-- Colour palette: `#EEF5FF` background, `#4A7BB5` primary, `#6B3FA0` questionnaire purple, `#E07A20` accent
-- Glassmorphic card style: `rgba(255,255,255,0.72)` + `rgba(255,255,255,0.9)` border
-- Questionnaire JSON schema and all scoring/interpretation logic
-- Step-by-step questionnaire runner UX
-
-Questionnaire definitions can be copied directly between the two codebases.
-
----
-
-## License
-
-MIT
+Lucas França · Mario Leocadio-Miguel  
+© Circadia Lab · MIT Licence · [circadia-lab.uk](https://circadia-lab.uk)
