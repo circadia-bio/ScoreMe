@@ -244,11 +244,11 @@ export default function ParticipantsScreen() {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Participants</Text>
                 <TouchableOpacity
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: showAdd ? 'rgba(74,123,181,0.18)' : 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8 }}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: showAdd ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: showAdd ? COLOURS.primary : 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.20)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 3 }}
                   onPress={() => { setShowAdd(!showAdd); setSelectedId(null); setScoringQid(null); }}
                 >
-                  <Ionicons name={showAdd ? 'close' : 'add'} size={18} color={COLOURS.primary} />
-                  <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: COLOURS.primary }}>{showAdd ? 'Cancel' : 'Add'}</Text>
+                  <Ionicons name={showAdd ? 'close' : 'person-add-outline'} size={16} color={showAdd ? '#fff' : COLOURS.primary} />
+                  <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: showAdd ? '#fff' : COLOURS.primary }}>{showAdd ? 'Cancel' : 'Add'}</Text>
                 </TouchableOpacity>
               </View>
               {participants.length === 0 && !showAdd && (
