@@ -8,7 +8,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Switch,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Animated,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -85,6 +85,27 @@ function itemTypes(items) {
   return [...new Set(items.map(i => typeLabel(i.type)))].join(', ');
 }
 
+// ─── Custom pill toggle ────────────────────────────────────────────────────────────
+function Toggle({ value, onValueChange }) {
+  const anim = React.useRef(new Animated.Value(value ? 1 : 0)).current;
+  React.useEffect(() => {
+    Animated.spring(anim, { toValue: value ? 1 : 0, useNativeDriver: false, speed: 40, bounciness: 4 }).start();
+  }, [value]);
+  const trackBg   = anim.interpolate({ inputRange: [0, 1], outputRange: ['rgba(148,163,184,0.25)', COLOURS.primary] });
+  const thumbLeft = anim.interpolate({ inputRange: [0, 1], outputRange: [2, 18] });
+  return (
+    <TouchableOpacity onPress={() => onValueChange(!value)} activeOpacity={0.85} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+      <Animated.View style={[tog.track, { backgroundColor: trackBg, borderColor: value ? COLOURS.primary : 'rgba(148,163,184,0.35)' }]}>
+        <Animated.View style={[tog.thumb, { left: thumbLeft, backgroundColor: value ? '#fff' : 'rgba(148,163,184,0.7)' }]} />
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+const tog = StyleSheet.create({
+  track: { width: 36, height: 20, borderRadius: 10, borderWidth: 1, justifyContent: 'center' },
+  thumb: { position: 'absolute', width: 16, height: 16, borderRadius: 8, shadowColor: 'rgba(0,0,0,0.18)', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 3, elevation: 2 },
+});
+
 // ─── Desktop: questionnaire row ───────────────────────────────────────────────
 function QRow({ q, selected, onPress, onDelete, disabled, onToggle }) {
   return (
@@ -102,13 +123,7 @@ function QRow({ q, selected, onPress, onDelete, disabled, onToggle }) {
             </View>
             <Text style={[qr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} items{q.domain ? ` · ${q.domain}` : ''}</Text>
           </View>
-          <Switch
-            value={!disabled}
-            onValueChange={(val) => onToggle(!val)}
-            trackColor={{ false: 'rgba(148,163,184,0.3)', true: COLOURS.primary + '80' }}
-            thumbColor={disabled ? '#CBD5E1' : COLOURS.primary}
-            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-          />
+          <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
           {onDelete && (
             <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
@@ -335,18 +350,12 @@ function MobileQRow({ q, isLast, onDelete, disabled, onToggle }) {
           </View>
           <Text style={[mr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} items</Text>
         </View>
-        <Switch
-          value={!disabled}
-          onValueChange={(val) => onToggle(!val)}
-          trackColor={{ false: 'rgba(148,163,184,0.3)', true: COLOURS.primary + '80' }}
-          thumbColor={disabled ? '#CBD5E1' : COLOURS.primary}
-          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-        />
-        {onDelete && (
-          <TouchableOpacity onPress={onDelete} style={qr.deleteBtn}>
-            <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
-          </TouchableOpacity>
-        )}
+          <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
+          {onDelete && (
+            <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
+            </TouchableOpacity>
+          )}
       </View>
       {!isLast && <View style={{ height: 1, backgroundColor: 'rgba(74,123,181,0.07)', marginHorizontal: 14 }} />}
     </View>
