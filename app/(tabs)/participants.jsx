@@ -7,7 +7,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, Alert, Modal, KeyboardAvoidingView, Platform,
+  StyleSheet, Alert, Modal, KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -85,7 +85,8 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
   if (!p) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
-      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5, textAlign: 'center' }}>Select a participant{'\n'}or add a new one</Text>
+      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5, textAlign: 'center' }}>{'Select a participant\nor add a new one'}</Text>
+      <Image source={require('../../assets/images/logo.png')} style={{ position: 'absolute', bottom: 24, right: 24, width: 120, height: 45, opacity: 0.12 }} resizeMode="contain" />
     </View>
   );
   const results  = p.results ?? {};
@@ -182,12 +183,11 @@ export default function ParticipantsScreen() {
   const [participants, setParticipants] = useState([]);
   const [selectedId,   setSelectedId]   = useState(null);
   const [showAdd,      setShowAdd]      = useState(false);
-  const [scoringQid,   setScoringQid]   = useState(null); // desktop inline scoring
+  const [scoringQid,   setScoringQid]   = useState(null);
   const [newName,      setNewName]      = useState('');
   const [newNotes,     setNewNotes]     = useState('');
   const [adding,       setAdding]       = useState(false);
-
-  const [allQs,        setAllQs]       = useState(QUESTIONNAIRES);
+  const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
 
   const load = useCallback(async () => {
     const [ps, customQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires()]);
@@ -267,7 +267,7 @@ export default function ParticipantsScreen() {
             </ScrollView>
           </View>
 
-          {/* Right col — add form / runner / detail */}
+          {/* Right col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, marginRight: 12 }}>
             {showAdd ? (
               <View style={{ padding: 28 }}>

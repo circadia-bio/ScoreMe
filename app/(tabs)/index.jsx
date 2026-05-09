@@ -7,7 +7,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, StatusBar, RefreshControl,
+  StyleSheet, StatusBar, RefreshControl, Image,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -59,6 +59,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
       <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5 }}>Select a participant</Text>
+      <Image source={require('../../assets/images/logo.png')} style={{ position: 'absolute', bottom: 24, right: 24, width: 120, height: 45, opacity: 0.12 }} resizeMode="contain" />
     </View>
   );
   const results  = p.results ?? {};
