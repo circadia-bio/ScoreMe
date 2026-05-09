@@ -29,9 +29,9 @@ const interpLabel = (q, score) => { try { return q.interpret(score).label; } cat
 const fmtScore    = (score) => typeof score === 'object' ? '—' : String(score);
 
 // ─── Desktop list row ─────────────────────────────────────────────────────────
-function ParticipantRow({ p, selected, onPress, onDelete }) {
+function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
   const n   = Object.keys(p.results ?? {}).length;
-  const pct = n / QUESTIONNAIRES.length;
+  const pct = totalQs > 0 ? n / totalQs : 0;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ marginBottom: 10 }}>
@@ -261,6 +261,7 @@ export default function ParticipantsScreen() {
               {participants.map(p => (
                 <ParticipantRow key={p.id} p={p}
                   selected={!showAdd && selectedId === p.id}
+                  totalQs={allQs.length}
                   onPress={() => { setShowAdd(false); setScoringQid(null); setSelectedId(selectedId === p.id ? null : p.id); }}
                   onDelete={() => handleDelete(p)}
                 />
