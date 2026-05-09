@@ -358,7 +358,7 @@ export default function DashboardScreen() {
               <Ionicons name="download-outline" size={22} color={COLOURS.primary} />
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>Export data</Text>
-                <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Download all scores as a CSV</Text>
+                <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Download scores as CSV or full JSON</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={COLOURS.textMuted} />
             </TouchableOpacity>

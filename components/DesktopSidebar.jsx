@@ -122,7 +122,7 @@ export default function DesktopSidebar({ activeTab, onNavigate, onExport }) {
 
         <TouchableOpacity style={s.exportBtn} onPress={onExport} activeOpacity={0.8}>
           <Ionicons name="download-outline" size={18} color={COLOURS.primary} />
-          <Text style={s.exportLabel}>Export CSV</Text>
+          <Text style={s.exportLabel}>Export Data</Text>
         </TouchableOpacity>
       </BlurView>
 

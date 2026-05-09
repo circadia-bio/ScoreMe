@@ -106,17 +106,9 @@ export async function deleteCustomQuestionnaire(id) {
 // ─── Export helpers ────────────────────────────────────────────────────────────
 
 /**
- * Produce a full JSON export: participants with all results including raw answers.
- * Custom questionnaire definitions are included so the file is self-contained.
+ * Produce a full JSON export: participants with all results including raw item-level answers.
  */
 export function participantsToJSON(participants, questionnaires) {
-  const qMap = {};
-  for (const q of questionnaires) {
-    // Strip runtime functions — not serialisable
-    const { score, interpret, ...rest } = q;
-    qMap[q.id] = rest;
-  }
-
   const data = participants.map((p) => ({
     id:        p.id,
     name:      p.name,
@@ -127,7 +119,6 @@ export function participantsToJSON(participants, questionnaires) {
         qid,
         {
           questionnaireId: r.questionnaireId,
-          questionnaire:   qMap[qid] ?? null,
           completedAt:     r.completedAt,
           answers:         r.answers,
           score:           r.score,
