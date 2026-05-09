@@ -8,7 +8,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Switch,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +20,7 @@ import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { QUESTIONNAIRES, compileQuestionnaire } from '../../data/questionnaires';
-import { loadCustomQuestionnaires, saveCustomQuestionnaire, deleteCustomQuestionnaire } from '../../storage/storage';
+import { loadCustomQuestionnaires, saveCustomQuestionnaire, deleteCustomQuestionnaire, loadDisabledQs, setQDisabled } from '../../storage/storage';
 
 async function importJSON(onDone) {
   try {
@@ -86,28 +86,33 @@ function itemTypes(items) {
 }
 
 // ─── Desktop: questionnaire row ───────────────────────────────────────────────
-function QRow({ q, selected, onPress, onDelete }) {
+function QRow({ q, selected, onPress, onDelete, disabled, onToggle }) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <BlurView intensity={selected ? 52 : 36} tint="light"
         style={{ overflow: 'hidden', borderBottomWidth: 0 }}>
-        <View style={[qr.row, selected && qr.rowSelected]}>
-          <View style={[qr.iconWrap, selected && qr.iconWrapSelected]}>
-            <Ionicons name="clipboard-outline" size={17} color={selected ? '#fff' : COLOURS.primary} />
+        <View style={[qr.row, selected && qr.rowSelected, disabled && qr.rowDisabled]}>
+          <View style={[qr.iconWrap, selected && qr.iconWrapSelected, disabled && qr.iconWrapDisabled]}>
+            <Ionicons name="clipboard-outline" size={17} color={selected ? '#fff' : disabled ? COLOURS.textMuted : COLOURS.primary} />
           </View>
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <Text style={[qr.title, selected && { color: COLOURS.primary }]}>{q.title}</Text>
+              <Text style={[qr.title, selected && { color: COLOURS.primary }, disabled && { color: COLOURS.textMuted }]}>{q.title}</Text>
               {q.beta && <View style={qr.betaChip}><Text style={qr.betaText}>BETA</Text></View>}
             </View>
-            <Text style={qr.meta}>{q.shortTitle} · {q.items?.length ?? '?'} items{q.domain ? ` · ${q.domain}` : ''}</Text>
+            <Text style={[qr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} items{q.domain ? ` · ${q.domain}` : ''}</Text>
           </View>
-          {onDelete ? (
+          <Switch
+            value={!disabled}
+            onValueChange={(val) => onToggle(!val)}
+            trackColor={{ false: 'rgba(148,163,184,0.3)', true: COLOURS.primary + '80' }}
+            thumbColor={disabled ? '#CBD5E1' : COLOURS.primary}
+            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+          />
+          {onDelete && (
             <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
             </TouchableOpacity>
-          ) : (
-            <Ionicons name="chevron-forward" size={15} color={selected ? COLOURS.primary : COLOURS.textMuted} />
           )}
         </View>
       </BlurView>
@@ -123,6 +128,8 @@ const qr = StyleSheet.create({
   meta:            { fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.primary, marginTop: 2 },
   betaChip:        { backgroundColor: COLOURS.purpleBg, borderWidth: 1, borderColor: COLOURS.purpleLight, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   betaText:        { fontSize: 11, fontFamily: FONTS.body, color: COLOURS.purple },
+  rowDisabled:     { opacity: 0.5 },
+  iconWrapDisabled:{ backgroundColor: 'rgba(148,163,184,0.15)' },
   deleteBtn:       { width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(220,38,38,0.08)', alignItems: 'center', justifyContent: 'center' },
 });
 
@@ -314,28 +321,31 @@ const dp = StyleSheet.create({
 });
 
 // ─── Mobile row ───────────────────────────────────────────────────────────────
-function MobileQRow({ q, isLast, onDelete }) {
+function MobileQRow({ q, isLast, onDelete, disabled, onToggle }) {
   return (
     <View>
       <View style={[mr.row]}>
-        <View style={mr.iconWrap}>
-          <Ionicons name="clipboard-outline" size={17} color={COLOURS.primary} />
+        <View style={[mr.iconWrap, disabled && { backgroundColor: 'rgba(148,163,184,0.15)' }]}>
+          <Ionicons name="clipboard-outline" size={17} color={disabled ? COLOURS.textMuted : COLOURS.primary} />
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, opacity: disabled ? 0.5 : 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <Text style={mr.title}>{q.title}</Text>
+            <Text style={[mr.title, disabled && { color: COLOURS.textMuted }]}>{q.title}</Text>
             {q.beta && <View style={qr.betaChip}><Text style={qr.betaText}>BETA</Text></View>}
           </View>
-          <Text style={mr.meta}>{q.shortTitle} · {q.items?.length ?? '?'} items</Text>
+          <Text style={[mr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} items</Text>
         </View>
-        {onDelete ? (
+        <Switch
+          value={!disabled}
+          onValueChange={(val) => onToggle(!val)}
+          trackColor={{ false: 'rgba(148,163,184,0.3)', true: COLOURS.primary + '80' }}
+          thumbColor={disabled ? '#CBD5E1' : COLOURS.primary}
+          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+        />
+        {onDelete && (
           <TouchableOpacity onPress={onDelete} style={qr.deleteBtn}>
             <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
           </TouchableOpacity>
-        ) : (
-          <View style={mr.lockBadge}>
-            <Ionicons name="lock-closed-outline" size={13} color={COLOURS.textMuted} />
-          </View>
         )}
       </View>
       {!isLast && <View style={{ height: 1, backgroundColor: 'rgba(74,123,181,0.07)', marginHorizontal: 14 }} />}
@@ -356,9 +366,19 @@ export default function QuestionnairesScreen() {
   const { isDesktop } = useLayout();
   const [customQs,   setCustomQs]   = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [disabledQs, setDisabledQs] = useState(new Set());
 
-  const load = useCallback(async () => { setCustomQs(await loadCustomQuestionnaires()); }, []);
+  const load = useCallback(async () => {
+    const [custom, disabled] = await Promise.all([loadCustomQuestionnaires(), loadDisabledQs()]);
+    setCustomQs(custom);
+    setDisabledQs(disabled);
+  }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  const handleToggle = useCallback(async (id, disabled) => {
+    await setQDisabled(id, disabled);
+    setDisabledQs(prev => { const next = new Set(prev); if (disabled) next.add(id); else next.delete(id); return next; });
+  }, []);
 
   const handleDelete = (q) => {
     Alert.alert('Remove questionnaire', `Remove "${q.title}"? Scores already collected are not affected.`, [
@@ -410,7 +430,10 @@ export default function QuestionnairesScreen() {
               </Text>
               <View style={{ borderRadius: 14, overflow: 'hidden', marginBottom: 16, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 }}>
                 {QUESTIONNAIRES.map((q) => (
-                  <QRow key={q.id} q={q} selected={selectedId === q.id} onPress={() => setSelectedId(selectedId === q.id ? null : q.id)} />
+                  <QRow key={q.id} q={q} selected={selectedId === q.id}
+                    disabled={disabledQs.has(q.id)}
+                    onToggle={(val) => handleToggle(q.id, val)}
+                    onPress={() => setSelectedId(selectedId === q.id ? null : q.id)} />
                 ))}
               </View>
 
@@ -421,6 +444,8 @@ export default function QuestionnairesScreen() {
                 <View style={{ borderRadius: 14, overflow: 'hidden', marginBottom: 16, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 }}>
                   {customQs.map((q) => (
                     <QRow key={q.id} q={q} selected={selectedId === q.id}
+                      disabled={disabledQs.has(q.id)}
+                      onToggle={(val) => handleToggle(q.id, val)}
                       onPress={() => setSelectedId(selectedId === q.id ? null : q.id)}
                       onDelete={() => handleDelete(q)} />
                   ))}
@@ -453,14 +478,19 @@ export default function QuestionnairesScreen() {
         <Text style={ms.sectionLabel}>BUILT-IN ({QUESTIONNAIRES.length})</Text>
         <View style={ms.card}>
           {QUESTIONNAIRES.map((q, i) => (
-            <MobileQRow key={q.id} q={q} isLast={i === QUESTIONNAIRES.length - 1} />
+            <MobileQRow key={q.id} q={q} isLast={i === QUESTIONNAIRES.length - 1}
+              disabled={disabledQs.has(q.id)}
+              onToggle={(val) => handleToggle(q.id, val)} />
           ))}
         </View>
         {customQs.length > 0 && <>
           <Text style={[ms.sectionLabel, { marginTop: 18 }]}>CUSTOM ({customQs.length})</Text>
           <View style={ms.card}>
             {customQs.map((q, i) => (
-              <MobileQRow key={q.id} q={q} isLast={i === customQs.length - 1} onDelete={() => handleDelete(q)} />
+              <MobileQRow key={q.id} q={q} isLast={i === customQs.length - 1}
+                disabled={disabledQs.has(q.id)}
+                onToggle={(val) => handleToggle(q.id, val)}
+                onDelete={() => handleDelete(q)} />
             ))}
           </View>
         </>}

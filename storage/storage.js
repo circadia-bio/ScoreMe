@@ -14,6 +14,7 @@ import { compileQuestionnaire } from '../data/questionnaires';
 const KEYS = {
   participants: 'scoreme:participants',
   customQs:     'scoreme:custom_qs',
+  disabledQs:   'scoreme:disabled_qs',
 };
 
 // ─── Participants ──────────────────────────────────────────────────────────────
@@ -75,6 +76,23 @@ export async function saveResult(participantId, questionnaireId, answers, score)
   participants[idx].results[questionnaireId] = result;
   await saveParticipants(participants);
   return result;
+}
+
+// ─── Disabled questionnaires ──────────────────────────────────────────────────
+
+export async function loadDisabledQs() {
+  try {
+    const raw = await AsyncStorage.getItem(KEYS.disabledQs);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+export async function setQDisabled(id, disabled) {
+  const set = await loadDisabledQs();
+  if (disabled) set.add(id); else set.delete(id);
+  await AsyncStorage.setItem(KEYS.disabledQs, JSON.stringify([...set]));
 }
 
 // ─── Custom questionnaires ─────────────────────────────────────────────────────

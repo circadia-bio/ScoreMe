@@ -20,6 +20,7 @@ import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { loadParticipants, addParticipant, deleteParticipant, saveResult } from '../../storage/storage';
 import { loadCustomQuestionnaires } from '../../storage/storage';
+import { loadDisabledQs } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
@@ -190,9 +191,9 @@ export default function ParticipantsScreen() {
   const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
 
   const load = useCallback(async () => {
-    const [ps, customQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires()]);
+    const [ps, customQs, disabledQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]);
     setParticipants(ps);
-    setAllQs([...QUESTIONNAIRES, ...customQs]);
+    setAllQs([...QUESTIONNAIRES, ...customQs].filter(q => !disabledQs.has(q.id)));
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
