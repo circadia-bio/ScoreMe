@@ -7,14 +7,11 @@
 import React, { useState, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  Modal, Animated, Image, Dimensions,
+  Modal, Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
-
-const { width: W } = Dimensions.get('window');
 
 const STEPS = [
   {
@@ -38,7 +35,6 @@ const STEPS = [
 ];
 
 export default function OnboardingModal({ visible, onDismiss }) {
-  const insets  = useSafeAreaInsets();
   const [step, setStep] = useState(0);
   const fadeAnim  = useRef(new Animated.Value(1)).current;
 
@@ -61,7 +57,7 @@ export default function OnboardingModal({ visible, onDismiss }) {
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onDismiss}
       statusBarTranslucent
     >
@@ -73,12 +69,11 @@ export default function OnboardingModal({ visible, onDismiss }) {
       />
 
       {/* Sheet */}
-      <View style={[s.sheet, { paddingBottom: Math.max(insets.bottom, 24) }]}>
+      <View style={s.sheet}>
         <BlurView intensity={52} tint="light" style={StyleSheet.absoluteFill} />
         <View style={s.sheetInner}>
 
-          {/* Drag handle */}
-          <View style={s.handle} />
+      {/* No handle for centred modal */}
 
           {/* Dismiss */}
           <TouchableOpacity style={s.closeBtn} onPress={onDismiss} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
@@ -124,14 +119,6 @@ export default function OnboardingModal({ visible, onDismiss }) {
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* Logo */}
-          <Image
-            source={require('../assets/images/logo.png')}
-            style={s.logo}
-            resizeMode="contain"
-          />
-        </View>
       </View>
     </Modal>
   );
@@ -141,17 +128,23 @@ const s = StyleSheet.create({
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(30,58,95,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
   },
   sheet: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    width: 340,
+    height: 340,
+    borderRadius: 28,
     overflow: 'hidden',
-    backgroundColor: 'rgba(238,245,255,0.85)',
+    backgroundColor: 'rgba(238,245,255,0.92)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.9)',
     shadowColor: 'rgba(74,123,181,0.25)',
-    shadowOffset: { width: 0, height: -8 },
-    shadowOpacity: 1, shadowRadius: 24, elevation: 16,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 1, shadowRadius: 32, elevation: 16,
   },
-  sheetInner: { padding: 28, gap: 20 },
+  sheetInner: { flex: 1, padding: 28, gap: 0 },
 
   handle: {
     width: 36, height: 4, borderRadius: 2,
@@ -165,23 +158,16 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
 
-  content: { alignItems: 'center', gap: 14 },
+  content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   iconWrap: {
-    width: 72, height: 72, borderRadius: 20,
+    width: 60, height: 60, borderRadius: 16,
     borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
-  title: {
-    fontSize: 22, fontFamily: FONTS.heading,
-    color: COLOURS.primaryDark, textAlign: 'center',
-  },
-  body: {
-    fontSize: SIZES.body, fontFamily: FONTS.bodyMedium,
-    color: COLOURS.textSecondary, textAlign: 'center',
-    lineHeight: 26, paddingHorizontal: 8,
-  },
+  title: { fontSize: 18, fontFamily: FONTS.heading, color: COLOURS.primaryDark, textAlign: 'center' },
+  body:  { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 22, paddingHorizontal: 4 },
 
-  footer: { gap: 16 },
+  footer: { gap: 10 },
   dots:   { flexDirection: 'row', justifyContent: 'center', gap: 8 },
   dot:       { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(74,123,181,0.20)' },
   dotActive: { width: 24 },
