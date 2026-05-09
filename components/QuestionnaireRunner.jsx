@@ -20,9 +20,9 @@ import { FONTS, SIZES, COLOURS } from '../theme/typography';
 import ScreenBackground from './ScreenBackground';
 
 const C = {
-  primary:      COLOURS.purple,
-  primaryLight: COLOURS.purpleLight,
-  progressFill: '#7B52B0',
+  primary:      COLOURS.primary,
+  primaryLight: COLOURS.primaryLight,
+  progressFill: COLOURS.primary,
 };
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -350,10 +350,10 @@ const s = StyleSheet.create({
   scroll:        { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
   instructionsBox: { backgroundColor: COLOURS.cardBg, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', padding: 16, marginTop: 16, marginBottom: 8 },
-  instructionsText: { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: '#3B1F6A', lineHeight: 24 },
+  instructionsText: { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, lineHeight: 24 },
   itemNumber: { fontSize: SIZES.label, fontFamily: FONTS.body, color: C.primaryLight, textTransform: 'uppercase', marginTop: 20, marginBottom: 6 },
   itemText:   { fontSize: 20, fontFamily: FONTS.heading, color: C.primary, lineHeight: 28, marginBottom: 12 },
-  hintBox:    { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: 'rgba(237,224,250,0.7)', borderRadius: 10, padding: 12, marginBottom: 16 },
+  hintBox:    { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 10, padding: 12, marginBottom: 16 },
   hintText:   { flex: 1, fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: C.primary, lineHeight: 22 },
   inputArea:  { alignItems: 'stretch' },
 
@@ -364,7 +364,7 @@ const s = StyleSheet.create({
 
   scale010Container: { width: '100%', gap: 10 },
   scale010Row:       { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
-  scale010Btn:       { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: 'rgba(107,63,160,0.3)', alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  scale010Btn:       { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: 'rgba(74,123,181,0.25)', alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
   scale010BtnText:   { fontSize: 17, fontFamily: FONTS.heading },
   scale010Labels:    { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
   scale010Anchor:    { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },
