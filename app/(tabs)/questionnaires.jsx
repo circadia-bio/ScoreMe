@@ -516,8 +516,8 @@ export default function QuestionnairesScreen() {
               contentContainerStyle={{ paddingTop: 24, paddingBottom: 40, paddingLeft: SIDEBAR_TOTAL + 20, paddingRight: 20 }}
               showsVerticalScrollIndicator={false}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Questionnaires</Text>
+              <View style={{ marginBottom: 20 }}>
+                <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 12 }}>Questionnaires</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   <TouchableOpacity
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: byDomain ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: byDomain ? COLOURS.primary : 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 }}
