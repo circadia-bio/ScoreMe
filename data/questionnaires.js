@@ -11,6 +11,7 @@
  *   shortTitle    string        abbreviation shown in chips and headers
  *   version       string?       instrument version (e.g. "DBAS-16", "ISI-7")
  *   beta          boolean?      flag unreleased / experimental instruments
+ *   domain        string?       clinical domain (e.g. "Sleep", "Mental Health", "Pain", "Neurology")
  *
  * CONTENT
  *   instructions  string        shown to participant before item 1
@@ -101,6 +102,7 @@ export const ESS = {
   title: 'Epworth Sleepiness Scale',
   shortTitle: 'ESS',
   version: 'ESS-8',
+  domain: 'Sleep',
 
   construct: 'Daytime sleepiness',
   constructDescription: 'Measures the general level of daytime sleepiness by asking about the likelihood of dozing in eight common everyday situations.',
@@ -149,6 +151,7 @@ export const ISI = {
   title: 'Insomnia Severity Index',
   shortTitle: 'ISI',
   version: 'ISI-7',
+  domain: 'Sleep',
 
   construct: 'Insomnia severity',
   constructDescription: 'Assesses the nature, severity, and impact of insomnia symptoms over the past two weeks, including sleep onset, maintenance, and early morning awakening difficulties.',
@@ -196,6 +199,7 @@ export const DBAS16 = {
   title: 'Dysfunctional Beliefs and Attitudes about Sleep',
   shortTitle: 'DBAS-16',
   version: 'DBAS-16',
+  domain: 'Sleep',
 
   construct: 'Sleep-related cognitive distortions',
   constructDescription: 'Assesses maladaptive cognitions about sleep, including unrealistic expectations, misconceptions about the causes of insomnia, and faulty beliefs about the consequences of poor sleep.',
@@ -251,6 +255,7 @@ export const MEQ = {
   title: 'Morningness–Eveningness Questionnaire',
   shortTitle: 'MEQ',
   version: 'MEQ-19',
+  domain: 'Sleep',
 
   construct: 'Chronotype',
   constructDescription: 'Assesses an individual\'s circadian preference — whether they are naturally inclined towards morning activity ("early bird") or evening activity ("night owl").',
@@ -313,6 +318,7 @@ export const PSQI = {
   title: 'Pittsburgh Sleep Quality Index',
   shortTitle: 'PSQI',
   version: 'PSQI',
+  domain: 'Sleep',
 
   construct: 'Sleep quality',
   constructDescription: 'Measures sleep quality and disturbances over the past month across seven component scores: subjective sleep quality, sleep latency, sleep duration, habitual sleep efficiency, sleep disturbances, use of sleeping medication, and daytime dysfunction.',
@@ -390,6 +396,7 @@ export const RUSATED = {
   title: 'Ru-SATED Sleep Health Scale',
   shortTitle: 'RU-SATED',
   version: 'RU-SATED v2.0',
+  domain: 'Sleep',
 
   construct: 'Sleep health',
   constructDescription: 'Measures multidimensional sleep health across six domains: Regularity, satisfaction, alertness, timing, efficiency, and duration — reflecting the RU-SATED acronym.',
@@ -435,6 +442,7 @@ export const STOPBANG = {
   title: 'STOP-BANG Questionnaire',
   shortTitle: 'STOP-BANG',
   version: 'STOP-BANG v3',
+  domain: 'Sleep',
 
   construct: 'Obstructive sleep apnoea risk',
   constructDescription: 'Screens for the risk of obstructive sleep apnoea (OSA) using eight dichotomous items covering snoring, tiredness, observed apnoeas, blood pressure, BMI, age, neck circumference, and gender.',
@@ -482,6 +490,7 @@ export const KSS = {
   title: 'Karolinska Sleepiness Scale',
   shortTitle: 'KSS',
   version: 'KSS-9',
+  domain: 'Sleep',
 
   construct: 'Momentary sleepiness',
   constructDescription: 'Measures subjective sleepiness at the moment of administration using a single 9-point verbal rating scale, sensitive to acute changes in alertness.',

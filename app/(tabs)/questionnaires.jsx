@@ -100,7 +100,7 @@ function QRow({ q, selected, onPress, onDelete }) {
               <Text style={[qr.title, selected && { color: COLOURS.primary }]}>{q.title}</Text>
               {q.beta && <View style={qr.betaChip}><Text style={qr.betaText}>BETA</Text></View>}
             </View>
-            <Text style={qr.meta}>{q.shortTitle} · {q.items?.length ?? '?'} items</Text>
+            <Text style={qr.meta}>{q.shortTitle} · {q.items?.length ?? '?'} items{q.domain ? ` · ${q.domain}` : ''}</Text>
           </View>
           {onDelete ? (
             <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -158,6 +158,11 @@ function DetailPanel({ q }) {
           {q.timeframe && (
             <View style={{ backgroundColor: 'rgba(224,122,32,0.10)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 }}>
               <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.accent }}>{q.timeframe}</Text>
+            </View>
+          )}
+          {q.domain && (
+            <View style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.domain}</Text>
             </View>
           )}
         </View>
