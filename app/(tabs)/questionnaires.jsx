@@ -40,19 +40,22 @@ async function importJSON(onDone) {
   }
 }
 
-// Derive score bands by probing interpret() with sentinel values
+// Derive score bands by probing interpret() across the full score range
 function getScoreBands(q) {
   if (!q.interpret || typeof q.maxScore !== 'number') return null;
   const bands = [];
   const seen  = new Set();
+  // Probe from 0 to maxScore to collect unique bands in order
   for (let s = 0; s <= q.maxScore; s++) {
     try {
       const r = q.interpret(s);
-      const key = r.label;
-      if (!seen.has(key)) { seen.add(key); bands.push({ ...r, minScore: s }); }
+      if (!seen.has(r.label)) {
+        seen.add(r.label);
+        bands.push({ ...r, minScore: s });
+      }
     } catch { /* skip */ }
   }
-  // attach maxScore to each band
+  // Attach maxScore to each band (next band's min - 1, or overall max)
   return bands.map((b, i) => ({
     ...b,
     maxScore: i < bands.length - 1 ? bands[i + 1].minScore - 1 : q.maxScore,

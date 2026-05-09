@@ -42,7 +42,7 @@ const FREQUENCY_4 = [
 
 // ─── ESS ──────────────────────────────────────────────────────────────────────
 export const ESS = {
-  id: 'ess', title: 'Epworth Sleepiness Scale', shortTitle: 'ESS',
+  id: 'ess', maxScore: 24, title: 'Epworth Sleepiness Scale', shortTitle: 'ESS',
   credit: 'Johns, M. W. (1991). Sleep, 14(6), 540–545.',
   instructions: 'How likely are you to doze off or fall asleep in the following situations, in contrast to feeling just tired? This refers to your usual way of life in recent times.',
   reference: 'Johns, M. W. (1991). Sleep, 14(6), 540–545.',
@@ -67,7 +67,7 @@ export const ESS = {
 
 // ─── ISI ──────────────────────────────────────────────────────────────────────
 export const ISI = {
-  id: 'isi', title: 'Insomnia Severity Index', shortTitle: 'ISI',
+  id: 'isi', maxScore: 28, title: 'Insomnia Severity Index', shortTitle: 'ISI',
   credit: 'Morin, C. M., et al. (2011). Sleep, 34(5), 601–608.',
   instructions: 'For each of the following questions, please rate the current severity of your insomnia problem over the past two weeks.',
   reference: 'Morin, C. M., et al. (2011). Sleep, 34(5), 601–608.',
@@ -91,7 +91,7 @@ export const ISI = {
 
 // ─── DBAS-16 ──────────────────────────────────────────────────────────────────
 export const DBAS16 = {
-  id: 'dbas16', title: 'Dysfunctional Beliefs and Attitudes about Sleep', shortTitle: 'DBAS-16',
+  id: 'dbas16', maxScore: 10, title: 'Dysfunctional Beliefs and Attitudes about Sleep', shortTitle: 'DBAS-16',
   credit: 'Morin, C. M., Vallières, A., & Ivers, H. (2007). Sleep, 30(11), 1547–1554.',
   instructions: "Listed below are statements reflecting people's beliefs and attitudes about sleep. Please indicate to what extent you personally agree or disagree with each statement. Use a scale from 0 (strongly disagree) to 10 (strongly agree).",
   reference: 'Morin, C. M., Vallières, A., & Ivers, H. (2007). Sleep, 30(11), 1547–1554.',
@@ -125,7 +125,7 @@ export const DBAS16 = {
 
 // ─── MEQ ──────────────────────────────────────────────────────────────────────
 export const MEQ = {
-  id: 'meq', title: 'Morningness–Eveningness Questionnaire', shortTitle: 'MEQ',
+  id: 'meq', maxScore: 86, title: 'Morningness–Eveningness Questionnaire', shortTitle: 'MEQ',
   credit: 'Horne, J. A., & Östberg, O. (1976). International Journal of Chronobiology, 4(2), 97–110.',
   instructions: 'Please read each question carefully before answering. Answer ALL questions. Each question should be answered independently of the others. Answer according to how you truly feel, not how you think you should feel.',
   reference: 'Horne, J. A., & Östberg, O. (1976). International Journal of Chronobiology, 4(2), 97–110.',
@@ -216,7 +216,7 @@ export const PSQI = {
 
 // ─── STOP-BANG ────────────────────────────────────────────────────────────────
 export const STOPBANG = {
-  id: 'stopbang', title: 'STOP-BANG Questionnaire', shortTitle: 'STOP-BANG',
+  id: 'stopbang', maxScore: 8, title: 'STOP-BANG Questionnaire', shortTitle: 'STOP-BANG',
   credit: 'Chung, F., et al. (2016). Chest, 149(3), 631–638.',
   instructions: 'Please answer YES or NO to each of the following questions. This questionnaire screens for the risk of obstructive sleep apnoea.',
   reference: 'Chung, F., et al. (2016). Chest, 149(3), 631–638.',
@@ -240,7 +240,7 @@ export const STOPBANG = {
 
 // ─── KSS ──────────────────────────────────────────────────────────────────────
 export const KSS = {
-  id: 'kss', beta: true, title: 'Karolinska Sleepiness Scale', shortTitle: 'KSS',
+  id: 'kss', beta: true, maxScore: 10, title: 'Karolinska Sleepiness Scale', shortTitle: 'KSS',
   credit: 'Åkerstedt, T., & Gillberg, M. (1990). International Journal of Neuroscience, 52(1–2), 29–37.',
   instructions: 'Using the scale below, please indicate how sleepy you feel right now, at this moment.',
   reference: 'Åkerstedt, T., & Gillberg, M. (1990). International Journal of Neuroscience, 52(1–2), 29–37.',
