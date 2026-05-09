@@ -125,6 +125,12 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                 <View style={{ width: 3, borderRadius: 2, alignSelf: 'stretch', backgroundColor: c }} />
                 <View style={{ flex: 1, gap: 4 }}>
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{q.title}</Text>
+                  {(q.construct || q.domain) && (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+                      {q.construct && <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{q.construct}</Text>}
+                      {q.domain && <View style={{ backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.domain}</Text></View>}
+                    </View>
+                  )}
                   <View style={{ alignSelf: 'flex-start', borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: c + '18', borderColor: c }}>
                     <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: c }}>{fmtScore(r.score)} — {interpLabel(q, r.score)}</Text>
                   </View>
@@ -146,7 +152,14 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
               <View style={{ backgroundColor: 'rgba(255,255,255,0.38)', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{q.title}</Text>
-                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{q.shortTitle} · {q.items.length} items</Text>
+                  {(q.construct || q.domain || q.timeframe) && (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 3 }}>
+                      {q.construct && <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{q.construct}</Text>}
+                      {q.domain && <View style={{ backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.domain}</Text></View>}
+                      {q.timeframe && <View style={{ backgroundColor: 'rgba(224,122,32,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.accent }}>{q.timeframe}</Text></View>}
+                    </View>
+                  )}
+                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {q.items.length} items</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}>
                   <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Start</Text>
