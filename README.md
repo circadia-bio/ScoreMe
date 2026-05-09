@@ -69,15 +69,6 @@ ScoreMe/
 
 - Node.js ≥ 18
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
-- The [SleepDiaries](https://github.com/circadia-bio/SleepDiaries) repo cloned as a sibling directory (for shared font assets)
-
-ScoreMe shares Livvic and Afacad font files with SleepDiaries. Both repos must sit inside the same parent directory:
-
-```
-GitHub/
-  SleepDiaries/    ← source of fonts and Circadia logo
-  ScoreMe/         ← this repo
-```
 
 ### Installation
 
