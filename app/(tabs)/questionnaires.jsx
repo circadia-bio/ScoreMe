@@ -93,7 +93,7 @@ function QRow({ q, selected, onPress, onDelete }) {
         style={{ overflow: 'hidden', borderBottomWidth: 0 }}>
         <View style={[qr.row, selected && qr.rowSelected]}>
           <View style={[qr.iconWrap, selected && qr.iconWrapSelected]}>
-            <Ionicons name="document-text-outline" size={17} color={selected ? '#fff' : COLOURS.primary} />
+            <Ionicons name="clipboard-outline" size={17} color={selected ? '#fff' : COLOURS.primary} />
           </View>
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -130,7 +130,7 @@ const qr = StyleSheet.create({
 function DetailPanel({ q }) {
   if (!q) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-      <Ionicons name="document-text-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
+      <Ionicons name="clipboard-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
       <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5 }}>
         Select a questionnaire to view details
       </Text>
@@ -239,7 +239,7 @@ function MobileQRow({ q, isLast, onDelete }) {
     <View>
       <View style={[mr.row]}>
         <View style={mr.iconWrap}>
-          <Ionicons name="document-text-outline" size={17} color={COLOURS.primary} />
+          <Ionicons name="clipboard-outline" size={17} color={COLOURS.primary} />
         </View>
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
