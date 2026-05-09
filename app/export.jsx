@@ -16,8 +16,9 @@ import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import ScreenBackground from '../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
-import { loadParticipants, participantsToCSV } from '../storage/storage';
+import { loadParticipants, participantsToCSV, participantsToJSON } from '../storage/storage';
 import { QUESTIONNAIRES } from '../data/questionnaires';
+import { loadCustomQuestionnaires } from '../storage/storage';
 
 const pad = (n) => String(n).padStart(2, '0');
 const formatDate = (iso) =>
@@ -39,10 +40,49 @@ export default function ExportScreen() {
   const insets  = useSafeAreaInsets();
   const [participants, setParticipants] = useState([]);
   const [exporting, setExporting]       = useState(false);
+  const [exportingJSON, setExportingJSON] = useState(false);
+  const [allQs, setAllQs]               = useState(QUESTIONNAIRES);
 
   useFocusEffect(useCallback(() => {
-    loadParticipants().then(setParticipants);
+    Promise.all([loadParticipants(), loadCustomQuestionnaires()]).then(([ps, customQs]) => {
+      setParticipants(ps);
+      setAllQs([...QUESTIONNAIRES, ...customQs]);
+    });
   }, []));
+
+  const handleExportJSON = async () => {
+    if (participants.length === 0) {
+      Alert.alert('Nothing to export', 'Add and score some participants first.');
+      return;
+    }
+    setExportingJSON(true);
+    try {
+      const json = participantsToJSON(participants, allQs);
+      const filename = `scoreme_export_${Date.now()}.json`;
+
+      if (Platform.OS === 'web') {
+        const blob = new Blob([json], { type: 'application/json' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const path = `${FileSystem.cacheDirectory}${filename}`;
+        await FileSystem.writeAsStringAsync(path, json, { encoding: FileSystem.EncodingType.UTF8 });
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(path, { mimeType: 'application/json', dialogTitle: 'Export ScoreMe data' });
+        } else {
+          Alert.alert('Sharing not available', `JSON saved to: ${path}`);
+        }
+      }
+    } catch (e) {
+      Alert.alert('Export failed', e.message);
+    } finally {
+      setExportingJSON(false);
+    }
+  };
 
   const handleExport = async () => {
     if (participants.length === 0) {
@@ -51,7 +91,7 @@ export default function ExportScreen() {
     }
     setExporting(true);
     try {
-      const qids = QUESTIONNAIRES.map((q) => q.id);
+      const qids = allQs.map((q) => q.id);
       const csv  = participantsToCSV(participants, qids);
 
       if (Platform.OS === 'web') {
@@ -80,7 +120,6 @@ export default function ExportScreen() {
   };
 
   // Build preview table
-  const allQs = QUESTIONNAIRES;
   const scoredParticipants = participants.filter((p) => Object.keys(p.results ?? {}).length > 0);
 
   return (
@@ -97,14 +136,21 @@ export default function ExportScreen() {
 
       <ScrollView contentContainerStyle={[s.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false} horizontal={false}>
 
-        {/* Export button */}
-        <TouchableOpacity style={[s.exportBtn, exporting && { opacity: 0.5 }]} onPress={handleExport} disabled={exporting}>
-          <Ionicons name="download-outline" size={22} color="#fff" />
-          <Text style={s.exportBtnText}>{exporting ? 'Exporting…' : 'Export as CSV'}</Text>
-        </TouchableOpacity>
+        {/* Export buttons */}
+        <View style={{ gap: 10 }}>
+          <TouchableOpacity style={[s.exportBtn, exporting && { opacity: 0.5 }]} onPress={handleExport} disabled={exporting}>
+            <Ionicons name="document-text-outline" size={22} color="#fff" />
+            <Text style={s.exportBtnText}>{exporting ? 'Exporting…' : 'Export as CSV'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[s.exportBtnJSON, exportingJSON && { opacity: 0.5 }]} onPress={handleExportJSON} disabled={exportingJSON}>
+            <Ionicons name="code-slash-outline" size={22} color={COLOURS.primary} />
+            <Text style={s.exportBtnJSONText}>{exportingJSON ? 'Exporting…' : 'Export as JSON'}</Text>
+          </TouchableOpacity>
+        </View>
 
         <Text style={s.hint}>
-          Exports all participants with their latest score for each questionnaire. One row per participant.
+          CSV exports scores only — one row per participant.{'
+'}JSON exports full responses including all item-level answers and questionnaire metadata.
         </Text>
 
         {/* Preview */}
@@ -165,8 +211,10 @@ const s = StyleSheet.create({
   title:   { fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
   content: { paddingHorizontal: 16, gap: 14 },
 
-  exportBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: COLOURS.primary, borderRadius: 14, paddingVertical: 16 },
+  exportBtn:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: COLOURS.primary, borderRadius: 14, paddingVertical: 16, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 },
   exportBtnText: { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
+  exportBtnJSON:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 14, paddingVertical: 16, shadowColor: 'rgba(74,123,181,0.15)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
+  exportBtnJSONText: { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary },
 
   hint: { fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, lineHeight: 22, textAlign: 'center', paddingHorizontal: 8 },
 

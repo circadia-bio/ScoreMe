@@ -106,10 +106,48 @@ export async function deleteCustomQuestionnaire(id) {
 // ─── Export helpers ────────────────────────────────────────────────────────────
 
 /**
+ * Produce a full JSON export: participants with all results including raw answers.
+ * Custom questionnaire definitions are included so the file is self-contained.
+ */
+export function participantsToJSON(participants, questionnaires) {
+  const qMap = {};
+  for (const q of questionnaires) {
+    // Strip runtime functions — not serialisable
+    const { score, interpret, ...rest } = q;
+    qMap[q.id] = rest;
+  }
+
+  const data = participants.map((p) => ({
+    id:        p.id,
+    name:      p.name,
+    notes:     p.notes,
+    createdAt: p.createdAt,
+    results:   Object.fromEntries(
+      Object.entries(p.results ?? {}).map(([qid, r]) => [
+        qid,
+        {
+          questionnaireId: r.questionnaireId,
+          questionnaire:   qMap[qid] ?? null,
+          completedAt:     r.completedAt,
+          answers:         r.answers,
+          score:           r.score,
+        },
+      ])
+    ),
+  }));
+
+  return JSON.stringify({
+    exportedAt:     new Date().toISOString(),
+    exportVersion:  '1.0',
+    participantCount: participants.length,
+    participants:   data,
+  }, null, 2);
+}
+
+/**
  * Produce a CSV string for all participants × all questionnaire scores.
  */
 export function participantsToCSV(participants, questionnaireIds) {
-  const header = ['ID', 'Name', 'Notes', 'Created', ...questionnaireIds].join(',');
   const rows = participants.map((p) => {
     const scores = questionnaireIds.map((qid) => {
       const r = p.results?.[qid];
