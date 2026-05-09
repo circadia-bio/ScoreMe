@@ -369,13 +369,43 @@ const mr = StyleSheet.create({
   lockBadge:{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(74,123,181,0.06)', alignItems: 'center', justifyContent: 'center' },
 });
 
+// ─── Section header with toggle-all ──────────────────────────────────────────────
+function SectionHeader({ label, qs, disabledQs, onToggleAll }) {
+  const allOn = qs.every(q => !disabledQs.has(q.id));
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+      <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>
+        {label} ({qs.length})
+      </Text>
+      <TouchableOpacity onPress={() => onToggleAll(!allOn)} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }} activeOpacity={0.7}>
+        <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>
+          {allOn ? 'Disable all' : 'Enable all'}
+        </Text>
+        <Toggle value={allOn} onValueChange={() => onToggleAll(!allOn)} />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ─── Group questionnaires by domain ─────────────────────────────────────────────
+function groupByDomain(qs) {
+  const map = {};
+  for (const q of qs) {
+    const key = q.domain ?? 'Other';
+    if (!map[key]) map[key] = [];
+    map[key].push(q);
+  }
+  return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
+}
+
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function QuestionnairesScreen() {
   const insets = useSafeAreaInsets();
   const { isDesktop } = useLayout();
-  const [customQs,   setCustomQs]   = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
-  const [disabledQs, setDisabledQs] = useState(new Set());
+  const [customQs,     setCustomQs]     = useState([]);
+  const [selectedId,   setSelectedId]   = useState(null);
+  const [disabledQs,   setDisabledQs]   = useState(new Set());
+  const [byDomain,     setByDomain]     = useState(false);
 
   const load = useCallback(async () => {
     const [custom, disabled] = await Promise.all([loadCustomQuestionnaires(), loadDisabledQs()]);
@@ -387,6 +417,15 @@ export default function QuestionnairesScreen() {
   const handleToggle = useCallback(async (id, disabled) => {
     await setQDisabled(id, disabled);
     setDisabledQs(prev => { const next = new Set(prev); if (disabled) next.add(id); else next.delete(id); return next; });
+  }, []);
+
+  const handleToggleAll = useCallback(async (qs, disable) => {
+    await Promise.all(qs.map(q => setQDisabled(q.id, disable)));
+    setDisabledQs(prev => {
+      const next = new Set(prev);
+      qs.forEach(q => disable ? next.add(q.id) : next.delete(q.id));
+      return next;
+    });
   }, []);
 
   const handleDelete = (q) => {
@@ -402,6 +441,55 @@ export default function QuestionnairesScreen() {
 
   const allQs    = [...QUESTIONNAIRES, ...customQs];
   const selected = allQs.find(q => q.id === selectedId) ?? null;
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const renderSection = (qs, label, isCustom = false) => (
+    <View key={label} style={{ marginBottom: 16 }}>
+      <SectionHeader
+        label={label}
+        qs={qs}
+        disabledQs={disabledQs}
+        onToggleAll={(disable) => handleToggleAll(qs, disable)}
+      />
+      <View style={{ borderRadius: 14, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 }}>
+        {qs.map(q => (
+          <QRow
+            key={q.id} q={q}
+            selected={selectedId === q.id}
+            disabled={disabledQs.has(q.id)}
+            onToggle={(val) => handleToggle(q.id, val)}
+            onPress={() => setSelectedId(prev => prev === q.id ? null : q.id)}
+            onDelete={isCustom ? () => handleDelete(q) : undefined}
+          />
+        ))}
+      </View>
+    </View>
+  );
+
+  const renderMobileSection = (qs, label, isCustom = false) => (
+    <View key={label}>
+      <SectionHeader
+        label={label}
+        qs={qs}
+        disabledQs={disabledQs}
+        onToggleAll={(disable) => handleToggleAll(qs, disable)}
+      />
+      <View style={ms.card}>
+        {qs.map((q, i) => (
+          <MobileQRow key={q.id} q={q} isLast={i === qs.length - 1}
+            disabled={disabledQs.has(q.id)}
+            onToggle={(val) => handleToggle(q.id, val)}
+            onDelete={isCustom ? () => handleDelete(q) : undefined}
+          />
+        ))}
+      </View>
+    </View>
+  );
+
+  // ── Group by domain mode ───────────────────────────────────────────────────
+  const domainGroups     = byDomain ? groupByDomain(allQs) : null;
+  const builtInDomains   = byDomain ? groupByDomain(QUESTIONNAIRES) : null;
+  const customDomains    = byDomain && customQs.length > 0 ? groupByDomain(customQs) : null;
 
   // ── Desktop ──────────────────────────────────────────────────────────────────
   if (isDesktop) {
@@ -425,41 +513,31 @@ export default function QuestionnairesScreen() {
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Questionnaires</Text>
-                <TouchableOpacity
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 }}
-                  onPress={() => importJSON(load)}
-                >
-                  <Ionicons name="cloud-upload-outline" size={17} color={COLOURS.primary} />
-                  <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: COLOURS.primary }}>Import JSON</Text>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>
-                BUILT-IN ({QUESTIONNAIRES.length})
-              </Text>
-              <View style={{ borderRadius: 14, overflow: 'hidden', marginBottom: 16, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 }}>
-                {QUESTIONNAIRES.map((q) => (
-                  <QRow key={q.id} q={q} selected={selectedId === q.id}
-                    disabled={disabledQs.has(q.id)}
-                    onToggle={(val) => handleToggle(q.id, val)}
-                    onPress={() => setSelectedId(selectedId === q.id ? null : q.id)} />
-                ))}
-              </View>
-
-              {customQs.length > 0 && <>
-                <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>
-                  CUSTOM ({customQs.length})
-                </Text>
-                <View style={{ borderRadius: 14, overflow: 'hidden', marginBottom: 16, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 }}>
-                  {customQs.map((q) => (
-                    <QRow key={q.id} q={q} selected={selectedId === q.id}
-                      disabled={disabledQs.has(q.id)}
-                      onToggle={(val) => handleToggle(q.id, val)}
-                      onPress={() => setSelectedId(selectedId === q.id ? null : q.id)}
-                      onDelete={() => handleDelete(q)} />
-                  ))}
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: byDomain ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: byDomain ? COLOURS.primary : 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 }}
+                    onPress={() => setByDomain(v => !v)}
+                  >
+                    <Ionicons name="albums-outline" size={15} color={byDomain ? '#fff' : COLOURS.primary} />
+                    <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: byDomain ? '#fff' : COLOURS.primary }}>By domain</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 }}
+                    onPress={() => importJSON(load)}
+                  >
+                    <Ionicons name="cloud-upload-outline" size={15} color={COLOURS.primary} />
+                    <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: COLOURS.primary }}>Import JSON</Text>
+                  </TouchableOpacity>
                 </View>
-              </>}
+              </View>
+
+              {byDomain
+                ? groupByDomain(allQs).map(([domain, qs]) => renderSection(qs, domain, qs.some(q => customQs.find(c => c.id === q.id))))
+                : <>
+                    {renderSection(QUESTIONNAIRES, `Built-in`)}
+                    {customQs.length > 0 && renderSection(customQs, 'Custom', true)}
+                  </>
+              }
             </ScrollView>
           </View>
 
@@ -478,31 +556,28 @@ export default function QuestionnairesScreen() {
       <ScreenBackground />
       <View style={[ms.header, { paddingTop: insets.top + 16 }]}>
         <Text style={ms.title}>Questionnaires</Text>
-        <TouchableOpacity style={ms.importBtn} onPress={() => importJSON(load)}>
-          <Ionicons name="cloud-upload-outline" size={18} color={COLOURS.primary} />
-          <Text style={ms.importText}>Import JSON</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <TouchableOpacity
+            style={[ms.importBtn, byDomain && { backgroundColor: COLOURS.primary, borderColor: COLOURS.primary }]}
+            onPress={() => setByDomain(v => !v)}
+          >
+            <Ionicons name="albums-outline" size={16} color={byDomain ? '#fff' : COLOURS.primary} />
+            <Text style={[ms.importText, byDomain && { color: '#fff' }]}>By domain</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={ms.importBtn} onPress={() => importJSON(load)}>
+            <Ionicons name="cloud-upload-outline" size={16} color={COLOURS.primary} />
+            <Text style={ms.importText}>Import</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <ScrollView contentContainerStyle={[ms.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
-        <Text style={ms.sectionLabel}>BUILT-IN ({QUESTIONNAIRES.length})</Text>
-        <View style={ms.card}>
-          {QUESTIONNAIRES.map((q, i) => (
-            <MobileQRow key={q.id} q={q} isLast={i === QUESTIONNAIRES.length - 1}
-              disabled={disabledQs.has(q.id)}
-              onToggle={(val) => handleToggle(q.id, val)} />
-          ))}
-        </View>
-        {customQs.length > 0 && <>
-          <Text style={[ms.sectionLabel, { marginTop: 18 }]}>CUSTOM ({customQs.length})</Text>
-          <View style={ms.card}>
-            {customQs.map((q, i) => (
-              <MobileQRow key={q.id} q={q} isLast={i === customQs.length - 1}
-                disabled={disabledQs.has(q.id)}
-                onToggle={(val) => handleToggle(q.id, val)}
-                onDelete={() => handleDelete(q)} />
-            ))}
-          </View>
-        </>}
+        {byDomain
+          ? groupByDomain(allQs).map(([domain, qs]) => renderMobileSection(qs, domain, qs.some(q => customQs.find(c => c.id === q.id))))
+          : <>
+              {renderMobileSection(QUESTIONNAIRES, 'Built-in')}
+              {customQs.length > 0 && renderMobileSection(customQs, 'Custom', true)}
+            </>
+        }
         <View style={ms.hint}>
           <Ionicons name="information-circle-outline" size={17} color={COLOURS.primary} />
           <Text style={ms.hintText}>Import custom questionnaires as JSON files following the same schema as the built-ins.</Text>
