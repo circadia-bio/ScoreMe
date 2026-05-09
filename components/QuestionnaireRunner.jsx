@@ -414,9 +414,9 @@ const s = StyleSheet.create({
   numUnit:   { fontSize: 16, fontFamily: FONTS.bodyMedium, marginLeft: 4 },
 
   navRow:          { flexDirection: 'row', paddingHorizontal: 24, paddingTop: 12, gap: 12 },
-  backBtn:         { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 14, paddingVertical: 14, gap: 4, backgroundColor: COLOURS.cardBg },
+  backBtn:         { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 14, paddingVertical: 14, gap: 4, backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.15)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   backBtnText:     { fontSize: SIZES.body, fontFamily: FONTS.body, color: C.primary },
-  nextBtn:         { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 14, paddingVertical: 14, gap: 4 },
+  nextBtn:         { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 14, paddingVertical: 14, gap: 4, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 },
   nextBtnDisabled: { opacity: 0.35 },
   nextBtnText:     { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
 
@@ -432,6 +432,6 @@ const s = StyleSheet.create({
   resultDesc:         { fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 24 },
   resultMeta:         { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary },
   resultRef:          { fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, lineHeight: 18, marginTop: 2 },
-  doneBtn:            { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 28, alignSelf: 'stretch' },
+  doneBtn:            { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 28, alignSelf: 'stretch', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 },
   doneBtnText:        { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
 });

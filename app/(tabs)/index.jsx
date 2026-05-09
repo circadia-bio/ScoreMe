@@ -109,7 +109,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                     <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: c }}>{fmtScore(r.score)} — {interpLabel(q, r.score)}</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }} onPress={() => onScore(q.id)}>
+                <TouchableOpacity style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 }} onPress={() => onScore(q.id)}>
                   <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Redo</Text>
                 </TouchableOpacity>
               </View>
@@ -135,9 +135,9 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                   )}
                   <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {q.items.length} items</Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Start</Text>
-                  <Ionicons name="chevron-forward" size={14} color={COLOURS.primary} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: COLOURS.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: '#fff' }}>Start</Text>
+                  <Ionicons name="chevron-forward" size={14} color="#fff" />
                 </View>
               </View>
             </BlurView>
@@ -275,7 +275,7 @@ export default function DashboardScreen() {
                 <View style={{ alignItems: 'center', paddingVertical: 40, gap: 10 }}>
                   <Ionicons name="people-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.5 }} />
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No participants yet</Text>
-                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 10 }} onPress={() => router.push('/(tabs)/participants')}>
+                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 10, elevation: 4 }} onPress={() => router.push('/(tabs)/participants')}>
                     <Ionicons name="add" size={16} color="#fff" />
                     <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>Add participant</Text>
                   </TouchableOpacity>
@@ -339,7 +339,7 @@ export default function DashboardScreen() {
             <Ionicons name="people-outline" size={52} color={COLOURS.textMuted} />
             <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>No participants yet</Text>
             <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24, paddingHorizontal: 20 }}>Add participants in the Participants tab, then score them on any questionnaire.</Text>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 14, paddingHorizontal: 20, paddingVertical: 12, marginTop: 8 }} onPress={() => router.push('/(tabs)/participants')}>
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 14, paddingHorizontal: 20, paddingVertical: 12, marginTop: 8, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }} onPress={() => router.push('/(tabs)/participants')}>
               <Ionicons name="add" size={18} color="#fff" />
               <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>Add first participant</Text>
             </TouchableOpacity>

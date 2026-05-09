@@ -68,7 +68,7 @@ function AddForm({ name, notes, onName, onNotes, onSubmit, onCancel, adding }) {
       <TextInput style={[af.input, { height: 80, textAlignVertical: 'top' }]} placeholder="e.g. Group A, session date…" placeholderTextColor={COLOURS.textMuted} value={notes} onChangeText={onNotes} multiline />
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
         {onCancel && <TouchableOpacity style={{ flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' }} onPress={onCancel}><Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text></TouchableOpacity>}
-        <TouchableOpacity style={[{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13 }, (!name.trim() || adding) && { opacity: 0.4 }, onCancel && { flex: 1 }]} onPress={onSubmit} disabled={!name.trim() || adding}>
+        <TouchableOpacity style={[{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }, (!name.trim() || adding) && { opacity: 0.4 }, onCancel && { flex: 1 }]} onPress={onSubmit} disabled={!name.trim() || adding}>
           <Ionicons name="person-add" size={17} color="#fff" />
           <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>Add Participant</Text>
         </TouchableOpacity>
@@ -136,7 +136,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                     <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: c }}>{fmtScore(r.score)} — {interpLabel(q, r.score)}</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }} onPress={() => onScore(q.id)}>
+                <TouchableOpacity style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 }} onPress={() => onScore(q.id)}>
                   <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Redo</Text>
                 </TouchableOpacity>
               </View>
@@ -162,9 +162,9 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                   )}
                   <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {q.items.length} items</Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Start</Text>
-                  <Ionicons name="chevron-forward" size={13} color={COLOURS.primary} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: COLOURS.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: '#fff' }}>Start</Text>
+                  <Ionicons name="chevron-forward" size={13} color="#fff" />
                 </View>
               </View>
             </BlurView>

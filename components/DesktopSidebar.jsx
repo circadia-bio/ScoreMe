@@ -162,6 +162,6 @@ const s = StyleSheet.create({
   iconWrapActive:{ backgroundColor: COLOURS.primary },
   navLabel:      { fontFamily: FONTS.bodyMedium, fontSize: 14, color: COLOURS.textMuted },
   navLabelActive:{ fontFamily: FONTS.body, color: COLOURS.primaryDark },
-  exportBtn:     { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 10, paddingVertical: 10, borderRadius: 12, backgroundColor: 'rgba(74,123,181,0.08)' },
+  exportBtn:     { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 10, paddingVertical: 10, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   exportLabel:   { fontFamily: FONTS.bodyMedium, fontSize: 14, color: COLOURS.primary },
 });
