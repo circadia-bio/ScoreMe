@@ -2,15 +2,17 @@
  * app/_layout.jsx — Root layout for ScoreMe
  *
  * Loads custom fonts shared with SleepDiaries (Livvic, Afacad).
- * Falls back gracefully if fonts haven't been copied yet — the app will still
- * work with system fonts until `assets/fonts/` is populated.
+ * Falls back gracefully if fonts haven't been copied yet.
  *
- * Web: constrains the layout to 480px centred, matching SleepDiaries' web shell.
+ * Web shell:
+ *   mobile/tablet (<1024px) → 480px max-width centred (PWA feel)
+ *   desktop (≥1024px)       → full width, no constraint
  */
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useLayout } from '../theme/responsive';
 
 function useAppFonts() {
   try {
@@ -23,6 +25,20 @@ function useAppFonts() {
   } catch {
     return [true, null];
   }
+}
+
+function WebShell({ children }) {
+  const { isDesktop } = useLayout();
+  if (isDesktop) {
+    // Full width — DesktopLayout handles its own background and structure
+    return <View style={s.webFull}>{children}</View>;
+  }
+  // Mobile / tablet: centred narrow column, PWA feel
+  return (
+    <View style={s.webOuter}>
+      <View style={s.webInner}>{children}</View>
+    </View>
+  );
 }
 
 export default function RootLayout() {
@@ -41,16 +57,13 @@ export default function RootLayout() {
   );
 
   if (Platform.OS === 'web') {
-    return (
-      <View style={s.webOuter}>
-        <View style={s.webInner}>{content}</View>
-      </View>
-    );
+    return <WebShell>{content}</WebShell>;
   }
   return content;
 }
 
 const s = StyleSheet.create({
+  webFull:  { flex: 1 },
   webOuter: { flex: 1, backgroundColor: '#EEF5FF', alignItems: 'center' },
   webInner: { flex: 1, width: '100%', maxWidth: 480, overflow: 'hidden' },
 });
