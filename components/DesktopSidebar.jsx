@@ -28,7 +28,7 @@ export default function DesktopSidebar({ activeTab, onNavigate, onExport }) {
         <View style={s.logoIcon}>
           <Ionicons name="document-text" size={18} color="#fff" />
         </View>
-        <Text style={s.logoText}>ScoreMe</Text>
+        <Text style={s.logoText}>Score<Text style={{ color: COLOURS.accent }}>Me</Text></Text>
       </View>
 
       {/* Nav */}
