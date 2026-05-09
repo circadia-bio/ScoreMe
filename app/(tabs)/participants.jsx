@@ -19,6 +19,7 @@ import QuestionnaireRunner from '../../components/QuestionnaireRunner';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { loadParticipants, addParticipant, deleteParticipant, saveResult } from '../../storage/storage';
+import { loadCustomQuestionnaires } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
@@ -43,7 +44,7 @@ function ParticipantRow({ p, selected, onPress, onDelete }) {
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.name}</Text>
             {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
-            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {n}/{QUESTIONNAIRES.length} scored</Text>
+            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {n} scored</Text>
           </View>
           <TouchableOpacity onPress={onDelete} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(220,38,38,0.08)', alignItems: 'center', justifyContent: 'center' }}>
@@ -80,7 +81,7 @@ const af = StyleSheet.create({
 });
 
 // ─── Right panel detail ───────────────────────────────────────────────────────
-function DetailPanel({ p, onScore, onClose }) {
+function DetailPanel({ p, onScore, onClose, allQs }) {
   if (!p) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
@@ -88,9 +89,9 @@ function DetailPanel({ p, onScore, onClose }) {
     </View>
   );
   const results  = p.results ?? {};
-  const scored   = QUESTIONNAIRES.filter(q => results[q.id]);
-  const unscored = QUESTIONNAIRES.filter(q => !results[q.id]);
-  const pct = scored.length / QUESTIONNAIRES.length;
+  const scored   = allQs.filter(q => results[q.id]);
+  const unscored = allQs.filter(q => !results[q.id]);
+  const pct = scored.length / allQs.length;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 28, paddingBottom: 48 }}>
@@ -112,7 +113,7 @@ function DetailPanel({ p, onScore, onClose }) {
       <View style={{ height: 5, borderRadius: 3, backgroundColor: '#DDE8F5', overflow: 'hidden', marginBottom: 6 }}>
         <View style={{ height: '100%', borderRadius: 3, width: `${pct * 100}%`, backgroundColor: col }} />
       </View>
-      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {QUESTIONNAIRES.length} scored</Text>
+      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {allQs.length} scored</Text>
 
       {scored.length > 0 && <>
         <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>RESULTS</Text>
@@ -173,7 +174,13 @@ export default function ParticipantsScreen() {
   const [newNotes,     setNewNotes]     = useState('');
   const [adding,       setAdding]       = useState(false);
 
-  const load = useCallback(async () => { setParticipants(await loadParticipants()); }, []);
+  const [allQs,        setAllQs]       = useState(QUESTIONNAIRES);
+
+  const load = useCallback(async () => {
+    const [ps, customQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires()]);
+    setParticipants(ps);
+    setAllQs([...QUESTIONNAIRES, ...customQs]);
+  }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const handleAdd = async () => {
@@ -196,7 +203,7 @@ export default function ParticipantsScreen() {
   };
 
   const selected  = participants.find(p => p.id === selectedId) ?? null;
-  const scoringQ  = QUESTIONNAIRES.find(q => q.id === scoringQid) ?? null;
+  const scoringQ  = allQs.find(q => q.id === scoringQid) ?? null;
 
   const handleScore = (qid) => setScoringQid(qid);
   const handleScoringComplete = async (answers, score) => {
@@ -267,6 +274,7 @@ export default function ParticipantsScreen() {
             ) : (
               <DetailPanel
                 p={selected}
+                allQs={allQs}
                 onScore={handleScore}
                 onClose={() => setSelectedId(null)}
               />
@@ -314,7 +322,7 @@ export default function ParticipantsScreen() {
               {scored.length > 0 && (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                   {scored.map(qid => {
-                    const q = QUESTIONNAIRES.find(q => q.id === qid);
+                    const q = allQs.find(q => q.id === qid);
                     return q ? <View key={qid} style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 }}><Text style={{ fontSize: 12, fontFamily: FONTS.body, color: COLOURS.primary }}>{q.shortTitle}</Text></View> : null;
                   })}
                 </View>

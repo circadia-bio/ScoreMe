@@ -20,6 +20,7 @@ import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { loadParticipants, saveResult } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
+import { loadCustomQuestionnaires } from '../../storage/storage';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
@@ -27,9 +28,9 @@ const interpLabel = (q, score) => { try { return q.interpret(score).label; } cat
 const fmtScore    = (score) => typeof score === 'object' ? '—' : String(score);
 
 // ─── Desktop list row ─────────────────────────────────────────────────────────
-function ParticipantRow({ p, selected, onPress }) {
+function ParticipantRow({ p, selected, onPress, totalQs }) {
   const n   = Object.keys(p.results ?? {}).length;
-  const pct = n / QUESTIONNAIRES.length;
+  const pct = n / totalQs;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ marginBottom: 10 }}>
@@ -43,7 +44,7 @@ function ParticipantRow({ p, selected, onPress }) {
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.name}</Text>
             {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
-            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{n}/{QUESTIONNAIRES.length} scored</Text>
+            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{n}/{totalQs} scored</Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color={selected ? COLOURS.primary : COLOURS.textMuted} />
         </View>
@@ -53,7 +54,7 @@ function ParticipantRow({ p, selected, onPress }) {
 }
 
 // ─── Desktop detail panel ─────────────────────────────────────────────────────
-function DetailPanel({ p, onScore, onClose }) {
+function DetailPanel({ p, onScore, onClose, allQs }) {
   if (!p) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
@@ -61,9 +62,9 @@ function DetailPanel({ p, onScore, onClose }) {
     </View>
   );
   const results  = p.results ?? {};
-  const scored   = QUESTIONNAIRES.filter(q => results[q.id]);
-  const unscored = QUESTIONNAIRES.filter(q => !results[q.id]);
-  const pct = scored.length / QUESTIONNAIRES.length;
+  const scored   = allQs.filter(q => results[q.id]);
+  const unscored = allQs.filter(q => !results[q.id]);
+  const pct = scored.length / allQs.length;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 28, paddingBottom: 48 }}>
@@ -85,7 +86,7 @@ function DetailPanel({ p, onScore, onClose }) {
       <View style={{ height: 5, borderRadius: 3, backgroundColor: '#DDE8F5', overflow: 'hidden', marginBottom: 6 }}>
         <View style={{ height: '100%', borderRadius: 3, width: `${pct * 100}%`, backgroundColor: col }} />
       </View>
-      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {QUESTIONNAIRES.length} scored</Text>
+      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {allQs.length} scored</Text>
 
       {scored.length > 0 && <>
         <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>RESULTS</Text>
@@ -134,10 +135,10 @@ function DetailPanel({ p, onScore, onClose }) {
 }
 
 // ─── Mobile card ──────────────────────────────────────────────────────────────
-function MobileCard({ p, onPress }) {
+function MobileCard({ p, onPress, allQs }) {
   const results = p.results ?? {};
   const n   = Object.keys(results).length;
-  const pct = n / QUESTIONNAIRES.length;
+  const pct = n / allQs.length;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
     <TouchableOpacity style={mc.card} onPress={onPress} activeOpacity={0.85}>
@@ -152,12 +153,12 @@ function MobileCard({ p, onPress }) {
         </View>
         <View style={{ alignItems: 'center', minWidth: 44 }}>
           <Text style={{ fontSize: 24, fontFamily: FONTS.heading, color: col }}>{n}</Text>
-          <Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>/ {QUESTIONNAIRES.length}</Text>
+          <Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>/ {allQs.length}</Text>
         </View>
       </View>
       {n > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {QUESTIONNAIRES.filter(q => results[q.id]).map(q => {
+          {allQs.filter(q => results[q.id]).map(q => {
             const c = interpColor(q, results[q.id].score);
             return <View key={q.id} style={{ borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: c + '18', borderColor: c }}><Text style={{ fontSize: 12, fontFamily: FONTS.body, color: c }}>{q.shortTitle} {fmtScore(results[q.id].score)}</Text></View>;
           })}
@@ -189,13 +190,18 @@ export default function DashboardScreen() {
   const [participants, setParticipants] = useState([]);
   const [refreshing,   setRefreshing]   = useState(false);
   const [selectedId,   setSelectedId]   = useState(null);
-  const [scoringQid,   setScoringQid]   = useState(null); // desktop inline scoring
+  const [scoringQid,   setScoringQid]   = useState(null);
+  const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
 
-  const load = useCallback(async () => { setParticipants(await loadParticipants()); }, []);
+  const load = useCallback(async () => {
+    const [ps, customQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires()]);
+    setParticipants(ps);
+    setAllQs([...QUESTIONNAIRES, ...customQs]);
+  }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
   const onRefresh = useCallback(async () => { setRefreshing(true); await load(); setRefreshing(false); }, [load]);
   const selected = participants.find(p => p.id === selectedId) ?? null;
-  const scoringQ = QUESTIONNAIRES.find(q => q.id === scoringQid) ?? null;
+  const scoringQ = allQs.find(q => q.id === scoringQid) ?? null;
 
   const handleScore = (qid) => setScoringQid(qid);
   const handleScoringComplete = async (answers, score) => {
@@ -265,6 +271,7 @@ export default function DashboardScreen() {
                   key={p.id} p={p}
                   selected={selectedId === p.id}
                   onPress={() => { setScoringQid(null); setSelectedId(selectedId === p.id ? null : p.id); }}
+                  totalQs={allQs.length}
                 />
               ))}
             </ScrollView>
@@ -281,6 +288,7 @@ export default function DashboardScreen() {
             ) : (
               <DetailPanel
                 p={selected}
+                allQs={allQs}
                 onScore={handleScore}
                 onClose={() => setSelectedId(null)}
               />
@@ -328,7 +336,7 @@ export default function DashboardScreen() {
             <View style={isTablet ? { flexDirection: 'row', flexWrap: 'wrap', gap: 10 } : { gap: 10 }}>
               {participants.map(p => (
                 <View key={p.id} style={isTablet && { width: '48.5%' }}>
-                  <MobileCard p={p} onPress={() => router.push(`/participant/${p.id}`)} />
+                  <MobileCard p={p} allQs={allQs} onPress={() => router.push(`/participant/${p.id}`)} />
                 </View>
               ))}
             </View>

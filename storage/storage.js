@@ -9,6 +9,7 @@
  *   scoreme:custom_qs      → JSON array of user-imported questionnaire objects
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { compileQuestionnaire } from '../data/questionnaires';
 
 const KEYS = {
   participants: 'scoreme:participants',
@@ -81,7 +82,9 @@ export async function saveResult(participantId, questionnaireId, answers, score)
 export async function loadCustomQuestionnaires() {
   try {
     const raw = await AsyncStorage.getItem(KEYS.customQs);
-    return raw ? JSON.parse(raw) : [];
+    const qs  = raw ? JSON.parse(raw) : [];
+    // Re-compile score() and interpret() — lost during JSON serialisation
+    return qs.map(compileQuestionnaire);
   } catch {
     return [];
   }
