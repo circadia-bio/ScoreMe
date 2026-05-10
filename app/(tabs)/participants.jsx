@@ -61,44 +61,47 @@ function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
 }
 
 // ─── Shared field helpers ─────────────────────────────────────────────────────
-const LABEL = { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 14, marginBottom: 2 };
-const SEX_OPTIONS = ['', 'Male', 'Female', 'Non-binary', 'Prefer not to say'];
+const SEX_OPTIONS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
 
 function FieldInput({ label, value, onChange, placeholder, multiline, keyboardType, required }) {
   return (
-    <>
-      <Text style={[LABEL, { marginTop: 14 }]}>{label}{required ? ' *' : ''}</Text>
+    <View style={{ marginTop: 12 }}>
+      <Text style={af.label}>{label}{required ? ' *' : ''}</Text>
       <TextInput
-        style={[af.input, multiline && { height: 72, textAlignVertical: 'top' }]}
+        style={[af.input, multiline && { height: 80, textAlignVertical: 'top', paddingTop: 12 }]}
         value={value} onChangeText={onChange} placeholder={placeholder}
         placeholderTextColor={COLOURS.textMuted} multiline={multiline}
         keyboardType={keyboardType ?? 'default'}
       />
-    </>
+    </View>
   );
 }
 
 function SexPicker({ value, onChange }) {
   return (
-    <>
-      <Text style={[LABEL, { marginTop: 14 }]}>Sex</Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-        {SEX_OPTIONS.filter(Boolean).map(opt => (
-          <TouchableOpacity key={opt}
-            style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1,
-              backgroundColor: value === opt ? COLOURS.primary : 'rgba(255,255,255,0.72)',
-              borderColor: value === opt ? COLOURS.primary : 'rgba(74,123,181,0.2)' }}
+    <View style={{ marginTop: 12 }}>
+      <Text style={af.label}>Sex</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+        {SEX_OPTIONS.map(opt => (
+          <TouchableOpacity key={opt} activeOpacity={0.8}
+            style={[af.sexBtn, value === opt && af.sexBtnActive]}
             onPress={() => onChange(value === opt ? '' : opt)}>
-            <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: value === opt ? '#fff' : COLOURS.primaryDark }}>{opt}</Text>
+            <Text style={[af.sexBtnText, value === opt && af.sexBtnTextActive]}>{opt}</Text>
           </TouchableOpacity>
         ))}
       </View>
-    </>
+    </View>
   );
 }
 
-function SectionHeader({ title }) {
-  return <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 20, marginBottom: 2, borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.10)', paddingBottom: 6 }}>{title}</Text>;
+function FormSection({ title }) {
+  return (
+    <View style={af.sectionRow}>
+      <View style={af.sectionLine} />
+      <Text style={af.sectionTitle}>{title}</Text>
+      <View style={af.sectionLine} />
+    </View>
+  );
 }
 
 // ─── Add / Edit form ──────────────────────────────────────────────────────────
@@ -112,56 +115,58 @@ function ParticipantForm({ fields, setField, onSubmit, onCancel, submitting, isE
   const removeCustomField = (i) => setField('customFields', (fields.customFields ?? []).filter((_, idx) => idx !== i));
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 24, paddingBottom: 40 }}>
-      <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 4 }}>{isEdit ? 'Edit Participant' : 'New Participant'}</Text>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 2 }} keyboardShouldPersistTaps="handled">
 
-      <SectionHeader title="Identity" />
+      <FormSection title="Identity" />
       <FieldInput label="Participant Code" value={fields.code} onChange={v => setField('code', v)} placeholder="e.g. P001" required />
       <FieldInput label="Name" value={fields.name} onChange={v => setField('name', v)} placeholder="Full name (optional)" />
 
-      <SectionHeader title="Demographics" />
+      <FormSection title="Demographics" />
       <FieldInput label="Age" value={fields.age} onChange={v => setField('age', v)} placeholder="e.g. 34" keyboardType="numeric" />
       <SexPicker value={fields.sex} onChange={v => setField('sex', v)} />
       <FieldInput label="BMI" value={fields.bmi} onChange={v => setField('bmi', v)} placeholder="e.g. 24.5" keyboardType="numeric" />
 
-      <SectionHeader title="Study" />
+      <FormSection title="Study" />
       <FieldInput label="Group / Condition" value={fields.group} onChange={v => setField('group', v)} placeholder="e.g. Control, Treatment A" />
       <FieldInput label="Site" value={fields.site} onChange={v => setField('site', v)} placeholder="e.g. London" />
       <FieldInput label="Session" value={fields.session} onChange={v => setField('session', v)} placeholder="e.g. Baseline, Week 4" />
 
-      <SectionHeader title="Clinical" />
+      <FormSection title="Clinical" />
       <FieldInput label="Diagnosis" value={fields.diagnosis} onChange={v => setField('diagnosis', v)} placeholder="e.g. Insomnia disorder" />
       <FieldInput label="Medication" value={fields.medication} onChange={v => setField('medication', v)} placeholder="e.g. None" />
       <FieldInput label="Referral" value={fields.referral} onChange={v => setField('referral', v)} placeholder="e.g. GP, self-referred" />
 
-      <SectionHeader title="Custom fields" />
+      <FormSection title="Custom fields" />
       {(fields.customFields ?? []).map((cf, i) => (
-        <View key={i} style={{ flexDirection: 'row', gap: 6, marginTop: 8, alignItems: 'flex-start' }}>
+        <View key={i} style={{ flexDirection: 'row', gap: 6, marginTop: 10, alignItems: 'center' }}>
           <TextInput style={[af.input, { flex: 1 }]} value={cf.label} onChangeText={v => updateCustomField(i, 'label', v)} placeholder="Label" placeholderTextColor={COLOURS.textMuted} />
           <TextInput style={[af.input, { flex: 2 }]} value={cf.value} onChangeText={v => updateCustomField(i, 'value', v)} placeholder="Value" placeholderTextColor={COLOURS.textMuted} />
-          <TouchableOpacity onPress={() => removeCustomField(i)} style={{ width: 36, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity onPress={() => removeCustomField(i)} style={{ width: 32, height: 44, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="close-circle" size={18} color={COLOURS.danger} />
           </TouchableOpacity>
         </View>
       ))}
-      <TouchableOpacity onPress={addCustomField} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
-        <Ionicons name="add-circle-outline" size={18} color={COLOURS.primary} />
-        <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>Add field</Text>
+      <TouchableOpacity onPress={addCustomField} style={af.addFieldBtn}>
+        <Ionicons name="add-circle-outline" size={17} color={COLOURS.primary} />
+        <Text style={{ fontSize: 14, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>Add field</Text>
       </TouchableOpacity>
 
-      <FieldInput label="Notes" value={fields.notes} onChange={v => setField('notes', v)} placeholder="Any additional notes…" multiline />
+      <FormSection title="Notes" />
+      <FieldInput label="" value={fields.notes} onChange={v => setField('notes', v)} placeholder="Any additional notes…" multiline />
 
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 24 }}>
         {onCancel && (
-          <TouchableOpacity style={{ flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' }} onPress={onCancel}>
+          <TouchableOpacity style={af.cancelBtn} onPress={onCancel}>
             <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }, (!fields.code?.trim() || submitting) && { opacity: 0.4 }]}
-          onPress={onSubmit} disabled={!fields.code?.trim() || submitting}>
+          style={[af.submitBtn, (!fields.code?.trim() || submitting) && { opacity: 0.4 }]}
+          onPress={onSubmit} disabled={!fields.code?.trim() || submitting} activeOpacity={0.85}>
           <Ionicons name={isEdit ? 'checkmark' : 'person-add'} size={17} color="#fff" />
-          <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{submitting ? (isEdit ? 'Saving…' : 'Adding…') : (isEdit ? 'Save' : 'Add Participant')}</Text>
+          <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>
+            {submitting ? (isEdit ? 'Saving…' : 'Adding…') : (isEdit ? 'Save changes' : 'Add Participant')}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -169,7 +174,18 @@ function ParticipantForm({ fields, setField, onSubmit, onCancel, submitting, isE
 }
 
 const af = StyleSheet.create({
-  input: { backgroundColor: 'rgba(255,255,255,0.80)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, marginTop: 6 },
+  label:       { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, marginBottom: 4 },
+  input:       { backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1 },
+  sexBtn:      { paddingHorizontal: 13, paddingVertical: 7, borderRadius: 20, borderWidth: 1, backgroundColor: 'rgba(255,255,255,0.72)', borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1 },
+  sexBtnActive:{ backgroundColor: COLOURS.primary, borderColor: COLOURS.primary },
+  sexBtnText:  { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary },
+  sexBtnTextActive: { color: '#fff' },
+  sectionRow:  { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 4 },
+  sectionLine: { flex: 1, height: 1, backgroundColor: 'rgba(74,123,181,0.10)' },
+  sectionTitle:{ fontSize: 11, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 1 },
+  addFieldBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10, alignSelf: 'flex-start', backgroundColor: 'rgba(74,123,181,0.07)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7 },
+  cancelBtn:   { flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1 },
+  submitBtn:   { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 },
 });
 
 // ─── Right panel detail ───────────────────────────────────────────────────────
@@ -513,11 +529,19 @@ export default function ParticipantsScreen() {
       <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowAdd(false)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           <ScreenBackground />
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 12 }}>
-        <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Add Participant</Text>
-            <TouchableOpacity onPress={() => setShowAdd(false)}><Ionicons name="close" size={26} color={COLOURS.primaryDark} /></TouchableOpacity>
-          </View>
-          <View style={{ paddingHorizontal: 4, flex: 1 }}>
+          <BlurView intensity={40} tint="light" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.6)' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: insets.top + 20, paddingBottom: 16, backgroundColor: 'rgba(255,255,255,0.4)' }}>
+              <View>
+                <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>New Participant</Text>
+                <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 1 }}>Fill in at least a code to continue</Text>
+              </View>
+              <TouchableOpacity onPress={() => { setShowAdd(false); setNewFieldsState(EMPTY_FIELDS); }}
+                style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(74,123,181,0.08)', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="close" size={18} color={COLOURS.primaryDark} />
+              </TouchableOpacity>
+            </View>
+          </BlurView>
+          <View style={{ flex: 1 }}>
             <ParticipantForm fields={newFields} setField={setNewField} onSubmit={handleAdd} submitting={adding} />
           </View>
         </KeyboardAvoidingView>
