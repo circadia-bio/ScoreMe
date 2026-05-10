@@ -90,9 +90,39 @@ export async function saveResult(participantId, questionnaireId, answers, score)
     completedAt:   new Date().toISOString(),
   };
   if (!participants[idx].results) participants[idx].results = {};
-  participants[idx].results[questionnaireId] = result;
+  const existing = participants[idx].results[questionnaireId];
+  // Append to history array; migrate legacy single-object format
+  if (!existing) {
+    participants[idx].results[questionnaireId] = [result];
+  } else if (Array.isArray(existing)) {
+    participants[idx].results[questionnaireId] = [...existing, result];
+  } else {
+    // Migrate legacy single object → array
+    participants[idx].results[questionnaireId] = [existing, result];
+  }
   await saveParticipants(participants);
   return result;
+}
+
+/**
+ * Returns the most recent result for a questionnaire, or null.
+ * Handles both legacy single-object and new array formats.
+ */
+export function getLatestResult(participant, questionnaireId) {
+  const entry = participant?.results?.[questionnaireId];
+  if (!entry) return null;
+  if (Array.isArray(entry)) return entry[entry.length - 1];
+  return entry; // legacy
+}
+
+/**
+ * Returns all results for a questionnaire as an array (oldest first).
+ */
+export function getAllResults(participant, questionnaireId) {
+  const entry = participant?.results?.[questionnaireId];
+  if (!entry) return [];
+  if (Array.isArray(entry)) return entry;
+  return [entry]; // legacy
 }
 
 // ─── Onboarding ──────────────────────────────────────────────────────────────
@@ -171,15 +201,15 @@ export function participantsToJSON(participants, questionnaires) {
     notes:       p.notes ?? '',
     createdAt:   p.createdAt,
     results:   Object.fromEntries(
-      Object.entries(p.results ?? {}).map(([qid, r]) => [
-        qid,
-        {
-          questionnaireId: r.questionnaireId,
-          completedAt:     r.completedAt,
-          answers:         r.answers,
-          score:           r.score,
-        },
-      ])
+      Object.entries(p.results ?? {}).map(([qid, r]) => {
+        const entries = Array.isArray(r) ? r : [r];
+        return [qid, entries.map(e => ({
+          questionnaireId: e.questionnaireId,
+          completedAt:     e.completedAt,
+          answers:         e.answers,
+          score:           e.score,
+        }))];
+      })
     ),
   }));
 
@@ -218,8 +248,9 @@ export function participantsToCSV(participants, questionnaireIds) {
       return `"${cf?.value ?? ''}"`;
     });
     const scores = questionnaireIds.map((qid) => {
-      const r = p.results?.[qid];
-      if (!r) return '';
+      const entry = p.results?.[qid];
+      if (!entry) return '';
+      const r = Array.isArray(entry) ? entry[entry.length - 1] : entry;
       if (typeof r.score === 'object') return `"${JSON.stringify(r.score)}"`;
       return String(r.score);
     });

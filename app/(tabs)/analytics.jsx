@@ -17,7 +17,7 @@ import { describe, groupBy, collectScores, completionRate, groupColor, round2 }
   from '../../components/charts/chartUtils';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
-import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs } from '../../storage/storage';
+import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, getLatestResult } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 // ─── Shared glass card wrapper — matches dashboard/participants recipe ─────────

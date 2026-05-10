@@ -51,17 +51,25 @@ export function groupBy(participants, field) {
   return map;
 }
 
-/** Collect numeric scores for a questionnaire across participants */
+/** Collect numeric scores for a questionnaire across participants (latest result only) */
 export function collectScores(participants, qid) {
   return participants
-    .map(p => numericScore(p.results?.[qid]))
+    .map(p => {
+      const entry = p.results?.[qid];
+      if (!entry) return null;
+      const r = Array.isArray(entry) ? entry[entry.length - 1] : entry;
+      return numericScore(r);
+    })
     .filter(x => x !== null);
 }
 
-/** Completion rate 0–1 */
+/** Completion rate 0–1 (any result present) */
 export function completionRate(participants, qid) {
   if (!participants.length) return 0;
-  return participants.filter(p => p.results?.[qid] != null).length / participants.length;
+  return participants.filter(p => {
+    const entry = p.results?.[qid];
+    return entry && (Array.isArray(entry) ? entry.length > 0 : true);
+  }).length / participants.length;
 }
 
 /** Palette for groups */

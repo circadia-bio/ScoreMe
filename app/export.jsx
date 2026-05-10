@@ -15,7 +15,7 @@ import * as FileSystem from 'expo-file-system';
 import ScreenBackground from '../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../theme/responsive';
-import { loadParticipants, participantsToCSV, participantsToJSON, loadCustomQuestionnaires, loadDisabledQs } from '../storage/storage';
+import { loadParticipants, participantsToCSV, participantsToJSON, loadCustomQuestionnaires, loadDisabledQs, getLatestResult } from '../storage/storage';
 import { QUESTIONNAIRES } from '../data/questionnaires';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -155,7 +155,7 @@ function ExportContent({ participants, allQs, onClose }) {
                 <View key={p.id} style={[pt.row, i % 2 === 1 && pt.rowAlt]}>
                   <Text style={[pt.cell, { width: 130, fontFamily: FONTS.body, color: COLOURS.primaryDark }]} numberOfLines={1}>{p.code ?? p.name}</Text>
                   {allQs.map(q => {
-                    const r = p.results?.[q.id];
+                    const r = getLatestResult(p, q.id);
                     const color = r ? (q.interpret ? q.interpret(r.score).color : COLOURS.primary) : null;
                     return (
                       <View key={q.id} style={[pt.cell, { width: 76, alignItems: 'center' }]}>

@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
-import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant, deleteParticipant } from '../../storage/storage';
+import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant, deleteParticipant, getLatestResult, getAllResults } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -102,8 +102,8 @@ export default function ParticipantScreen() {
   if (!participant) return null;
 
   const results  = participant.results ?? {};
-  const scored   = allQs.filter((q) => results[q.id]);
-  const unscored = allQs.filter((q) => !results[q.id]);
+  const scored   = allQs.filter((q) => !!getLatestResult(participant, q.id));
+  const unscored = allQs.filter((q) => !getLatestResult(participant, q.id));
   const displayName = participant.code ?? participant.name;
 
   return (
@@ -221,7 +221,8 @@ export default function ParticipantScreen() {
             <Text style={s.sectionLabel}>RESULTS</Text>
             <View style={s.card}>
               {scored.map((q, i, arr) => {
-                const result = results[q.id];
+                const result = getLatestResult(participant, q.id);
+                const history = getAllResults(participant, q.id);
                 const interp = q.interpret(result.score);
                 return (
                   <View key={q.id}>
@@ -233,7 +234,9 @@ export default function ParticipantScreen() {
                             {formatScore(q, result.score)} — {interp.label}
                           </Text>
                         </View>
-                        <Text style={s.resultDate}>{formatDate(result.completedAt)}</Text>
+                        <Text style={s.resultDate}>
+                          {formatDate(result.completedAt)}{history.length > 1 ? ` · ${history.length} attempts` : ''}
+                        </Text>
                       </View>
                       <TouchableOpacity
                         style={s.redoBtn}

@@ -18,7 +18,7 @@ import ScreenBackground    from '../../components/ScreenBackground';
 import QuestionnaireRunner from '../../components/QuestionnaireRunner';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
-import { loadParticipants, addParticipant, deleteParticipant, saveResult, updateParticipant } from '../../storage/storage';
+import { loadParticipants, addParticipant, deleteParticipant, saveResult, updateParticipant, getLatestResult } from '../../storage/storage';
 import { loadCustomQuestionnaires } from '../../storage/storage';
 import { loadDisabledQs } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
@@ -27,6 +27,7 @@ const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, {
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
 const interpLabel = (q, score) => { try { return q.interpret(score).label; } catch { return '—'; } };
 const fmtScore    = (score) => typeof score === 'object' ? '—' : String(score);
+const hasResult   = (p, qid) => !!getLatestResult(p, qid);
 
 // ─── Desktop list row ─────────────────────────────────────────────────────────
 function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
@@ -198,8 +199,8 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
     </View>
   );
   const results  = p.results ?? {};
-  const scored   = allQs.filter(q => results[q.id]);
-  const unscored = allQs.filter(q => !results[q.id]);
+  const scored   = allQs.filter(q => hasResult(p, q.id));
+  const unscored  = allQs.filter(q => !hasResult(p, q.id));
   const pct = scored.length / allQs.length;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
@@ -247,7 +248,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       {scored.length > 0 && <>
         <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>RESULTS</Text>
         {scored.map(q => {
-          const r = results[q.id]; const c = interpColor(q, r.score);
+          const r = getLatestResult(p, q.id); const c = interpColor(q, r.score);
           return (
             <BlurView key={q.id} intensity={40} tint="light" style={{ borderRadius: 14, overflow: 'hidden', marginBottom: 10, shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 14, elevation: 3 }}>
               <View style={{ backgroundColor: 'rgba(255,255,255,0.52)', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
