@@ -56,8 +56,8 @@ export default function OnboardingModal({ visible, onDismiss }) {
         <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onDismiss} />
 
         {/* Square card */}
-        <View style={s.card}>
-          <BlurView intensity={52} tint="light" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={52} tint="light" style={s.card}>
+          <View style={s.cardInner}>
 
           {/* Close */}
           <TouchableOpacity style={s.closeBtn} onPress={onDismiss} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
@@ -98,7 +98,7 @@ export default function OnboardingModal({ visible, onDismiss }) {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </BlurView>
       </View>
     </Modal>
   );
@@ -116,12 +116,14 @@ const s = StyleSheet.create({
     width: 340, height: 340,
     borderRadius: 28,
     overflow: 'hidden',
-    backgroundColor: 'rgba(238,245,255,0.92)',
+    backgroundColor: 'rgba(255,255,255,0.45)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
     shadowColor: 'rgba(74,123,181,0.25)',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 1, shadowRadius: 32, elevation: 16,
-    padding: 28,
+  },
+  cardInner: {
+    flex: 1, padding: 28,
   },
   closeBtn: {
     position: 'absolute', top: 16, right: 16,

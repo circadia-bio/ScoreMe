@@ -39,45 +39,47 @@ function AboutModal({ visible, onClose }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={am.backdrop} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity activeOpacity={1} style={[am.sheet, { paddingBottom: Math.max(insets.bottom, 24) }]}>
-          <View style={am.inner}>
+        <TouchableOpacity activeOpacity={1}>
+          <BlurView intensity={52} tint="light" style={[am.sheet, { paddingBottom: Math.max(insets.bottom, 24) }]}>
+            <View style={am.inner}>
 
-            {/* Close */}
-            <TouchableOpacity style={am.closeBtn} onPress={onClose}>
-              <Ionicons name="close" size={20} color={COLOURS.textMuted} />
-            </TouchableOpacity>
+              {/* Close */}
+              <TouchableOpacity style={am.closeBtn} onPress={onClose}>
+                <Ionicons name="close" size={20} color={COLOURS.textMuted} />
+              </TouchableOpacity>
 
-            {/* Logo */}
-            <Image source={require('../assets/images/logo.png')} style={am.logo} resizeMode="contain" />
+              {/* Logo */}
+              <Image source={require('../assets/images/logo.png')} style={am.logo} resizeMode="contain" />
 
-            {/* Meta */}
-            <Text style={am.version}>v{version}</Text>
-            <Text style={am.copy}>© Circadia Lab</Text>
-            <Text style={am.licence}>MIT Licence</Text>
+              {/* Meta */}
+              <Text style={am.version}>v{version}</Text>
+              <Text style={am.copy}>© Circadia Lab</Text>
+              <Text style={am.licence}>MIT Licence</Text>
 
-            <View style={am.divider} />
+              <View style={am.divider} />
 
-            {/* Team */}
-            <Text style={am.sectionLabel}>RESEARCHERS</Text>
-            <Text style={am.name}>Lucas França</Text>
-            <Text style={am.name}>Mario Leocadio-Miguel</Text>
+              {/* Team */}
+              <Text style={am.sectionLabel}>RESEARCHERS</Text>
+              <Text style={am.name}>Lucas França</Text>
+              <Text style={am.name}>Mario Leocadio-Miguel</Text>
 
-            <View style={am.divider} />
+              <View style={am.divider} />
 
-            {/* Links */}
-            <TouchableOpacity onPress={() => Linking.openURL('https://circadia-lab.uk')}>
-              <Text style={am.link}>circadia-lab.uk</Text>
-            </TouchableOpacity>
+              {/* Links */}
+              <TouchableOpacity onPress={() => Linking.openURL('https://circadia-lab.uk')}>
+                <Text style={am.link}>circadia-lab.uk</Text>
+              </TouchableOpacity>
 
-            <View style={am.divider} />
+              <View style={am.divider} />
 
-            <TouchableOpacity onPress={handleReplayOnboarding} style={am.replayBtn}>
-              <Ionicons name="refresh-outline" size={14} color={COLOURS.textMuted} />
-              <Text style={am.replayText}>Replay onboarding</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleReplayOnboarding} style={am.replayBtn}>
+                <Ionicons name="refresh-outline" size={14} color={COLOURS.textMuted} />
+                <Text style={am.replayText}>Replay onboarding</Text>
+              </TouchableOpacity>
 
-            <Text style={am.heart}>Made with ❤️</Text>
-          </View>
+              <Text style={am.heart}>Made with ❤️</Text>
+            </View>
+          </BlurView>
         </TouchableOpacity>
       </TouchableOpacity>
     </Modal>
@@ -86,7 +88,7 @@ function AboutModal({ visible, onClose }) {
 
 const am = StyleSheet.create({
   backdrop:    { flex: 1, backgroundColor: 'rgba(30,58,95,0.35)', alignItems: 'center', justifyContent: 'center' },
-  sheet:       { width: 300, borderRadius: 24, overflow: 'hidden', backgroundColor: 'rgba(238,245,255,0.97)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12 },
+  sheet:       { width: 300, borderRadius: 24, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.45)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12 },
   inner:       { padding: 28, alignItems: 'center', gap: 6 },
   closeBtn:    { position: 'absolute', top: 16, right: 16, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center', zIndex: 1 },
   logo:       { width: 160, height: 60, marginBottom: 4 },

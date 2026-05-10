@@ -367,14 +367,14 @@ const s = StyleSheet.create({
   closeBtn: { padding: 4 },
 
   progressRow:  { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, gap: 10 },
-  progressIcon: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
-  progressTrack: { flex: 1, height: 28, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', backgroundColor: COLOURS.cardBg, overflow: 'hidden' },
+  progressIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 },
+  progressTrack: { flex: 1, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.72)', overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1 },
   progressFill:  { height: '100%', borderRadius: 14, backgroundColor: C.progressFill },
   progressLabel: { fontSize: 16, fontFamily: FONTS.heading, color: C.primary, minWidth: 40, textAlign: 'right' },
 
   scroll:        { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
-  instructionsBox: { backgroundColor: COLOURS.cardBg, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', padding: 16, marginTop: 16, marginBottom: 8 },
+  instructionsBox: { backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 14, padding: 16, marginTop: 16, marginBottom: 8, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   instructionsText: { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, lineHeight: 24 },
   itemNumber: { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', marginTop: 20, marginBottom: 6 },
   itemText:   { fontSize: 20, fontFamily: FONTS.heading, color: C.primary, lineHeight: 28, marginBottom: 12 },
