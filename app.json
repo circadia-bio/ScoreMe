@@ -26,7 +26,12 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/favicon.svg"
+      "favicon": "./assets/favicon.svg",
+      "name": "ScoreMe",
+      "shortName": "ScoreMe",
+      "description": "Research questionnaire scorer · Circadia Lab",
+      "themeColor": "#4A7BB5",
+      "backgroundColor": "#EEF5FF"
     }
   }
 }
