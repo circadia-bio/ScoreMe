@@ -263,8 +263,8 @@ export default function ExportScreen() {
   // we instead show a floating panel. Redirect back and let the tab handle it.
   // For simplicity, just render the content full-screen on desktop too.
   return (
-    <View style={{ flex: 1, backgroundColor: COLOURS.screenBg }}>
-      <ScreenBackground />
+    <View style={{ flex: 1, backgroundColor: isDesktop ? 'transparent' : COLOURS.screenBg }}>
+      {!isDesktop && <ScreenBackground />}
       {!isDesktop && (
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingTop: insets.top + 16, paddingBottom: 8 }}>
           <TouchableOpacity onPress={() => router.back()} style={{ width: 36 }}>

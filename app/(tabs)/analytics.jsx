@@ -361,8 +361,7 @@ export default function AnalyticsScreen() {
 
   if (isDesktop) {
     return (
-      <View style={{ flex: 1, backgroundColor: COLOURS.screenBg }}>
-        <ScreenBackground />
+      <View style={{ flex: 1, backgroundColor: 'transparent' }}>
         {content}
       </View>
     );
