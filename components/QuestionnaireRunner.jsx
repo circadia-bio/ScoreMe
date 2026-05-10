@@ -194,7 +194,7 @@ const ResultScreen = ({ questionnaire, score, onClose }) => {
       showsVerticalScrollIndicator={false}
     >
       {/* Score badge */}
-      <View style={[s.resultBadgeWrap, { borderColor: interpretation.color + '40', backgroundColor: interpretation.color + '0C' }]}>
+      <View style={[s.resultBadgeWrap, { backgroundColor: interpretation.color + '0C', shadowColor: interpretation.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 20, elevation: 6 }]}>
         <View style={[s.resultScoreRow]}>
           <Text style={[s.resultScoreNum, { color: interpretation.color }]}>{scoreDisplay}</Text>
           {!!scoreMax && <Text style={[s.resultScoreMax, { color: interpretation.color }]}>{scoreMax}</Text>}
@@ -419,12 +419,12 @@ const s = StyleSheet.create({
   nextBtnText:     { fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' },
 
   resultScroll:      { padding: 24, gap: 16 },
-  resultBadgeWrap:    { borderRadius: 20, borderWidth: 1.5, padding: 28, alignItems: 'center', gap: 8 },
+  resultBadgeWrap:    { borderRadius: 20, padding: 28, alignItems: 'center', gap: 8 },
   resultScoreRow:     { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
   resultScoreNum:     { fontSize: 64, fontFamily: FONTS.heading, lineHeight: 72 },
   resultScoreMax:     { fontSize: 22, fontFamily: FONTS.bodyMedium },
   resultLabel:        { fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading },
-  resultCard:         { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, padding: 16, gap: 8 },
+  resultCard:         { backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 16, padding: 16, gap: 8, shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 2 },
   resultCardHeader:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
   resultCardTitle:    { fontSize: SIZES.body, fontFamily: FONTS.body },
   resultDesc:         { fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 24 },
