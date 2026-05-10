@@ -189,7 +189,7 @@ function MobileCard({ p, onPress, allQs }) {
   );
 }
 const mc = StyleSheet.create({
-  card: { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, padding: 16, gap: 10 },
+  card: { backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 16, padding: 16, gap: 10, shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 },
   row:  { flexDirection: 'row', alignItems: 'center', gap: 12 },
   ring: { width: 52, height: 52, borderRadius: 26, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' },
@@ -373,7 +373,7 @@ export default function DashboardScreen() {
 }
 
 const mob = StyleSheet.create({
-  iconBtn:    { width: 40, height: 40, borderRadius: 20, backgroundColor: COLOURS.cardBg, borderWidth: 1, borderColor: COLOURS.cardBorder, alignItems: 'center', justifyContent: 'center' },
+  iconBtn:    { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2, alignItems: 'center', justifyContent: 'center' },
   label:      { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 },
-  exportCard: { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 },
+  exportCard: { backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 },
 });

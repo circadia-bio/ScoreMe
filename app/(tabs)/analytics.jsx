@@ -94,7 +94,7 @@ function QCard({ q, participants, groupField, chartWidth }) {
           <Text style={qc.title}>{q.shortTitle}</Text>
           <Text style={qc.subtitle} numberOfLines={1}>{q.title}</Text>
         </View>
-        <View style={[qc.pill, { borderColor: rateColor, backgroundColor: rateColor + '15' }]}>
+        <View style={[qc.pill, { borderColor: rateColor, backgroundColor: rateColor + '15', shadowColor: rateColor, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.18, shadowRadius: 6, elevation: 2 }]}>
           <Text style={[qc.pillText, { color: rateColor }]}>{Math.round(overallRate * 100)}% complete</Text>
         </View>
       </View>
@@ -168,7 +168,7 @@ const qc = StyleSheet.create({
   title:       { fontSize: SIZES.body, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
   subtitle:    { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, marginTop: 1 },
   sectionLabel:{ fontSize: 11, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
-  pill:        { borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
+  pill:        { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
   pillText:    { fontSize: 12, fontFamily: FONTS.bodyMedium },
 });
 
