@@ -83,7 +83,7 @@ export default function BoxPlot({ groups, maxVal, width, height = 160 }) {
             ))}
             {/* Group label */}
             <SvgText x={cx} y={height - 6} fontSize={9} textAnchor="middle"
-              fill={COLOURS.primaryDark} fontFamily={FONTS.bodyMedium} numberOfLines={1}>
+              fill={COLOURS.primaryDark} fontFamily={FONTS.bodyMedium}>
               {g.label.length > 8 ? g.label.slice(0, 7) + '…' : g.label}
             </SvgText>
           </React.Fragment>
