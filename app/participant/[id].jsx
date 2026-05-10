@@ -6,7 +6,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity,
+  View, Text, ScrollView, TouchableOpacity, TextInput,
   StyleSheet, Alert, Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
-import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs } from '../../storage/storage';
+import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -37,7 +37,11 @@ export default function ParticipantScreen() {
   const router   = useRouter();
   const insets   = useSafeAreaInsets();
   const [participant, setParticipant] = useState(null);
-  const [allQs, setAllQs] = useState(QUESTIONNAIRES);
+  const [allQs, setAllQs]             = useState(QUESTIONNAIRES);
+  const [editing, setEditing]         = useState(false);
+  const [editName, setEditName]       = useState('');
+  const [editNotes, setEditNotes]     = useState('');
+  const [saving, setSaving]           = useState(false);
 
   const load = useCallback(async () => {
     const [ps, customQs, disabledQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]);
@@ -46,6 +50,17 @@ export default function ParticipantScreen() {
   }, [id]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  const startEdit = () => { setEditName(participant.name); setEditNotes(participant.notes ?? ''); setEditing(true); };
+  const cancelEdit = () => setEditing(false);
+  const saveEdit = async () => {
+    if (!editName.trim()) return;
+    setSaving(true);
+    await updateParticipant(id, { name: editName.trim(), notes: editNotes.trim() });
+    await load();
+    setSaving(false);
+    setEditing(false);
+  };
 
   if (!participant) return null;
 
@@ -62,11 +77,48 @@ export default function ParticipantScreen() {
           <Ionicons name="chevron-back" size={26} color={COLOURS.primaryDark} />
         </TouchableOpacity>
         <Text style={s.headerTitle} numberOfLines={1}>{participant.name}</Text>
-        <View style={{ width: 36 }} />
+        <TouchableOpacity onPress={startEdit} style={s.editBtn}>
+          <Ionicons name="pencil-outline" size={20} color={COLOURS.primary} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={[s.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
 
+        {editing ? (
+          <View style={[s.profileCard, { flexDirection: 'column', gap: 12 }]}>
+            <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Name *</Text>
+            <TextInput
+              style={s.input}
+              value={editName}
+              onChangeText={setEditName}
+              placeholder="Participant name or ID"
+              placeholderTextColor={COLOURS.textMuted}
+              autoFocus
+            />
+            <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Notes (optional)</Text>
+            <TextInput
+              style={[s.input, { height: 72, textAlignVertical: 'top' }]}
+              value={editNotes}
+              onChangeText={setEditNotes}
+              placeholder="e.g. Group A, session date…"
+              placeholderTextColor={COLOURS.textMuted}
+              multiline
+            />
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity style={s.cancelBtn} onPress={cancelEdit}>
+                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.saveBtn, (!editName.trim() || saving) && { opacity: 0.4 }]}
+                onPress={saveEdit}
+                disabled={!editName.trim() || saving}
+              >
+                <Ionicons name="checkmark" size={16} color="#fff" />
+                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{saving ? 'Saving…' : 'Save'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
         <View style={s.profileCard}>
           <View style={s.avatar}>
             <Text style={s.avatarText}>{participant.name.charAt(0).toUpperCase()}</Text>
@@ -81,6 +133,7 @@ export default function ParticipantScreen() {
             <Text style={s.scoreCountLabel}>of {allQs.length}</Text>
           </View>
         </View>
+        )}
 
         {scored.length > 0 && (
           <>
@@ -187,4 +240,8 @@ const s = StyleSheet.create({
   betaChipText: { fontSize: 11, fontFamily: FONTS.body, color: COLOURS.purple },
   startBtn:{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(74,123,181,0.12)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7 },
   startBtnText: { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.primary },
+  editBtn: { width: 36, alignItems: 'flex-end' },
+  input:   { backgroundColor: 'rgba(255,255,255,0.80)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
+  cancelBtn: { flex: 1, borderRadius: 12, paddingVertical: 12, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' },
+  saveBtn:   { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 12, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 10, elevation: 4 },
 });
