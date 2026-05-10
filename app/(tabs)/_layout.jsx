@@ -34,7 +34,8 @@ export default function TabLayout() {
 
   const activeTab =
     pathname.includes('participants')   ? 'participants'   :
-    pathname.includes('questionnaires') ? 'questionnaires' : 'dashboard';
+    pathname.includes('questionnaires') ? 'questionnaires' :
+    pathname.includes('analytics')      ? 'analytics'      : 'dashboard';
 
   const tabs = (
     <Tabs
@@ -48,9 +49,10 @@ export default function TabLayout() {
         tabBarLabelStyle: { fontFamily: FONTS.body, fontSize: 12 },
       }}
     >
-      <Tabs.Screen name="index"          options={{ title: 'Dashboard',     tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline"      color={color} size={size} /> }} />
-      <Tabs.Screen name="participants"   options={{ title: 'Participants',   tabBarIcon: ({ color, size }) => <Ionicons name="people-outline"    color={color} size={size} /> }} />
-      <Tabs.Screen name="questionnaires" options={{ title: 'Questionnaires', tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} /> }} />
+      <Tabs.Screen name="index"          options={{ title: 'Dashboard',     tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline"         color={color} size={size} /> }} />
+      <Tabs.Screen name="participants"   options={{ title: 'Participants',   tabBarIcon: ({ color, size }) => <Ionicons name="people-outline"       color={color} size={size} /> }} />
+      <Tabs.Screen name="questionnaires" options={{ title: 'Questionnaires', tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline"    color={color} size={size} /> }} />
+      <Tabs.Screen name="analytics"      options={{ title: 'Analytics',     tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart-outline"    color={color} size={size} /> }} />
     </Tabs>
   );
 
@@ -66,6 +68,7 @@ export default function TabLayout() {
               if (tab === 'dashboard')      router.push('/(tabs)');
               if (tab === 'participants')   router.push('/(tabs)/participants');
               if (tab === 'questionnaires') router.push('/(tabs)/questionnaires');
+              if (tab === 'analytics')      router.push('/(tabs)/analytics');
             }}
             onExport={() => isDesktop ? setShowExport(true) : router.push('/export')}
           />

@@ -15,9 +15,10 @@ import { COLOURS, FONTS, SIZES } from '../theme/typography';
 export const SIDEBAR_W = 220;
 
 const NAV = [
-  { id: 'dashboard',      label: 'Dashboard',     icon: 'grid',      iconOut: 'grid-outline'      },
-  { id: 'participants',   label: 'Participants',   icon: 'people',    iconOut: 'people-outline'    },
-  { id: 'questionnaires', label: 'Questionnaires', icon: 'clipboard', iconOut: 'clipboard-outline' },
+  { id: 'dashboard',      label: 'Dashboard',     icon: 'grid',       iconOut: 'grid-outline'      },
+  { id: 'participants',   label: 'Participants',   icon: 'people',     iconOut: 'people-outline'    },
+  { id: 'questionnaires', label: 'Questionnaires', icon: 'clipboard',  iconOut: 'clipboard-outline' },
+  { id: 'analytics',      label: 'Analytics',      icon: 'bar-chart',  iconOut: 'bar-chart-outline' },
 ];
 
 // ─── About modal ──────────────────────────────────────────────────────────────
