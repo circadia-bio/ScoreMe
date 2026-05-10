@@ -7,14 +7,14 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Alert,
+  StyleSheet, Alert, Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
-import { loadParticipants } from '../../storage/storage';
+import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -37,10 +37,12 @@ export default function ParticipantScreen() {
   const router   = useRouter();
   const insets   = useSafeAreaInsets();
   const [participant, setParticipant] = useState(null);
+  const [allQs, setAllQs] = useState(QUESTIONNAIRES);
 
   const load = useCallback(async () => {
-    const ps = await loadParticipants();
+    const [ps, customQs, disabledQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]);
     setParticipant(ps.find((p) => p.id === id) ?? null);
+    setAllQs([...QUESTIONNAIRES, ...customQs].filter(q => !disabledQs.has(q.id)));
   }, [id]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -48,8 +50,8 @@ export default function ParticipantScreen() {
   if (!participant) return null;
 
   const results  = participant.results ?? {};
-  const scored   = QUESTIONNAIRES.filter((q) => results[q.id]);
-  const unscored = QUESTIONNAIRES.filter((q) => !results[q.id]);
+  const scored   = allQs.filter((q) => results[q.id]);
+  const unscored = allQs.filter((q) => !results[q.id]);
 
   return (
     <View style={s.root}>
@@ -76,7 +78,7 @@ export default function ParticipantScreen() {
           </View>
           <View style={s.scoreCount}>
             <Text style={s.scoreCountNum}>{scored.length}</Text>
-            <Text style={s.scoreCountLabel}>of {QUESTIONNAIRES.length}</Text>
+            <Text style={s.scoreCountLabel}>of {allQs.length}</Text>
           </View>
         </View>
 
@@ -102,10 +104,14 @@ export default function ParticipantScreen() {
                       <TouchableOpacity
                         style={s.redoBtn}
                         onPress={() => {
-                          Alert.alert('Re-score', `Re-score ${q.shortTitle} for ${participant.name}? Previous result will be replaced.`, [
-                            { text: 'Cancel', style: 'cancel' },
-                            { text: 'Re-score', onPress: () => router.push(`/score/${participant.id}/${q.id}`) },
-                          ]);
+                          if (Platform.OS === 'web') {
+                            if (window.confirm(`Re-score ${q.shortTitle} for ${participant.name}? Previous result will be replaced.`)) router.push(`/score/${participant.id}/${q.id}`);
+                          } else {
+                            Alert.alert('Re-score', `Re-score ${q.shortTitle} for ${participant.name}? Previous result will be replaced.`, [
+                              { text: 'Cancel', style: 'cancel' },
+                              { text: 'Re-score', onPress: () => router.push(`/score/${participant.id}/${q.id}`) },
+                            ]);
+                          }
                         }}
                       >
                         <Text style={s.redoBtnText}>Redo</Text>
