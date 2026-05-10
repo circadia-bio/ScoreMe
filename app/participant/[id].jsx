@@ -191,6 +191,13 @@ export default function ParticipantScreen() {
                         {q.beta && <View style={s.betaChip}><Text style={s.betaChipText}>BETA</Text></View>}
                       </View>
                       <Text style={s.qMeta}>{q.shortTitle} · {q.items.length} items</Text>
+                      {(q.construct || q.domain || q.timeframe) && (
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 3 }}>
+                          {q.construct && <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{q.construct}</Text>}
+                          {q.domain && <View style={{ backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.domain}</Text></View>}
+                          {q.timeframe && <View style={{ backgroundColor: 'rgba(224,122,32,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.accent }}>{q.timeframe}</Text></View>}
+                        </View>
+                      )}
                     </View>
                     <TouchableOpacity style={s.startBtn} onPress={() => router.push(`/score/${participant.id}/${q.id}`)}>
                       <Text style={s.startBtnText}>Start</Text>
