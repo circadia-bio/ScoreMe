@@ -94,15 +94,22 @@ function ExportContent({ participants, allQs, onClose }) {
       {/* Stat pills */}
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {[
-          { icon: 'people-outline',      label: 'Participants', value: participants.length },
-          { icon: 'checkmark-circle-outline', label: 'Scored',  value: scoredParticipants.length },
-          { icon: 'bar-chart-outline',   label: 'Total scores', value: totalScores },
-        ].map(({ icon, label, value }) => (
-          <BlurView key={label} intensity={36} tint="light" style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}>
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.50)', padding: 12, alignItems: 'center', gap: 3 }}>
-              <Ionicons name={icon} size={18} color={COLOURS.primary} />
-              <Text style={{ fontSize: 18, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
-              <Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
+          { icon: 'people-outline',           label: 'Participants', value: participants.length,        color: COLOURS.primary, bg: 'rgba(74,123,181,0.12)' },
+          { icon: 'checkmark-circle-outline', label: 'Scored',       value: scoredParticipants.length, color: COLOURS.success, bg: 'rgba(46,125,50,0.10)'  },
+          { icon: 'bar-chart-outline',         label: 'Total scores', value: totalScores,               color: COLOURS.accent,  bg: 'rgba(224,122,32,0.12)' },
+        ].map(({ icon, label, value, color, bg }) => (
+          <BlurView key={label} intensity={36} tint="light" style={{ flex: 1, borderRadius: 14, overflow: 'hidden', shadowColor: color, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 3 }}>
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.52)', padding: 12, gap: 6 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name={icon} size={15} color={color} />
+                </View>
+                <Text style={{ fontSize: 22, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
+              </View>
+              <Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
+              <View style={{ height: 2, borderRadius: 1, backgroundColor: bg, overflow: 'hidden' }}>
+                <View style={{ width: '100%', height: '100%', backgroundColor: color, opacity: 0.5 }} />
+              </View>
             </View>
           </BlurView>
         ))}
@@ -160,7 +167,7 @@ function ExportContent({ participants, allQs, onClose }) {
                     return (
                       <View key={q.id} style={[pt.cell, { width: 76, alignItems: 'center' }]}>
                         {r ? (
-                          <View style={{ borderWidth: 1, borderRadius: 12, paddingHorizontal: 7, paddingVertical: 2, backgroundColor: color + '18', borderColor: color }}>
+                          <View style={{ borderRadius: 12, paddingHorizontal: 7, paddingVertical: 2, backgroundColor: color + '18', shadowColor: color, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 2 }}>
                             <Text style={{ fontSize: 12, fontFamily: FONTS.body, color }}>{formatScore(q, r.score)}</Text>
                           </View>
                         ) : (
@@ -200,9 +207,9 @@ const ec = StyleSheet.create({
 });
 
 const pt = StyleSheet.create({
-  row:        { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.48)', borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.06)' },
-  rowAlt:     { backgroundColor: 'rgba(238,245,255,0.55)' },
-  headerRow:  { backgroundColor: 'rgba(200,223,245,0.55)' },
+  row:        { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.52)', borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.05)' },
+  rowAlt:     { backgroundColor: 'rgba(255,255,255,0.30)' },
+  headerRow:  { backgroundColor: 'rgba(74,123,181,0.07)' },
   cell:       { paddingHorizontal: 10, paddingVertical: 10, justifyContent: 'center' },
   headerCell: { fontSize: 12, fontFamily: FONTS.body, color: COLOURS.primaryDark },
 });
@@ -224,20 +231,10 @@ function DesktopExportModal({ visible, onClose }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(30,58,95,0.30)' }} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{
-            position: 'absolute', right: 24, top: insets.top + 24, bottom: 24,
-            width: 520,
-            borderRadius: 20,
-            overflow: 'hidden',
-            backgroundColor: COLOURS.screenBg,
-            borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
-            shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12,
-          }}
-        >
-          <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
-          <ExportContent participants={participants} allQs={allQs} onClose={onClose} />
+        <TouchableOpacity activeOpacity={1} style={{ position: 'absolute', right: 24, top: insets.top + 24, bottom: 24, width: 520 }}>
+          <BlurView intensity={52} tint="light" style={{ flex: 1, borderRadius: 20, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.45)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12 }}>
+            <ExportContent participants={participants} allQs={allQs} onClose={onClose} />
+          </BlurView>
         </TouchableOpacity>
       </TouchableOpacity>
     </Modal>
