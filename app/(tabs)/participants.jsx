@@ -18,7 +18,7 @@ import ScreenBackground    from '../../components/ScreenBackground';
 import QuestionnaireRunner from '../../components/QuestionnaireRunner';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
-import { loadParticipants, addParticipant, deleteParticipant, saveResult } from '../../storage/storage';
+import { loadParticipants, addParticipant, deleteParticipant, saveResult, updateParticipant } from '../../storage/storage';
 import { loadCustomQuestionnaires } from '../../storage/storage';
 import { loadDisabledQs } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
@@ -84,7 +84,7 @@ const af = StyleSheet.create({
 });
 
 // ─── Right panel detail ───────────────────────────────────────────────────────
-function DetailPanel({ p, onScore, onClose, allQs }) {
+function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
   if (!p) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
@@ -112,6 +112,9 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
         </View>
         <TouchableOpacity onPress={onClose} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.6)', alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="close" size={18} color={COLOURS.textMuted} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onEdit} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(74,123,181,0.08)', alignItems: 'center', justifyContent: 'center' }}>
+          <Ionicons name="pencil-outline" size={16} color={COLOURS.primary} />
         </TouchableOpacity>
       </View>
       <View style={{ height: 5, borderRadius: 3, backgroundColor: '#DDE8F5', overflow: 'hidden', marginBottom: 6 }}>
@@ -186,6 +189,10 @@ export default function ParticipantsScreen() {
   const [participants, setParticipants] = useState([]);
   const [selectedId,   setSelectedId]   = useState(null);
   const [showAdd,      setShowAdd]      = useState(false);
+  const [showEdit,     setShowEdit]     = useState(false);
+  const [editName,     setEditName]     = useState('');
+  const [editNotes,    setEditNotes]    = useState('');
+  const [saving,       setSaving]       = useState(false);
   const [scoringQid,   setScoringQid]   = useState(null);
   const [newName,      setNewName]      = useState('');
   const [newNotes,     setNewNotes]     = useState('');
@@ -205,6 +212,16 @@ export default function ParticipantsScreen() {
     await addParticipant(newName, newNotes);
     setNewName(''); setNewNotes(''); setShowAdd(false); setAdding(false);
     load();
+  };
+
+  const handleEdit = (p) => { setEditName(p.name); setEditNotes(p.notes ?? ''); setShowEdit(true); setShowAdd(false); setScoringQid(null); };
+  const handleSaveEdit = async () => {
+    if (!editName.trim() || !selectedId) return;
+    setSaving(true);
+    await updateParticipant(selectedId, { name: editName.trim(), notes: editNotes.trim() });
+    await load();
+    setSaving(false);
+    setShowEdit(false);
   };
 
   const handleDelete = (p) => {
@@ -287,6 +304,27 @@ export default function ParticipantsScreen() {
                   </View>
                 </BlurView>
               </View>
+            ) : showEdit && selected ? (
+              <View style={{ padding: 28 }}>
+                <BlurView intensity={40} tint="light" style={{ borderRadius: 20, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.14)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 1, shadowRadius: 22, elevation: 5 }}>
+                  <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 24, gap: 4 }}>
+                    <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 16 }}>Edit Participant</Text>
+                    <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Name *</Text>
+                    <TextInput style={af.input} value={editName} onChangeText={setEditName} placeholder="Participant name or ID" placeholderTextColor={COLOURS.textMuted} autoFocus />
+                    <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 14 }}>Notes (optional)</Text>
+                    <TextInput style={[af.input, { height: 80, textAlignVertical: 'top' }]} value={editNotes} onChangeText={setEditNotes} placeholder="e.g. Group A, session date…" placeholderTextColor={COLOURS.textMuted} multiline />
+                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+                      <TouchableOpacity style={{ flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' }} onPress={() => setShowEdit(false)}>
+                        <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }, (!editName.trim() || saving) && { opacity: 0.4 }]} onPress={handleSaveEdit} disabled={!editName.trim() || saving}>
+                        <Ionicons name="checkmark" size={17} color="#fff" />
+                        <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{saving ? 'Saving…' : 'Save'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </BlurView>
+              </View>
             ) : scoringQ && selected ? (
               <QuestionnaireRunner
                 questionnaire={scoringQ}
@@ -298,7 +336,8 @@ export default function ParticipantsScreen() {
                 p={selected}
                 allQs={allQs}
                 onScore={handleScore}
-                onClose={() => setSelectedId(null)}
+                onEdit={() => selected && handleEdit(selected)}
+                onClose={() => { setSelectedId(null); setShowEdit(false); }}
               />
             )}
           </View>
