@@ -332,6 +332,7 @@ export default function ParticipantsScreen() {
   const [scoringQid, setScoringQid] = useState(null);
   const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
   const [query,        setQuery]         = useState('');
+  const [sortBy,       setSortBy]        = useState('added'); // 'added' | 'alpha' | 'completion'
 
   const load = useCallback(async () => {
     const [ps, customQs, disabledQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]);
@@ -386,35 +387,68 @@ export default function ParticipantsScreen() {
   const selected  = participants.find(p => p.id === selectedId) ?? null;
   const scoringQ  = allQs.find(q => q.id === scoringQid) ?? null;
 
-  const filteredParticipants = query.trim()
-    ? participants.filter(p => {
-        const q = query.toLowerCase();
-        return (
-          (p.code  ?? '').toLowerCase().includes(q) ||
-          (p.name  ?? '').toLowerCase().includes(q) ||
-          (p.group ?? '').toLowerCase().includes(q) ||
-          (p.site  ?? '').toLowerCase().includes(q) ||
-          (p.session ?? '').toLowerCase().includes(q)
-        );
-      })
-    : participants;
+  const filteredParticipants = (() => {
+    let list = query.trim()
+      ? participants.filter(p => {
+          const q = query.toLowerCase();
+          return (
+            (p.code  ?? '').toLowerCase().includes(q) ||
+            (p.name  ?? '').toLowerCase().includes(q) ||
+            (p.group ?? '').toLowerCase().includes(q) ||
+            (p.site  ?? '').toLowerCase().includes(q) ||
+            (p.session ?? '').toLowerCase().includes(q)
+          );
+        })
+      : [...participants];
+    if (sortBy === 'alpha') {
+      list.sort((a, b) => (a.code ?? a.name ?? '').localeCompare(b.code ?? b.name ?? ''));
+    } else if (sortBy === 'completion') {
+      list.sort((a, b) => {
+        const pctA = allQs.length ? Object.keys(a.results ?? {}).length / allQs.length : 0;
+        const pctB = allQs.length ? Object.keys(b.results ?? {}).length / allQs.length : 0;
+        return pctB - pctA;
+      });
+    }
+    return list;
+  })();
+
+  const SORT_OPTIONS = [
+    { id: 'added',      icon: 'time-outline',       label: 'Added' },
+    { id: 'alpha',      icon: 'text-outline',        label: 'A–Z' },
+    { id: 'completion', icon: 'checkmark-circle-outline', label: '% Done' },
+  ];
 
   const SearchBar = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1, marginBottom: 14 }}>
-      <Ionicons name="search" size={16} color={COLOURS.textMuted} />
-      <TextInput
-        style={{ flex: 1, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark }}
-        placeholder="Search by code, name, group…"
-        placeholderTextColor={COLOURS.textMuted}
-        value={query}
-        onChangeText={setQuery}
-        autoCorrect={false}
-        autoCapitalize="none"
-        returnKeyType="search"
-      />
-      {query.length > 0
-        ? <TouchableOpacity onPress={() => setQuery('')}><Ionicons name="close-circle" size={16} color={COLOURS.textMuted} /></TouchableOpacity>
-        : null}
+    <View style={{ gap: 8, marginBottom: 14 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1 }}>
+        <Ionicons name="search" size={16} color={COLOURS.textMuted} />
+        <TextInput
+          style={{ flex: 1, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark }}
+          placeholder="Search by code, name, group…"
+          placeholderTextColor={COLOURS.textMuted}
+          value={query}
+          onChangeText={setQuery}
+          autoCorrect={false}
+          autoCapitalize="none"
+          returnKeyType="search"
+        />
+        {query.length > 0
+          ? <TouchableOpacity onPress={() => setQuery('')}><Ionicons name="close-circle" size={16} color={COLOURS.textMuted} /></TouchableOpacity>
+          : null}
+      </View>
+      <View style={{ flexDirection: 'row', gap: 6 }}>
+        {SORT_OPTIONS.map(opt => {
+          const active = sortBy === opt.id;
+          return (
+            <TouchableOpacity key={opt.id} activeOpacity={0.8}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, backgroundColor: active ? COLOURS.primary : 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 4, elevation: 1 }}
+              onPress={() => setSortBy(opt.id)}>
+              <Ionicons name={opt.icon} size={12} color={active ? '#fff' : COLOURS.textMuted} />
+              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: active ? '#fff' : COLOURS.textMuted }}>{opt.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 
