@@ -25,16 +25,18 @@ export default function Root({ children }: PropsWithChildren) {
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://scoreme.circadia-lab.uk" />
         <meta property="og:title" content="ScoreMe" />
         <meta property="og:description" content="Research questionnaire scorer · Circadia Lab" />
-        <meta property="og:image" content="/og-image.png" />
+        <meta property="og:image" content="https://scoreme.circadia-lab.uk/og-image.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
 
-        {/* Twitter / iMessage */}
+        {/* Twitter / iMessage / WhatsApp fallback */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="ScoreMe" />
-        <meta name="twitter:image" content="/og-image.png" />
+        <meta name="twitter:description" content="Research questionnaire scorer · Circadia Lab" />
+        <meta name="twitter:image" content="https://scoreme.circadia-lab.uk/og-image.png" />
 
         <ScrollViewStyleReset />
       </head>
