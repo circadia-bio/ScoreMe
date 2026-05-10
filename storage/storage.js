@@ -168,6 +168,7 @@ export function participantsToJSON(participants, questionnaires) {
  * Produce a CSV string for all participants × all questionnaire scores.
  */
 export function participantsToCSV(participants, questionnaireIds) {
+  const header = ['id', 'name', 'notes', 'createdAt', ...questionnaireIds].join(',');
   const rows = participants.map((p) => {
     const scores = questionnaireIds.map((qid) => {
       const r = p.results?.[qid];
