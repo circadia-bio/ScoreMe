@@ -42,7 +42,8 @@ export default function ScoreScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: COLOURS.screenBg }}>
+      <ScreenBackground />
       <QuestionnaireRunner
         questionnaire={questionnaire}
         onComplete={handleComplete}

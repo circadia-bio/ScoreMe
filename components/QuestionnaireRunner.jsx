@@ -12,12 +12,11 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, Pressable, SafeAreaView, Platform,
+  StyleSheet, Pressable, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
-import ScreenBackground from './ScreenBackground';
 
 const C = {
   primary:      COLOURS.primary,
@@ -295,7 +294,6 @@ export default function QuestionnaireRunner({ questionnaire, onComplete, onBack 
 
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
-      <ScreenBackground />
 
       {/* Header */}
       <View style={s.header}>
