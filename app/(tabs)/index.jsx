@@ -264,7 +264,7 @@ export default function DashboardScreen() {
                         </View>
                         <Text style={{ fontSize: 28, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
                       </View>
-                      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
+                      <Text style={{ fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
                       <View style={{ height: 3, borderRadius: 2, backgroundColor: bg, overflow: 'hidden' }}>
                         <View style={{ width: '100%', height: '100%', backgroundColor: color, opacity: 0.5 }} />
                       </View>

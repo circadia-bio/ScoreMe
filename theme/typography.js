@@ -15,9 +15,12 @@ export const SIZES = {
   cardTitle:    20,
   body:         18,
   bodySmall:    16,
-  caption:      16,
-  label:        16,
-  badge:        16,
+  caption:      15,
+  label:        15,
+  badge:        15,
+  // Sub-label sizes used for chips, table cells, hints
+  chip:         14,
+  meta:         13,
 };
 
 // ─── Colour palette ────────────────────────────────────────────────────────────

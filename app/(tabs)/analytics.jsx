@@ -66,11 +66,11 @@ function StatRow({ label, color, stats }) {
 
 const st = StyleSheet.create({
   headerRow:  { flexDirection: 'row', paddingHorizontal: 14, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.07)', backgroundColor: 'rgba(74,123,181,0.04)' },
-  headerCell: { fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  headerCell: { fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
   row:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.05)' },
   dot:        { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
-  groupLabel: { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flex: 1.4, minWidth: 0 },
-  cell:       { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flex: 1.4, textAlign: 'right' },
+  groupLabel: { fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flex: 1.4, minWidth: 0 },
+  cell:       { fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flex: 1.4, textAlign: 'right' },
 });
 
 // ─── Per-questionnaire card ───────────────────────────────────────────────────
@@ -116,10 +116,10 @@ function QCard({ q, participants, groupField, chartWidth }) {
                   {groups.filter(g => g.stats).map(g => (
                     <View key={g.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: g.color }} />
-                      <Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{g.label}</Text>
+                      <Text style={{ fontSize: SIZES.meta, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{g.label}</Text>
                     </View>
                   ))}
-                  <Text style={{ fontSize: 10, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>◆ mean  ━ median</Text>
+                  <Text style={{ fontSize: SIZES.meta, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>◆ mean  ━ median</Text>
                 </View>
               )}
             </View>
@@ -148,11 +148,11 @@ function QCard({ q, participants, groupField, chartWidth }) {
               <Text style={[qc.sectionLabel, { marginBottom: 8 }]}>COMPLETION BY GROUP</Text>
               {groups.map(g => (
                 <View key={g.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, flexShrink: 1, minWidth: 40 }} numberOfLines={1}>{g.label}</Text>
+                  <Text style={{ fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, flexShrink: 1, minWidth: 40 }} numberOfLines={1}>{g.label}</Text>
                   <View style={{ flex: 1, height: 8, backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 4, overflow: 'hidden' }}>
                     <View style={{ width: `${g.rate * 100}%`, height: '100%', backgroundColor: g.color, borderRadius: 4 }} />
                   </View>
-                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, width: 34, textAlign: 'right' }}>{Math.round(g.rate * 100)}%</Text>
+                  <Text style={{ fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, width: 34, textAlign: 'right' }}>{Math.round(g.rate * 100)}%</Text>
                 </View>
               ))}
             </View>
@@ -166,10 +166,10 @@ function QCard({ q, participants, groupField, chartWidth }) {
 const qc = StyleSheet.create({
   header:      { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.07)' },
   title:       { fontSize: SIZES.body, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
-  subtitle:    { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, marginTop: 1 },
-  sectionLabel:{ fontSize: 11, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
+  subtitle:    { fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, marginTop: 1 },
+  sectionLabel:{ fontSize: SIZES.chip, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
   pill:        { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
-  pillText:    { fontSize: 12, fontFamily: FONTS.bodyMedium },
+  pillText:    { fontSize: SIZES.meta, fontFamily: FONTS.bodyMedium },
 });
 
 // ─── Overview stat cards ──────────────────────────────────────────────────────
@@ -199,7 +199,7 @@ function OverviewCards({ participants, allQs }) {
               </View>
               <Text style={{ fontSize: 26, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
             </View>
-            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
+            <Text style={{ fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
             <View style={{ height: 3, borderRadius: 2, backgroundColor: bg, overflow: 'hidden' }}>
               <View style={{ width: '100%', height: '100%', backgroundColor: color, opacity: 0.5 }} />
             </View>
@@ -249,11 +249,11 @@ function CompletionPanel({ participants, allQs }) {
           const col  = rate >= 0.8 ? COLOURS.success : rate >= 0.5 ? COLOURS.warning : COLOURS.primary;
           return (
             <View key={q.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flexShrink: 1, minWidth: 48 }} numberOfLines={1}>{q.shortTitle}</Text>
+              <Text style={{ fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flexShrink: 1, minWidth: 48 }} numberOfLines={1}>{q.shortTitle}</Text>
               <View style={{ flex: 1, height: 8, backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 4, overflow: 'hidden' }}>
                 <View style={{ width: `${rate * 100}%`, height: '100%', backgroundColor: col, borderRadius: 4 }} />
               </View>
-              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, width: 44, textAlign: 'right' }}>
+              <Text style={{ fontSize: SIZES.chip, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, width: 44, textAlign: 'right' }}>
                 {n}/{participants.length}
               </Text>
             </View>
