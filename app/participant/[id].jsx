@@ -62,6 +62,19 @@ export default function ParticipantScreen() {
     setEditing(false);
   };
 
+  const handleDelete = () => {
+    if (Platform.OS === 'web') {
+      if (window.confirm(`Delete ${participant.name} and all their scores? This cannot be undone.`)) {
+        deleteParticipant(id).then(() => router.back());
+      }
+    } else {
+      Alert.alert('Delete participant', `Delete ${participant.name} and all their scores?`, [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => deleteParticipant(id).then(() => router.back()) },
+      ]);
+    }
+  };
+
   if (!participant) return null;
 
   const results  = participant.results ?? {};
@@ -79,6 +92,9 @@ export default function ParticipantScreen() {
         <Text style={s.headerTitle} numberOfLines={1}>{participant.name}</Text>
         <TouchableOpacity onPress={startEdit} style={s.editBtn}>
           <Ionicons name="pencil-outline" size={20} color={COLOURS.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDelete} style={{ width: 36, alignItems: 'flex-end' }}>
+          <Ionicons name="trash-outline" size={20} color={COLOURS.danger} />
         </TouchableOpacity>
       </View>
 
