@@ -3,8 +3,8 @@
 **A cross-platform research questionnaire scorer for Circadia Lab.**
 
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow)](./LICENSE)
-[![Expo](https://img.shields.io/badge/Expo-SDK%2052-000020?logo=expo)](https://expo.dev)
-[![React Native](https://img.shields.io/badge/React%20Native-0.76-61DAFB?logo=react)](https://reactnative.dev)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2055-000020?logo=expo)](https://expo.dev)
+[![React Native](https://img.shields.io/badge/React%20Native-0.83-61DAFB?logo=react)](https://reactnative.dev)
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-4A7BB5)](https://expo.dev)
 
 ---
@@ -20,14 +20,15 @@ It is part of the Circadia Lab toolchain and shares its visual identity with [Sl
 ## ✨ Features
 
 - 📋 **8 built-in validated instruments** — ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
-- 👥 **Multi-participant management** — add, track, and delete participants; progress rings colour-coded by completion
-- 🎯 **Step-by-step questionnaire runner** — one item at a time, automatic scoring and interpretation on completion
-- 🔀 **Enable/disable instruments** — per-questionnaire toggles persisted across sessions; group by clinical domain
+- 👥 **Rich participant profiles** — mandatory participant code plus optional name, demographics (age, sex, BMI), study fields (group, site, session), clinical fields (diagnosis, medication, referral), and arbitrary custom key–value pairs
+- 🎯 **Step-by-step questionnaire runner** — one item at a time, automatic scoring and interpretation on completion, coloured result badge with interpretation description
+- 🔀 **Enable/disable instruments** — per-questionnaire toggles persisted across sessions; animated pill toggle; group by clinical domain
+- 📊 **Analytics tab** — score distributions (box plots with whiskers, mean, median), descriptive statistics table (n, mean ± SD, median, range), completion rates, switchable grouping by group/condition, sex, session, or site
 - 📥 **Custom questionnaire import** — import any instrument as a JSON file following the built-in schema
-- 📤 **CSV and JSON export** — CSV for scores-only spreadsheet analysis; JSON for full item-level responses with metadata
-- 🖥️ **Desktop split-panel layout** — left participant list, right detail and inline scoring panel, glassmorphic sidebar
+- 📤 **CSV and JSON export** — CSV for scores-only spreadsheet analysis; JSON for full item-level responses with rich participant metadata; preview table in the export panel
+- 🖥️ **Desktop split-panel layout** — left participant list, right detail/scoring/edit panel, glassmorphic sidebar with About modal
 - 🌐 **Cross-platform** — runs as a web app, iOS app, and Android app from the same codebase
-- 🎉 **First-run onboarding** — centred modal walkthrough, shown once on first launch
+- 🎉 **First-run onboarding** — 3-slide centred modal walkthrough, shown once on first launch
 
 ---
 
@@ -39,24 +40,33 @@ ScoreMe/
 │   ├── _layout.jsx              Root layout — fonts, WebShell, Stack
 │   ├── index.jsx                Redirects to tabs
 │   ├── export.jsx               Export screen + DesktopExportModal
+│   ├── score/[pid]/[qid].jsx   Mobile scoring route
+│   ├── participant/[id].jsx     Mobile participant detail + edit
 │   └── (tabs)/
 │       ├── _layout.jsx          Desktop shell; onboarding modal
 │       ├── index.jsx            Dashboard
 │       ├── participants.jsx     Participant list + FAB + detail panel
-│       └── questionnaires.jsx   Questionnaire library + toggles + domain grouping
+│       ├── questionnaires.jsx   Questionnaire library + toggles + domain grouping
+│       └── analytics.jsx        Score distributions, stats table, completion rates
 ├── components/
 │   ├── QuestionnaireRunner.jsx  Step-by-step runner (desktop + mobile)
 │   ├── OnboardingModal.jsx      First-run centred square modal
 │   ├── ScreenBackground.jsx     SVG gradient background (mobile)
 │   ├── DesktopBackground.jsx    Dot-grid pattern background (desktop)
-│   └── DesktopSidebar.jsx       Sidebar nav + About modal
+│   ├── DesktopSidebar.jsx       Sidebar nav + About modal
+│   └── charts/
+│       ├── BoxPlot.jsx          SVG box-and-whisker plot with group support
+│       ├── CompletionBar.jsx    Horizontal completion rate bars
+│       └── chartUtils.js        Descriptive stats, grouping, palette helpers
 ├── data/
 │   └── questionnaires.js        8 built-in instruments + compileQuestionnaire()
 ├── storage/
-│   └── storage.js               AsyncStorage CRUD, export helpers, onboarding flag
+│   └── storage.js               AsyncStorage CRUD, export helpers, disabled-Qs, onboarding flag
 ├── theme/
 │   ├── typography.js            FONTS, SIZES, COLOURS
 │   └── responsive.js            useLayout(), SIDEBAR_W, SIDEBAR_TOTAL
+├── docs/
+│   └── questionnaire-schema.md  Full schema reference + LLM prompt template
 └── scripts/
     └── setup.js                 Copies fonts + logo.png from SleepDiaries sibling repo
 ```
@@ -69,6 +79,7 @@ ScoreMe/
 
 - Node.js ≥ 18
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- The [SleepDiaries](https://github.com/circadia-bio/SleepDiaries) repo cloned as a sibling directory (for fonts and logo)
 
 ### Installation
 
@@ -93,6 +104,30 @@ npx expo start --ios
 # Android emulator
 npx expo start --android
 ```
+
+---
+
+## 👤 Participant Data Model
+
+Each participant stores a mandatory code and a set of optional fields that are all exported in CSV and JSON:
+
+| Field | Type | Notes |
+|---|---|---|
+| `code` | string | **Required.** Unique participant identifier (e.g. `P001`) |
+| `name` | string | Full name (optional) |
+| `age` | string | Age in years |
+| `sex` | string | Male / Female / Non-binary / Prefer not to say |
+| `bmi` | string | Body mass index |
+| `group` | string | Group or condition label (e.g. Control, Treatment A) |
+| `site` | string | Recruitment or testing site |
+| `session` | string | Session label (e.g. Baseline, Week 4) |
+| `diagnosis` | string | Clinical diagnosis |
+| `medication` | string | Current medication |
+| `referral` | string | Referral source |
+| `customFields` | `{label, value}[]` | Arbitrary researcher-defined key–value pairs |
+| `notes` | string | Free-text notes |
+
+Participant metadata chips are displayed in the detail panel, colour-coded by category (demographics, study, clinical).
 
 ---
 
@@ -153,16 +188,17 @@ See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full 
 
 | Package | Version | Purpose |
 |---|---|---|
-| `expo` | ~52 | App framework and build toolchain |
-| `expo-router` | ~4 | File-based navigation |
+| `expo` | ~55 | App framework and build toolchain |
+| `expo-router` | ~55 | File-based navigation |
 | `expo-blur` | ~14 | Glassmorphic BlurView components |
-| `expo-document-picker` | ~12 | JSON import from device |
-| `expo-file-system` | ~17 | File write for CSV/JSON export |
-| `expo-sharing` | ~12 | Share sheet for export |
-| `expo-font` | ~12 | Custom font loading |
-| `@react-native-async-storage/async-storage` | ~2 | Persistent storage |
-| `react-native-safe-area-context` | ~4 | Safe area insets |
-| `@expo/vector-icons` | ~14 | Ionicons icon set |
+| `expo-document-picker` | ~55 | JSON import from device |
+| `expo-file-system` | ~18 | File write for CSV/JSON export |
+| `expo-sharing` | ~55 | Share sheet for export |
+| `expo-font` | ~55 | Custom font loading |
+| `@react-native-async-storage/async-storage` | 2.2 | Persistent storage |
+| `react-native-safe-area-context` | 5.6 | Safe area insets |
+| `react-native-svg` | 15.15 | SVG charts in analytics tab |
+| `@expo/vector-icons` | ~15 | Ionicons icon set |
 
 ---
 
