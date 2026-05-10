@@ -331,6 +331,7 @@ export default function ParticipantsScreen() {
   const [saving,     setSaving]     = useState(false);
   const [scoringQid, setScoringQid] = useState(null);
   const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
+  const [query,        setQuery]         = useState('');
 
   const load = useCallback(async () => {
     const [ps, customQs, disabledQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]);
@@ -385,6 +386,40 @@ export default function ParticipantsScreen() {
   const selected  = participants.find(p => p.id === selectedId) ?? null;
   const scoringQ  = allQs.find(q => q.id === scoringQid) ?? null;
 
+  const filteredParticipants = query.trim()
+    ? participants.filter(p => {
+        const q = query.toLowerCase();
+        return (
+          (p.code  ?? '').toLowerCase().includes(q) ||
+          (p.name  ?? '').toLowerCase().includes(q) ||
+          (p.group ?? '').toLowerCase().includes(q) ||
+          (p.site  ?? '').toLowerCase().includes(q) ||
+          (p.session ?? '').toLowerCase().includes(q)
+        );
+      })
+    : participants;
+
+  const SearchBar = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 1, marginBottom: 14 }}>
+      <Ionicons name="search" size={16} color={COLOURS.textMuted} />
+      <TextInput
+        style={{ flex: 1, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark }}
+        placeholder="Search by code, name, group…"
+        placeholderTextColor={COLOURS.textMuted}
+        value={query}
+        onChangeText={setQuery}
+        autoCorrect={false}
+        autoCapitalize="none"
+        returnKeyType="search"
+      />
+      {query.length > 0 && (
+        <TouchableOpacity onPress={() => setQuery('')}>
+          <Ionicons name="close-circle" size={16} color={COLOURS.textMuted} />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
   const handleScore = (qid) => setScoringQid(qid);
   const handleScoringComplete = async (answers, score) => {
     await saveResult(selectedId, scoringQid, answers, score);
@@ -408,7 +443,7 @@ export default function ParticipantsScreen() {
           {/* Left col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, overflow: 'hidden' }}>
             <ScrollView contentContainerStyle={{ paddingTop: 24, paddingBottom: 40, paddingLeft: SIDEBAR_TOTAL + 20, paddingRight: 20 }} showsVerticalScrollIndicator={false}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Participants</Text>
                 <TouchableOpacity
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: showAdd ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: showAdd ? COLOURS.primary : 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.20)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 3 }}
@@ -418,13 +453,19 @@ export default function ParticipantsScreen() {
                   <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: showAdd ? '#fff' : COLOURS.primary }}>{showAdd ? 'Cancel' : 'Add'}</Text>
                 </TouchableOpacity>
               </View>
+              {participants.length > 0 && SearchBar}
               {participants.length === 0 && !showAdd && (
                 <View style={{ alignItems: 'center', paddingVertical: 40, gap: 8 }}>
                   <Ionicons name="person-add-outline" size={36} color={COLOURS.textMuted} style={{ opacity: 0.5 }} />
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No participants yet</Text>
                 </View>
               )}
-              {participants.map(p => (
+              {query.trim() && filteredParticipants.length === 0 && participants.length > 0 && (
+                <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
+                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
+                </View>
+              )}
+              {filteredParticipants.map(p => (
                 <ParticipantRow key={p.id} p={p}
                   selected={!showAdd && selectedId === p.id}
                   totalQs={allQs.length}
@@ -479,7 +520,8 @@ export default function ParticipantsScreen() {
     <View style={{ flex: 1 }}>
       <ScreenBackground />
       <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12 }}>
-        <Text style={{ fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Participants</Text>
+        <Text style={{ fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 12 }}>Participants</Text>
+        {participants.length > 0 && SearchBar}
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         {participants.length === 0 ? (
@@ -488,34 +530,43 @@ export default function ParticipantsScreen() {
             <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>No participants yet</Text>
             <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24, paddingHorizontal: 24 }}>Add participants to begin scoring questionnaires.</Text>
           </View>
-        ) : participants.map(p => {
-          const scored = Object.keys(p.results ?? {});
-          return (
-            <TouchableOpacity key={p.id} style={ms.card} onPress={() => router.push(`/participant/${p.id}`)} activeOpacity={0.85}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
-                  {p.name ? <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {scored.length} scored</Text>
-                </View>
-                <TouchableOpacity style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1, borderColor: 'rgba(220,38,38,0.2)', alignItems: 'center', justifyContent: 'center' }} onPress={(e) => { e.stopPropagation(); handleDelete(p); }}>
-                  <Ionicons name="trash-outline" size={18} color={COLOURS.danger} />
-                </TouchableOpacity>
+        ) : (
+          <>
+            {query.trim() && filteredParticipants.length === 0 && (
+              <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
+                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
               </View>
-              {scored.length > 0 && (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                  {scored.map(qid => {
-                    const q = allQs.find(q => q.id === qid);
-                    return q ? <View key={qid} style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 }}><Text style={{ fontSize: 12, fontFamily: FONTS.body, color: COLOURS.primary }}>{q.shortTitle}</Text></View> : null;
-                  })}
-                </View>
-              )}
-            </TouchableOpacity>
-          );
-        })}
+            )}
+            {filteredParticipants.map(p => {
+              const scored = Object.keys(p.results ?? {});
+              return (
+                <TouchableOpacity key={p.id} style={ms.card} onPress={() => router.push(`/participant/${p.id}`)} activeOpacity={0.85}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{(p.code ?? p.name ?? '?').charAt(0).toUpperCase()}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
+                      {p.name && p.code ? <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
+                      <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {scored.length} scored</Text>
+                    </View>
+                    <TouchableOpacity style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(220,38,38,0.08)', alignItems: 'center', justifyContent: 'center' }} onPress={(e) => { e.stopPropagation(); handleDelete(p); }}>
+                      <Ionicons name="trash-outline" size={18} color={COLOURS.danger} />
+                    </TouchableOpacity>
+                  </View>
+                  {scored.length > 0 && (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {scored.map(qid => {
+                        const q = allQs.find(q => q.id === qid);
+                        return q ? <View key={qid} style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 }}><Text style={{ fontSize: 12, fontFamily: FONTS.body, color: COLOURS.primary }}>{q.shortTitle}</Text></View> : null;
+                      })}
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </>
+        )}
       </ScrollView>
 
       {/* FAB */}
