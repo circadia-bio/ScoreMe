@@ -34,7 +34,7 @@ const OptionListInput = ({ value, onChange, options }) => (
       return (
         <TouchableOpacity
           key={opt.value}
-          style={[s.scaleBtn, sel ? { backgroundColor: C.primary, borderColor: C.primary } : { borderColor: 'rgba(255,255,255,0.9)' }]}
+          style={[s.scaleBtn, sel && { backgroundColor: C.primary, shadowColor: 'rgba(74,123,181,0.35)', shadowRadius: 12, elevation: 5 }]}
           onPress={() => onChange(opt.value)}
           activeOpacity={0.8}
         >
@@ -57,7 +57,7 @@ const Scale010Input = ({ value, onChange }) => {
         {Array.from({ length: 11 }, (_, i) => {
           const sel = cur === i;
           return (
-            <TouchableOpacity key={i} style={[s.scale010Btn, sel && { backgroundColor: C.primary }]} onPress={() => onChange(i)} activeOpacity={0.7}>
+            <TouchableOpacity key={i} style={[s.scale010Btn, sel && { backgroundColor: C.primary, shadowColor: 'rgba(74,123,181,0.35)', shadowRadius: 10, elevation: 5 }]} onPress={() => onChange(i)} activeOpacity={0.7}>
               <Text style={[s.scale010BtnText, { color: sel ? '#fff' : C.primary }]}>{i}</Text>
             </TouchableOpacity>
           );
@@ -78,7 +78,7 @@ const YesNoInput = ({ value, onChange }) => (
       const sel = value === opt;
       return (
         <TouchableOpacity key={opt}
-          style={[s.yesNoBtn, sel ? { backgroundColor: C.primary, borderColor: C.primary } : { borderColor: 'rgba(255,255,255,0.9)' }]}
+          style={[s.yesNoBtn, sel && { backgroundColor: C.primary, shadowColor: 'rgba(74,123,181,0.35)', shadowRadius: 12, elevation: 5 }]}
           onPress={() => onChange(opt)} activeOpacity={0.8}>
           <Text style={[s.yesNoText, { color: sel ? '#fff' : C.primary }]}>{opt === 'yes' ? 'Yes' : 'No'}</Text>
         </TouchableOpacity>
@@ -148,11 +148,11 @@ const NumberInput = ({ value, onChange, min = 0, max = 99, unit = '' }) => {
   useEffect(() => () => stopLong(), []);
   return (
     <View style={s.numberRow}>
-      <Pressable style={[s.numBtn, { borderColor: C.primary }]} onPress={() => adjust(-1)} onLongPress={() => startLong(-1)} onPressOut={stopLong} delayLongPress={300}>
+      <Pressable style={s.numBtn} onPress={() => adjust(-1)} onLongPress={() => startLong(-1)} onPressOut={stopLong} delayLongPress={300}>
         <Ionicons name="remove" size={24} color={C.primary} />
       </Pressable>
       <Text style={[s.numValue, { color: C.primary }]}>{v}</Text>
-      <Pressable style={[s.numBtn, { borderColor: C.primary }]} onPress={() => adjust(1)} onLongPress={() => startLong(1)} onPressOut={stopLong} delayLongPress={300}>
+      <Pressable style={s.numBtn} onPress={() => adjust(1)} onLongPress={() => startLong(1)} onPressOut={stopLong} delayLongPress={300}>
         <Ionicons name="add" size={24} color={C.primary} />
       </Pressable>
       {!!unit && <Text style={[s.numUnit, { color: C.primary }]}>{unit}</Text>}
@@ -383,19 +383,19 @@ const s = StyleSheet.create({
   inputArea:  { alignItems: 'stretch' },
 
   scaleCol:       { gap: 10 },
-  scaleBtn:       { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 13, borderRadius: 12, borderWidth: 1, backgroundColor: COLOURS.cardBg },
+  scaleBtn:       { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 13, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   scaleBtnValue:  { fontSize: 20, fontFamily: FONTS.heading, minWidth: 26, textAlign: 'center' },
   scaleBtnLabel:  { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, flex: 1 },
 
   scale010Container: { width: '100%', gap: 10 },
   scale010Row:       { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
-  scale010Btn:       { width: 46, height: 46, borderRadius: 23, borderWidth: 1, borderColor: 'rgba(74,123,181,0.25)', alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  scale010Btn:       { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 },
   scale010BtnText:   { fontSize: 17, fontFamily: FONTS.heading },
   scale010Labels:    { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
   scale010Anchor:    { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },
 
   yesNoRow: { flexDirection: 'row', gap: 20, marginTop: 8, justifyContent: 'center' },
-  yesNoBtn: { width: 130, height: 56, borderRadius: 28, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  yesNoBtn: { width: 130, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   yesNoText: { fontSize: 20, fontFamily: FONTS.body },
 
   stepperWrapper: { alignItems: 'center', gap: 10 },
@@ -407,7 +407,7 @@ const s = StyleSheet.create({
   timeSep:    { fontSize: 40, fontFamily: FONTS.heading, marginTop: -12 },
 
   numberRow: { flexDirection: 'row', alignItems: 'center', gap: 20, justifyContent: 'center' },
-  numBtn:    { width: 52, height: 52, borderRadius: 26, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOURS.cardBg },
+  numBtn:    { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.72)', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   numValue:  { fontSize: 48, fontFamily: FONTS.heading, minWidth: 60, textAlign: 'center' },
   numUnit:   { fontSize: 16, fontFamily: FONTS.bodyMedium, marginLeft: 4 },
 
