@@ -21,14 +21,16 @@ It is part of the Circadia Lab toolchain and shares its visual identity with [Sl
 
 - 📋 **8 built-in validated instruments** — ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
 - 👥 **Rich participant profiles** — mandatory participant code plus optional name, demographics (age, sex, BMI), study fields (group, site, session), clinical fields (diagnosis, medication, referral), and arbitrary custom key–value pairs
-- 🎯 **Step-by-step questionnaire runner** — one item at a time, automatic scoring and interpretation on completion, coloured result badge with interpretation description
+- 🔍 **Search and sort** — filter participants by code, name, group, site, or session; sort by date added, A–Z, or completion %
+- 🎯 **Step-by-step questionnaire runner** — one item at a time, automatic scoring and interpretation on completion, coloured result badge with glow shadow
+- 🕐 **Score history** — re-scoring appends to a timestamped history array; no data is ever overwritten; attempt count shown in detail view; full history in JSON export
 - 🔀 **Enable/disable instruments** — per-questionnaire toggles persisted across sessions; animated pill toggle; group by clinical domain
-- 📊 **Analytics tab** — score distributions (box plots with whiskers, mean, median), descriptive statistics table (n, mean ± SD, median, range), completion rates, switchable grouping by group/condition, sex, session, or site
+- 📊 **Analytics tab** — score distributions (SVG box plots with whiskers, mean, median), descriptive statistics table (n, mean ± SD, median, range), completion rates, switchable grouping by group/condition, sex, session, or site
 - 📥 **Custom questionnaire import** — import any instrument as a JSON file following the built-in schema
-- 📤 **CSV and JSON export** — CSV for scores-only spreadsheet analysis; JSON for full item-level responses with rich participant metadata; preview table in the export panel
+- 📤 **CSV and JSON export** — CSV includes all participant metadata fields and custom fields as dynamic columns, with latest score per questionnaire; JSON includes full timestamped score history with item-level answers; preview table in the export panel
 - 🖥️ **Desktop split-panel layout** — left participant list, right detail/scoring/edit panel, glassmorphic sidebar with About modal
 - 🌐 **Cross-platform** — runs as a web app, iOS app, and Android app from the same codebase
-- 🎉 **First-run onboarding** — 3-slide centred modal walkthrough, shown once on first launch
+- 🎉 **First-run onboarding** — 3-slide centred modal walkthrough, shown once; resettable from the About modal
 
 ---
 
@@ -41,11 +43,11 @@ ScoreMe/
 │   ├── index.jsx                Redirects to tabs
 │   ├── export.jsx               Export screen + DesktopExportModal
 │   ├── score/[pid]/[qid].jsx   Mobile scoring route
-│   ├── participant/[id].jsx     Mobile participant detail + edit
+│   ├── participant/[id].jsx     Mobile participant detail + inline edit
 │   └── (tabs)/
 │       ├── _layout.jsx          Desktop shell; onboarding modal
 │       ├── index.jsx            Dashboard
-│       ├── participants.jsx     Participant list + FAB + detail panel
+│       ├── participants.jsx     Participant list + search/sort + FAB + detail panel
 │       ├── questionnaires.jsx   Questionnaire library + toggles + domain grouping
 │       └── analytics.jsx        Score distributions, stats table, completion rates
 ├── components/
@@ -53,7 +55,7 @@ ScoreMe/
 │   ├── OnboardingModal.jsx      First-run centred square modal
 │   ├── ScreenBackground.jsx     SVG gradient background (mobile)
 │   ├── DesktopBackground.jsx    Dot-grid pattern background (desktop)
-│   ├── DesktopSidebar.jsx       Sidebar nav + About modal
+│   ├── DesktopSidebar.jsx       Sidebar nav + About modal + onboarding reset
 │   └── charts/
 │       ├── BoxPlot.jsx          SVG box-and-whisker plot with group support
 │       ├── CompletionBar.jsx    Horizontal completion rate bars
@@ -61,7 +63,9 @@ ScoreMe/
 ├── data/
 │   └── questionnaires.js        8 built-in instruments + compileQuestionnaire()
 ├── storage/
-│   └── storage.js               AsyncStorage CRUD, export helpers, disabled-Qs, onboarding flag
+│   └── storage.js               AsyncStorage CRUD, score history, export helpers,
+│                                 disabled-Qs, onboarding flag
+│                                 Exports: getLatestResult, getAllResults
 ├── theme/
 │   ├── typography.js            FONTS, SIZES, COLOURS
 │   └── responsive.js            useLayout(), SIDEBAR_W, SIDEBAR_TOTAL
@@ -109,7 +113,7 @@ npx expo start --android
 
 ## 👤 Participant Data Model
 
-Each participant stores a mandatory code and a set of optional fields that are all exported in CSV and JSON:
+Each participant stores a mandatory code and a set of optional fields exported in both CSV and JSON:
 
 | Field | Type | Notes |
 |---|---|---|
@@ -124,10 +128,14 @@ Each participant stores a mandatory code and a set of optional fields that are a
 | `diagnosis` | string | Clinical diagnosis |
 | `medication` | string | Current medication |
 | `referral` | string | Referral source |
-| `customFields` | `{label, value}[]` | Arbitrary researcher-defined key–value pairs |
+| `customFields` | `{label, value}[]` | Arbitrary researcher-defined key–value pairs; each becomes its own CSV column |
 | `notes` | string | Free-text notes |
 
-Participant metadata chips are displayed in the detail panel, colour-coded by category (demographics, study, clinical).
+Metadata chips in the detail panel are colour-coded by category (demographics, study, clinical).
+
+### Score history
+
+Each questionnaire result is stored as a timestamped array. Re-scoring appends a new entry rather than overwriting. `getLatestResult(participant, qid)` and `getAllResults(participant, qid)` are exported from `storage.js` for use across screens. Legacy single-object results are migrated automatically on next save.
 
 ---
 
