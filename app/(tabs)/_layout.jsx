@@ -19,7 +19,7 @@ import DesktopBackground from '../../components/DesktopBackground';
 import DesktopSidebar from '../../components/DesktopSidebar';
 import OnboardingModal from '../../components/OnboardingModal';
 import { DesktopExportModal } from '../export';
-import { hasSeenOnboarding } from '../../storage/storage';
+import { hasSeenOnboarding, markOnboardingComplete } from '../../storage/storage';
 
 export default function TabLayout() {
   const { isDesktop } = useLayout();
@@ -31,6 +31,11 @@ export default function TabLayout() {
   useEffect(() => {
     hasSeenOnboarding().then(seen => { if (!seen) setShowOnboarding(true); });
   }, []);
+
+  const handleDismissOnboarding = async () => {
+    await markOnboardingComplete();
+    setShowOnboarding(false);
+  };
 
   const activeTab =
     pathname.includes('participants')   ? 'participants'   :
@@ -78,7 +83,7 @@ export default function TabLayout() {
           </View>
         </View>
         <DesktopExportModal visible={showExport} onClose={() => setShowExport(false)} />
-        <OnboardingModal visible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
+        <OnboardingModal visible={showOnboarding} onDismiss={handleDismissOnboarding} />
       </View>
     );
   }
@@ -86,7 +91,7 @@ export default function TabLayout() {
   return (
     <>
       {tabs}
-      <OnboardingModal visible={showOnboarding} onDismiss={() => setShowOnboarding(false)} />
+      <OnboardingModal visible={showOnboarding} onDismiss={handleDismissOnboarding} />
     </>
   );
 }
