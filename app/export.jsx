@@ -231,7 +231,7 @@ function DesktopExportModal({ visible, onClose }) {
             width: 520,
             borderRadius: 20,
             overflow: 'hidden',
-            backgroundColor: 'rgba(238,245,255,0.97)',
+            backgroundColor: COLOURS.screenBg,
             borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
             shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12,
           }}
@@ -263,9 +263,8 @@ export default function ExportScreen() {
   // we instead show a floating panel. Redirect back and let the tab handle it.
   // For simplicity, just render the content full-screen on desktop too.
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: COLOURS.screenBg }}>
       <ScreenBackground />
-      {/* Back button — mobile only */}
       {!isDesktop && (
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingTop: insets.top + 16, paddingBottom: 8 }}>
           <TouchableOpacity onPress={() => router.back()} style={{ width: 36 }}>
