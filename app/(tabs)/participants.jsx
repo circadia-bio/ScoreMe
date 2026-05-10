@@ -327,7 +327,7 @@ export default function ParticipantsScreen() {
                   {p.notes ? <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
                   <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {scored.length} scored</Text>
                 </View>
-                <TouchableOpacity style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1, borderColor: 'rgba(220,38,38,0.2)', alignItems: 'center', justifyContent: 'center' }} onPress={() => handleDelete(p)}>
+                <TouchableOpacity style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1, borderColor: 'rgba(220,38,38,0.2)', alignItems: 'center', justifyContent: 'center' }} onPress={(e) => { e.stopPropagation(); handleDelete(p); }}>
                   <Ionicons name="trash-outline" size={18} color={COLOURS.danger} />
                 </TouchableOpacity>
               </View>
