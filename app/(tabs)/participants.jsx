@@ -207,7 +207,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 }}>
         <View style={{ width: 52, height: 52, borderRadius: 26, borderWidth: 2.5, borderColor: col, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
+            <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{(p.code ?? p.name ?? '?').charAt(0).toUpperCase()}</Text>
           </View>
         </View>
         <View style={{ flex: 1 }}>
@@ -230,9 +230,9 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       {/* Participant metadata chips */}
       {(p.age || p.sex || p.bmi || p.group || p.site || p.session || p.diagnosis || p.medication || p.referral || p.notes || (p.customFields?.length > 0)) && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-          {p.age      ? <View style={dp.chip}><Text style={dp.chipText}>🗓 Age: {p.age}</Text></View> : null}
+          {p.age      ? <View style={dp.chip}><Text style={dp.chipText}>Age {p.age}</Text></View> : null}
           {p.sex      ? <View style={dp.chip}><Text style={dp.chipText}>{p.sex}</Text></View> : null}
-          {p.bmi      ? <View style={dp.chip}><Text style={dp.chipText}>BMI: {p.bmi}</Text></View> : null}
+          {p.bmi      ? <View style={dp.chip}><Text style={dp.chipText}>BMI {p.bmi}</Text></View> : null}
           {p.group    ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.group}</Text></View> : null}
           {p.site     ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.site}</Text></View> : null}
           {p.session  ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.session}</Text></View> : null}
@@ -240,7 +240,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
           {p.medication ? <View style={[dp.chip, dp.chipClinical]}><Text style={[dp.chipText, dp.chipClinicalText]}>{p.medication}</Text></View> : null}
           {p.referral   ? <View style={[dp.chip, dp.chipClinical]}><Text style={[dp.chipText, dp.chipClinicalText]}>{p.referral}</Text></View> : null}
           {(p.customFields ?? []).map((cf, i) => cf.label ? <View key={i} style={dp.chip}><Text style={dp.chipText}>{cf.label}: {cf.value}</Text></View> : null)}
-          {p.notes    ? <View style={dp.chip}><Text style={dp.chipText} numberOfLines={1}>📝 {p.notes}</Text></View> : null}
+          {p.notes    ? <View style={dp.chip}><Text style={dp.chipText} numberOfLines={1}>{p.notes}</Text></View> : null}
         </View>
       )}
 
@@ -304,11 +304,11 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
 }
 
 const dp = StyleSheet.create({
-  chip:            { backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
-  chipText:        { fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
-  chipStudy:       { backgroundColor: 'rgba(107,63,160,0.08)' },
+  chip:            { backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 11, paddingVertical: 5, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 4, elevation: 1 },
+  chipText:        { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
+  chipStudy:       { backgroundColor: 'rgba(107,63,160,0.08)', borderColor: 'rgba(107,63,160,0.18)' },
   chipStudyText:   { color: COLOURS.purple },
-  chipClinical:    { backgroundColor: 'rgba(220,38,38,0.07)' },
+  chipClinical:    { backgroundColor: 'rgba(220,38,38,0.06)', borderColor: 'rgba(220,38,38,0.15)' },
   chipClinicalText:{ color: '#B91C1C' },
 });
 
