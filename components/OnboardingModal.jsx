@@ -98,7 +98,8 @@ export default function OnboardingModal({ visible, onDismiss }) {
               </TouchableOpacity>
             </View>
           </View>
-        </BlurView>
+          </View>
+          </BlurView>
       </View>
     </Modal>
   );
