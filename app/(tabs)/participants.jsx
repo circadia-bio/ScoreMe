@@ -34,27 +34,29 @@ function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
   const pct = totalQs > 0 ? n / totalQs : 0;
   const col = pct === 0 ? COLOURS.textMuted : pct < 0.5 ? COLOURS.warning : pct < 1 ? COLOURS.primary : COLOURS.success;
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ marginBottom: 10 }}>
+    <View style={{ marginBottom: 10 }}>
       <BlurView intensity={selected ? 52 : 36} tint="light" style={{ borderRadius: 14, overflow: 'hidden', shadowColor: selected ? 'rgba(74,123,181,0.22)' : 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: selected ? 7 : 3 }, shadowOpacity: 1, shadowRadius: selected ? 22 : 12, elevation: selected ? 5 : 2 }}>
-        <View style={{ backgroundColor: selected ? 'rgba(255,255,255,0.70)' : 'rgba(255,255,255,0.48)', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: col, alignItems: 'center', justifyContent: 'center' }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 16, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
+        <View style={{ backgroundColor: selected ? 'rgba(255,255,255,0.70)' : 'rgba(255,255,255,0.48)', flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 }}>
+            <View style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: col, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 16, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
+              </View>
             </View>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.name}</Text>
-            {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
-            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {n} scored</Text>
-          </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.name}</Text>
+              {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
+              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {n} scored</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={15} color={selected ? COLOURS.primary : COLOURS.textMuted} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={onDelete} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(220,38,38,0.08)', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(220,38,38,0.08)', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
             <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
           </TouchableOpacity>
-          <Ionicons name="chevron-forward" size={15} color={selected ? COLOURS.primary : COLOURS.textMuted} />
         </View>
       </BlurView>
-    </TouchableOpacity>
+    </View>
   );
 }
 
