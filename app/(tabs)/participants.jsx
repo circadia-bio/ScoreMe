@@ -457,7 +457,7 @@ export default function ParticipantsScreen() {
                   <Ionicons name="person-add-outline" size={36} color={COLOURS.textMuted} style={{ opacity: 0.5 }} />
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No participants yet</Text>
                 </View>
-              )}
+              ) : null}
               {query.trim() && filteredParticipants.length === 0 && participants.length > 0 ? (
                 <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
