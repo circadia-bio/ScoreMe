@@ -15,9 +15,8 @@ import * as FileSystem from 'expo-file-system';
 import ScreenBackground from '../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../theme/responsive';
-import { loadParticipants, participantsToCSV, participantsToJSON } from '../storage/storage';
+import { loadParticipants, participantsToCSV, participantsToJSON, loadCustomQuestionnaires, loadDisabledQs } from '../storage/storage';
 import { QUESTIONNAIRES } from '../data/questionnaires';
-import { loadCustomQuestionnaires } from '../storage/storage';
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -216,9 +215,9 @@ function DesktopExportModal({ visible, onClose }) {
 
   React.useEffect(() => {
     if (!visible) return;
-    Promise.all([loadParticipants(), loadCustomQuestionnaires()]).then(([ps, customQs]) => {
+    Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]).then(([ps, customQs, disabledQs]) => {
       setParticipants(ps);
-      setAllQs([...QUESTIONNAIRES, ...customQs]);
+      setAllQs([...QUESTIONNAIRES, ...customQs].filter(q => !disabledQs.has(q.id)));
     });
   }, [visible]);
 
@@ -254,9 +253,9 @@ export default function ExportScreen() {
   const [allQs, setAllQs]              = useState(QUESTIONNAIRES);
 
   useFocusEffect(useCallback(() => {
-    Promise.all([loadParticipants(), loadCustomQuestionnaires()]).then(([ps, customQs]) => {
+    Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]).then(([ps, customQs, disabledQs]) => {
       setParticipants(ps);
-      setAllQs([...QUESTIONNAIRES, ...customQs]);
+      setAllQs([...QUESTIONNAIRES, ...customQs].filter(q => !disabledQs.has(q.id)));
     });
   }, []));
 
