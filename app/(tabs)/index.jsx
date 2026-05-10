@@ -39,12 +39,12 @@ function ParticipantRow({ p, selected, onPress, totalQs }) {
         <View style={{ backgroundColor: selected ? 'rgba(255,255,255,0.70)' : 'rgba(255,255,255,0.48)', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: col, alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 16, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
+              <Text style={{ fontSize: 16, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{(p.code ?? p.name ?? '?').charAt(0).toUpperCase()}</Text>
             </View>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.name}</Text>
-            {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
+            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
+            {p.name && p.code ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
             <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{n}/{totalQs} scored</Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color={selected ? COLOURS.primary : COLOURS.textMuted} />
@@ -73,12 +73,12 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 }}>
         <View style={{ width: 52, height: 52, borderRadius: 26, borderWidth: 2.5, borderColor: col, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: COLOURS.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
+            <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{(p.code ?? p.name ?? '?').charAt(0).toUpperCase()}</Text>
           </View>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name}</Text>
-          {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{p.notes}</Text> : null}
+          <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
+          {p.name && p.code ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{p.name}</Text> : null}
           <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Added {formatDate(p.createdAt)}</Text>
         </View>
         <TouchableOpacity onPress={onClose} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.6)', alignItems: 'center', justifyContent: 'center' }}>
@@ -159,11 +159,11 @@ function MobileCard({ p, onPress, allQs }) {
     <TouchableOpacity style={mc.card} onPress={onPress} activeOpacity={0.85}>
       <View style={mc.row}>
         <View style={[mc.ring, { borderColor: col }]}>
-          <View style={mc.avatar}><Text style={mc.at}>{p.name.charAt(0).toUpperCase()}</Text></View>
+          <View style={mc.avatar}><Text style={mc.at}>{(p.code ?? p.name ?? '?').charAt(0).toUpperCase()}</Text></View>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={mc.name}>{p.name}</Text>
-          {p.notes ? <Text style={mc.notes} numberOfLines={1}>{p.notes}</Text> : null}
+          <Text style={mc.name}>{p.code ?? p.name}</Text>
+          {p.name && p.code ? <Text style={mc.notes} numberOfLines={1}>{p.name}</Text> : null}
           <Text style={mc.date}>{formatDate(p.createdAt)}</Text>
         </View>
         <View style={{ alignItems: 'center', minWidth: 44 }}>
