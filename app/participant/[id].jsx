@@ -228,7 +228,7 @@ export default function ParticipantScreen() {
                     <View style={s.resultRow}>
                       <View style={{ flex: 1, gap: 4 }}>
                         <Text style={s.qTitle}>{q.title}</Text>
-                        <View style={[s.badge, { backgroundColor: interp.color + '18', borderColor: interp.color }]}>
+                        <View style={[s.badge, { backgroundColor: interp.color + '18', shadowColor: interp.color, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 }]}>
                           <Text style={[s.badgeText, { color: interp.color }]}>
                             {formatScore(q, result.score)} — {interp.label}
                           </Text>
@@ -315,7 +315,7 @@ const s = StyleSheet.create({
   card:    { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, overflow: 'hidden' },
   divider: { height: 1, backgroundColor: '#F1F5F9', marginHorizontal: 16 },
   resultRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
-  badge:   { alignSelf: 'flex-start', borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  badge:   { alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText: { fontSize: SIZES.label, fontFamily: FONTS.body },
   resultDate: { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },
   redoBtn: { backgroundColor: 'rgba(74,123,181,0.12)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7 },

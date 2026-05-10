@@ -106,7 +106,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                       {q.domain && <View style={{ backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{q.domain}</Text></View>}
                     </View>
                   )}
-                  <View style={{ alignSelf: 'flex-start', borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: c + '18', borderColor: c }}>
+                  <View style={{ alignSelf: 'flex-start', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: c + '18', shadowColor: c, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 }}>
                     <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: c }}>{fmtScore(r.score)} — {interpLabel(q, r.score)}</Text>
                   </View>
                 </View>
@@ -175,7 +175,7 @@ function MobileCard({ p, onPress, allQs }) {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
           {allQs.filter(q => results[q.id]).map(q => {
             const c = interpColor(q, results[q.id].score);
-            return <View key={q.id} style={{ borderWidth: 1, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: c + '18', borderColor: c }}><Text style={{ fontSize: 12, fontFamily: FONTS.body, color: c }}>{q.shortTitle} {fmtScore(results[q.id].score)}</Text></View>;
+            return <View key={q.id} style={{ borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: c + '18', shadowColor: c, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.22, shadowRadius: 5, elevation: 2 }}><Text style={{ fontSize: 12, fontFamily: FONTS.body, color: c }}>{q.shortTitle} {fmtScore(results[q.id].score)}</Text></View>;
           })}
         </View>
       )}
