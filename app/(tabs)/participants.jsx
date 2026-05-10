@@ -44,8 +44,8 @@ function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
               </View>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.name}</Text>
-              {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
+              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
+              {p.name ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
               <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {n} scored</Text>
             </View>
             <Ionicons name="chevron-forward" size={15} color={selected ? COLOURS.primary : COLOURS.textMuted} />
@@ -60,25 +60,114 @@ function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
   );
 }
 
-// ─── Add form ─────────────────────────────────────────────────────────────────
-function AddForm({ name, notes, onName, onNotes, onSubmit, onCancel, adding }) {
+// ─── Shared field helpers ─────────────────────────────────────────────────────
+const LABEL = { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 14, marginBottom: 2 };
+const SEX_OPTIONS = ['', 'Male', 'Female', 'Non-binary', 'Prefer not to say'];
+
+function FieldInput({ label, value, onChange, placeholder, multiline, keyboardType, required }) {
   return (
-    <View style={{ padding: 24, gap: 4 }}>
-      <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 16 }}>New Participant</Text>
-      <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Name *</Text>
-      <TextInput style={af.input} placeholder="Participant name or ID" placeholderTextColor={COLOURS.textMuted} value={name} onChangeText={onName} returnKeyType="next" autoFocus />
-      <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 14 }}>Notes (optional)</Text>
-      <TextInput style={[af.input, { height: 80, textAlignVertical: 'top' }]} placeholder="e.g. Group A, session date…" placeholderTextColor={COLOURS.textMuted} value={notes} onChangeText={onNotes} multiline />
-      <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-        {onCancel && <TouchableOpacity style={{ flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' }} onPress={onCancel}><Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text></TouchableOpacity>}
-        <TouchableOpacity style={[{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }, (!name.trim() || adding) && { opacity: 0.4 }, onCancel && { flex: 1 }]} onPress={onSubmit} disabled={!name.trim() || adding}>
-          <Ionicons name="person-add" size={17} color="#fff" />
-          <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>Add Participant</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <>
+      <Text style={[LABEL, { marginTop: 14 }]}>{label}{required ? ' *' : ''}</Text>
+      <TextInput
+        style={[af.input, multiline && { height: 72, textAlignVertical: 'top' }]}
+        value={value} onChangeText={onChange} placeholder={placeholder}
+        placeholderTextColor={COLOURS.textMuted} multiline={multiline}
+        keyboardType={keyboardType ?? 'default'}
+      />
+    </>
   );
 }
+
+function SexPicker({ value, onChange }) {
+  return (
+    <>
+      <Text style={[LABEL, { marginTop: 14 }]}>Sex</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+        {SEX_OPTIONS.filter(Boolean).map(opt => (
+          <TouchableOpacity key={opt}
+            style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1,
+              backgroundColor: value === opt ? COLOURS.primary : 'rgba(255,255,255,0.72)',
+              borderColor: value === opt ? COLOURS.primary : 'rgba(74,123,181,0.2)' }}
+            onPress={() => onChange(value === opt ? '' : opt)}>
+            <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: value === opt ? '#fff' : COLOURS.primaryDark }}>{opt}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+}
+
+function SectionHeader({ title }) {
+  return <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 20, marginBottom: 2, borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.10)', paddingBottom: 6 }}>{title}</Text>;
+}
+
+// ─── Add / Edit form ──────────────────────────────────────────────────────────
+function ParticipantForm({ fields, setField, onSubmit, onCancel, submitting, isEdit }) {
+  const addCustomField = () => setField('customFields', [...(fields.customFields ?? []), { label: '', value: '' }]);
+  const updateCustomField = (i, key, val) => {
+    const cf = [...(fields.customFields ?? [])];
+    cf[i] = { ...cf[i], [key]: val };
+    setField('customFields', cf);
+  };
+  const removeCustomField = (i) => setField('customFields', (fields.customFields ?? []).filter((_, idx) => idx !== i));
+
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 24, paddingBottom: 40 }}>
+      <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 4 }}>{isEdit ? 'Edit Participant' : 'New Participant'}</Text>
+
+      <SectionHeader title="Identity" />
+      <FieldInput label="Participant Code" value={fields.code} onChange={v => setField('code', v)} placeholder="e.g. P001" required />
+      <FieldInput label="Name" value={fields.name} onChange={v => setField('name', v)} placeholder="Full name (optional)" />
+
+      <SectionHeader title="Demographics" />
+      <FieldInput label="Age" value={fields.age} onChange={v => setField('age', v)} placeholder="e.g. 34" keyboardType="numeric" />
+      <SexPicker value={fields.sex} onChange={v => setField('sex', v)} />
+      <FieldInput label="BMI" value={fields.bmi} onChange={v => setField('bmi', v)} placeholder="e.g. 24.5" keyboardType="numeric" />
+
+      <SectionHeader title="Study" />
+      <FieldInput label="Group / Condition" value={fields.group} onChange={v => setField('group', v)} placeholder="e.g. Control, Treatment A" />
+      <FieldInput label="Site" value={fields.site} onChange={v => setField('site', v)} placeholder="e.g. London" />
+      <FieldInput label="Session" value={fields.session} onChange={v => setField('session', v)} placeholder="e.g. Baseline, Week 4" />
+
+      <SectionHeader title="Clinical" />
+      <FieldInput label="Diagnosis" value={fields.diagnosis} onChange={v => setField('diagnosis', v)} placeholder="e.g. Insomnia disorder" />
+      <FieldInput label="Medication" value={fields.medication} onChange={v => setField('medication', v)} placeholder="e.g. None" />
+      <FieldInput label="Referral" value={fields.referral} onChange={v => setField('referral', v)} placeholder="e.g. GP, self-referred" />
+
+      <SectionHeader title="Custom fields" />
+      {(fields.customFields ?? []).map((cf, i) => (
+        <View key={i} style={{ flexDirection: 'row', gap: 6, marginTop: 8, alignItems: 'flex-start' }}>
+          <TextInput style={[af.input, { flex: 1 }]} value={cf.label} onChangeText={v => updateCustomField(i, 'label', v)} placeholder="Label" placeholderTextColor={COLOURS.textMuted} />
+          <TextInput style={[af.input, { flex: 2 }]} value={cf.value} onChangeText={v => updateCustomField(i, 'value', v)} placeholder="Value" placeholderTextColor={COLOURS.textMuted} />
+          <TouchableOpacity onPress={() => removeCustomField(i)} style={{ width: 36, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="close-circle" size={18} color={COLOURS.danger} />
+          </TouchableOpacity>
+        </View>
+      ))}
+      <TouchableOpacity onPress={addCustomField} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
+        <Ionicons name="add-circle-outline" size={18} color={COLOURS.primary} />
+        <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>Add field</Text>
+      </TouchableOpacity>
+
+      <FieldInput label="Notes" value={fields.notes} onChange={v => setField('notes', v)} placeholder="Any additional notes…" multiline />
+
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 24 }}>
+        {onCancel && (
+          <TouchableOpacity style={{ flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' }} onPress={onCancel}>
+            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }, (!fields.code?.trim() || submitting) && { opacity: 0.4 }]}
+          onPress={onSubmit} disabled={!fields.code?.trim() || submitting}>
+          <Ionicons name={isEdit ? 'checkmark' : 'person-add'} size={17} color="#fff" />
+          <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{submitting ? (isEdit ? 'Saving…' : 'Adding…') : (isEdit ? 'Save' : 'Add Participant')}</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+
 const af = StyleSheet.create({
   input: { backgroundColor: 'rgba(255,255,255,0.80)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, marginTop: 6 },
 });
@@ -106,8 +195,8 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
           </View>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name}</Text>
-          {p.notes ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{p.notes}</Text> : null}
+          <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
+          {p.name ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{p.name}</Text> : null}
           <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Added {formatDate(p.createdAt)}</Text>
         </View>
         <TouchableOpacity onPress={onClose} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.6)', alignItems: 'center', justifyContent: 'center' }}>
@@ -121,6 +210,23 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
         <View style={{ height: '100%', borderRadius: 3, width: `${pct * 100}%`, backgroundColor: col }} />
       </View>
       <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {allQs.length} scored</Text>
+
+      {/* Participant metadata chips */}
+      {(p.age || p.sex || p.bmi || p.group || p.site || p.session || p.diagnosis || p.medication || p.referral || p.notes || (p.customFields?.length > 0)) && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+          {p.age      ? <View style={dp.chip}><Text style={dp.chipText}>🗓 Age: {p.age}</Text></View> : null}
+          {p.sex      ? <View style={dp.chip}><Text style={dp.chipText}>{p.sex}</Text></View> : null}
+          {p.bmi      ? <View style={dp.chip}><Text style={dp.chipText}>BMI: {p.bmi}</Text></View> : null}
+          {p.group    ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.group}</Text></View> : null}
+          {p.site     ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.site}</Text></View> : null}
+          {p.session  ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.session}</Text></View> : null}
+          {p.diagnosis  ? <View style={[dp.chip, dp.chipClinical]}><Text style={[dp.chipText, dp.chipClinicalText]}>{p.diagnosis}</Text></View> : null}
+          {p.medication ? <View style={[dp.chip, dp.chipClinical]}><Text style={[dp.chipText, dp.chipClinicalText]}>{p.medication}</Text></View> : null}
+          {p.referral   ? <View style={[dp.chip, dp.chipClinical]}><Text style={[dp.chipText, dp.chipClinicalText]}>{p.referral}</Text></View> : null}
+          {(p.customFields ?? []).map((cf, i) => cf.label ? <View key={i} style={dp.chip}><Text style={dp.chipText}>{cf.label}: {cf.value}</Text></View> : null)}
+          {p.notes    ? <View style={dp.chip}><Text style={dp.chipText} numberOfLines={1}>📝 {p.notes}</Text></View> : null}
+        </View>
+      )}
 
       {scored.length > 0 && <>
         <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>RESULTS</Text>
@@ -181,6 +287,15 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
   );
 }
 
+const dp = StyleSheet.create({
+  chip:            { backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
+  chipText:        { fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
+  chipStudy:       { backgroundColor: 'rgba(107,63,160,0.08)' },
+  chipStudyText:   { color: COLOURS.purple },
+  chipClinical:    { backgroundColor: 'rgba(220,38,38,0.07)' },
+  chipClinicalText:{ color: '#B91C1C' },
+});
+
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function ParticipantsScreen() {
   const router  = useRouter();
@@ -188,15 +303,16 @@ export default function ParticipantsScreen() {
   const { isDesktop } = useLayout();
   const [participants, setParticipants] = useState([]);
   const [selectedId,   setSelectedId]   = useState(null);
-  const [showAdd,      setShowAdd]      = useState(false);
-  const [showEdit,     setShowEdit]     = useState(false);
-  const [editName,     setEditName]     = useState('');
-  const [editNotes,    setEditNotes]    = useState('');
-  const [saving,       setSaving]       = useState(false);
-  const [scoringQid,   setScoringQid]   = useState(null);
-  const [newName,      setNewName]      = useState('');
-  const [newNotes,     setNewNotes]     = useState('');
-  const [adding,       setAdding]       = useState(false);
+  const EMPTY_FIELDS = { code: '', name: '', age: '', sex: '', bmi: '', group: '', site: '', session: '', diagnosis: '', medication: '', referral: '', notes: '', customFields: [] };
+  const [newFields,    setNewFieldsState] = useState(EMPTY_FIELDS);
+  const [editFields,   setEditFieldsState] = useState(EMPTY_FIELDS);
+  const setNewField  = (k, v) => setNewFieldsState(f => ({ ...f, [k]: v }));
+  const setEditField = (k, v) => setEditFieldsState(f => ({ ...f, [k]: v }));
+  const [showAdd,    setShowAdd]    = useState(false);
+  const [showEdit,   setShowEdit]   = useState(false);
+  const [adding,     setAdding]     = useState(false);
+  const [saving,     setSaving]     = useState(false);
+  const [scoringQid, setScoringQid] = useState(null);
   const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
 
   const load = useCallback(async () => {
@@ -207,18 +323,27 @@ export default function ParticipantsScreen() {
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const handleAdd = async () => {
-    if (!newName.trim()) return;
+    if (!newFields.code.trim()) return;
     setAdding(true);
-    await addParticipant(newName, newNotes);
-    setNewName(''); setNewNotes(''); setShowAdd(false); setAdding(false);
+    await addParticipant(
+      newFields.code, newFields.name,
+      { age: newFields.age, sex: newFields.sex, bmi: newFields.bmi },
+      { group: newFields.group, site: newFields.site, session: newFields.session },
+      { diagnosis: newFields.diagnosis, medication: newFields.medication, referral: newFields.referral },
+      newFields.customFields,
+    );
+    setNewFieldsState(EMPTY_FIELDS); setShowAdd(false); setAdding(false);
     load();
   };
 
-  const handleEdit = (p) => { setEditName(p.name); setEditNotes(p.notes ?? ''); setShowEdit(true); setShowAdd(false); setScoringQid(null); };
+  const handleEdit = (p) => {
+    setEditFieldsState({ code: p.code ?? p.name ?? '', name: p.name ?? '', age: p.age ?? '', sex: p.sex ?? '', bmi: p.bmi ?? '', group: p.group ?? '', site: p.site ?? '', session: p.session ?? '', diagnosis: p.diagnosis ?? '', medication: p.medication ?? '', referral: p.referral ?? '', notes: p.notes ?? '', customFields: p.customFields ?? [] });
+    setShowEdit(true); setShowAdd(false); setScoringQid(null);
+  };
   const handleSaveEdit = async () => {
-    if (!editName.trim() || !selectedId) return;
+    if (!editFields.code.trim() || !selectedId) return;
     setSaving(true);
-    await updateParticipant(selectedId, { name: editName.trim(), notes: editNotes.trim() });
+    await updateParticipant(selectedId, { code: editFields.code.trim(), name: editFields.name.trim(), age: editFields.age, sex: editFields.sex, bmi: editFields.bmi, group: editFields.group, site: editFields.site, session: editFields.session, diagnosis: editFields.diagnosis, medication: editFields.medication, referral: editFields.referral, notes: editFields.notes, customFields: editFields.customFields });
     await load();
     setSaving(false);
     setShowEdit(false);
@@ -296,32 +421,18 @@ export default function ParticipantsScreen() {
           {/* Right col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, marginRight: 12 }}>
             {showAdd ? (
-              <View style={{ padding: 28 }}>
-                <BlurView intensity={40} tint="light" style={{ borderRadius: 20, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.14)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 1, shadowRadius: 22, elevation: 5 }}>
-                  <View style={{ backgroundColor: 'rgba(255,255,255,0.55)' }}>
-                    <AddForm name={newName} notes={newNotes} onName={setNewName} onNotes={setNewNotes}
-                      onSubmit={handleAdd} onCancel={() => { setShowAdd(false); setNewName(''); setNewNotes(''); }} adding={adding} />
+              <View style={{ flex: 1 }}>
+                <BlurView intensity={40} tint="light" style={{ flex: 1, overflow: 'hidden', margin: 12, borderRadius: 20, shadowColor: 'rgba(74,123,181,0.14)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 1, shadowRadius: 22, elevation: 5 }}>
+                  <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.55)' }}>
+                    <ParticipantForm fields={newFields} setField={setNewField} onSubmit={handleAdd} onCancel={() => { setShowAdd(false); setNewFieldsState(EMPTY_FIELDS); }} submitting={adding} />
                   </View>
                 </BlurView>
               </View>
             ) : showEdit && selected ? (
-              <View style={{ padding: 28 }}>
-                <BlurView intensity={40} tint="light" style={{ borderRadius: 20, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.14)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 1, shadowRadius: 22, elevation: 5 }}>
-                  <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 24, gap: 4 }}>
-                    <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 16 }}>Edit Participant</Text>
-                    <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Name *</Text>
-                    <TextInput style={af.input} value={editName} onChangeText={setEditName} placeholder="Participant name or ID" placeholderTextColor={COLOURS.textMuted} autoFocus />
-                    <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 14 }}>Notes (optional)</Text>
-                    <TextInput style={[af.input, { height: 80, textAlignVertical: 'top' }]} value={editNotes} onChangeText={setEditNotes} placeholder="e.g. Group A, session date…" placeholderTextColor={COLOURS.textMuted} multiline />
-                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-                      <TouchableOpacity style={{ flex: 1, borderRadius: 12, paddingVertical: 13, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' }} onPress={() => setShowEdit(false)}>
-                        <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={[{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 13, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }, (!editName.trim() || saving) && { opacity: 0.4 }]} onPress={handleSaveEdit} disabled={!editName.trim() || saving}>
-                        <Ionicons name="checkmark" size={17} color="#fff" />
-                        <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{saving ? 'Saving…' : 'Save'}</Text>
-                      </TouchableOpacity>
-                    </View>
+              <View style={{ flex: 1 }}>
+                <BlurView intensity={40} tint="light" style={{ flex: 1, overflow: 'hidden', margin: 12, borderRadius: 20, shadowColor: 'rgba(74,123,181,0.14)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 1, shadowRadius: 22, elevation: 5 }}>
+                  <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.55)' }}>
+                    <ParticipantForm fields={editFields} setField={setEditField} onSubmit={handleSaveEdit} onCancel={() => setShowEdit(false)} submitting={saving} isEdit />
                   </View>
                 </BlurView>
               </View>
@@ -369,8 +480,8 @@ export default function ParticipantsScreen() {
                   <Text style={{ fontSize: 20, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.name.charAt(0).toUpperCase()}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{p.name}</Text>
-                  {p.notes ? <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.notes}</Text> : null}
+                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
+                  {p.name ? <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
                   <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {scored.length} scored</Text>
                 </View>
                 <TouchableOpacity style={{ width: 34, height: 34, borderRadius: 17, borderWidth: 1, borderColor: 'rgba(220,38,38,0.2)', alignItems: 'center', justifyContent: 'center' }} onPress={(e) => { e.stopPropagation(); handleDelete(p); }}>
@@ -403,11 +514,11 @@ export default function ParticipantsScreen() {
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           <ScreenBackground />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: insets.top + 16, paddingBottom: 12 }}>
-            <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Add Participant</Text>
+        <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Add Participant</Text>
             <TouchableOpacity onPress={() => setShowAdd(false)}><Ionicons name="close" size={26} color={COLOURS.primaryDark} /></TouchableOpacity>
           </View>
-          <View style={{ paddingHorizontal: 4 }}>
-            <AddForm name={newName} notes={newNotes} onName={setNewName} onNotes={setNewNotes} onSubmit={handleAdd} adding={adding} />
+          <View style={{ paddingHorizontal: 4, flex: 1 }}>
+            <ParticipantForm fields={newFields} setField={setNewField} onSubmit={handleAdd} submitting={adding} />
           </View>
         </KeyboardAvoidingView>
       </Modal>

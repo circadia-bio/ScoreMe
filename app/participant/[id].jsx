@@ -1,20 +1,17 @@
 /**
- * app/participant/[id].jsx — Participant detail & scoring hub
- *
- * Shows all questionnaire results for a participant and lets the researcher
- * start scoring any questionnaire.
+ * app/participant/[id].jsx — Participant detail & scoring hub (mobile)
  */
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, Alert, Platform,
+  StyleSheet, Alert, Platform, Keyboard,
 } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
-import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant } from '../../storage/storage';
+import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant, deleteParticipant } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -32,6 +29,27 @@ const formatScore = (q, score) => {
   return String(score);
 };
 
+// ─── Inline edit form helpers ────────────────────────────────────────────────────
+const SEX_OPTIONS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+
+function FieldRow({ label, value, onChange, placeholder, keyboardType, multiline }) {
+  return (
+    <>
+      <Text style={s.fieldLabel}>{label}</Text>
+      <TextInput
+        style={[s.input, multiline && { height: 72, textAlignVertical: 'top' }]}
+        value={value} onChangeText={onChange} placeholder={placeholder}
+        placeholderTextColor={COLOURS.textMuted} multiline={multiline}
+        keyboardType={keyboardType ?? 'default'}
+      />
+    </>
+  );
+}
+
+function EditSection({ title }) {
+  return <Text style={s.editSection}>{title}</Text>;
+}
+
 export default function ParticipantScreen() {
   const { id }   = useLocalSearchParams();
   const router   = useRouter();
@@ -39,8 +57,9 @@ export default function ParticipantScreen() {
   const [participant, setParticipant] = useState(null);
   const [allQs, setAllQs]             = useState(QUESTIONNAIRES);
   const [editing, setEditing]         = useState(false);
-  const [editName, setEditName]       = useState('');
-  const [editNotes, setEditNotes]     = useState('');
+  const EMPTY = { code: '', name: '', age: '', sex: '', bmi: '', group: '', site: '', session: '', diagnosis: '', medication: '', referral: '', notes: '', customFields: [] };
+  const [ef, setEF]                   = useState(EMPTY);
+  const setF = (k, v) => setEF(f => ({ ...f, [k]: v }));
   const [saving, setSaving]           = useState(false);
 
   const load = useCallback(async () => {
@@ -51,24 +70,29 @@ export default function ParticipantScreen() {
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
-  const startEdit = () => { setEditName(participant.name); setEditNotes(participant.notes ?? ''); setEditing(true); };
-  const cancelEdit = () => setEditing(false);
+  const startEdit = () => {
+    setEF({ code: participant.code ?? participant.name ?? '', name: participant.name ?? '', age: participant.age ?? '', sex: participant.sex ?? '', bmi: participant.bmi ?? '', group: participant.group ?? '', site: participant.site ?? '', session: participant.session ?? '', diagnosis: participant.diagnosis ?? '', medication: participant.medication ?? '', referral: participant.referral ?? '', notes: participant.notes ?? '', customFields: participant.customFields ?? [] });
+    setEditing(true);
+  };
+
   const saveEdit = async () => {
-    if (!editName.trim()) return;
+    if (!ef.code.trim()) return;
+    Keyboard.dismiss();
     setSaving(true);
-    await updateParticipant(id, { name: editName.trim(), notes: editNotes.trim() });
+    await updateParticipant(id, { ...ef, code: ef.code.trim(), name: ef.name.trim() });
     await load();
     setSaving(false);
     setEditing(false);
   };
 
   const handleDelete = () => {
+    const label = participant.code ?? participant.name;
     if (Platform.OS === 'web') {
-      if (window.confirm(`Delete ${participant.name} and all their scores? This cannot be undone.`)) {
+      if (window.confirm(`Delete ${label} and all their scores? This cannot be undone.`)) {
         deleteParticipant(id).then(() => router.back());
       }
     } else {
-      Alert.alert('Delete participant', `Delete ${participant.name} and all their scores?`, [
+      Alert.alert('Delete participant', `Delete ${label} and all their scores?`, [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Delete', style: 'destructive', onPress: () => deleteParticipant(id).then(() => router.back()) },
       ]);
@@ -80,6 +104,7 @@ export default function ParticipantScreen() {
   const results  = participant.results ?? {};
   const scored   = allQs.filter((q) => results[q.id]);
   const unscored = allQs.filter((q) => !results[q.id]);
+  const displayName = participant.code ?? participant.name;
 
   return (
     <View style={s.root}>
@@ -89,7 +114,7 @@ export default function ParticipantScreen() {
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
           <Ionicons name="chevron-back" size={26} color={COLOURS.primaryDark} />
         </TouchableOpacity>
-        <Text style={s.headerTitle} numberOfLines={1}>{participant.name}</Text>
+        <Text style={s.headerTitle} numberOfLines={1}>{displayName}</Text>
         <TouchableOpacity onPress={startEdit} style={s.editBtn}>
           <Ionicons name="pencil-outline" size={20} color={COLOURS.primary} />
         </TouchableOpacity>
@@ -101,54 +126,94 @@ export default function ParticipantScreen() {
       <ScrollView contentContainerStyle={[s.content, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
 
         {editing ? (
-          <View style={[s.profileCard, { flexDirection: 'column', gap: 12 }]}>
-            <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Name *</Text>
-            <TextInput
-              style={s.input}
-              value={editName}
-              onChangeText={setEditName}
-              placeholder="Participant name or ID"
-              placeholderTextColor={COLOURS.textMuted}
-              autoFocus
-            />
-            <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6 }}>Notes (optional)</Text>
-            <TextInput
-              style={[s.input, { height: 72, textAlignVertical: 'top' }]}
-              value={editNotes}
-              onChangeText={setEditNotes}
-              placeholder="e.g. Group A, session date…"
-              placeholderTextColor={COLOURS.textMuted}
-              multiline
-            />
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <TouchableOpacity style={s.cancelBtn} onPress={cancelEdit}>
+          <View style={[s.profileCard, { flexDirection: 'column' }]}>
+            <EditSection title="Identity" />
+            <FieldRow label="Code *" value={ef.code} onChange={v => setF('code', v)} placeholder="e.g. P001" />
+            <FieldRow label="Name" value={ef.name} onChange={v => setF('name', v)} placeholder="Full name (optional)" />
+
+            <EditSection title="Demographics" />
+            <FieldRow label="Age" value={ef.age} onChange={v => setF('age', v)} placeholder="e.g. 34" keyboardType="numeric" />
+            <Text style={s.fieldLabel}>Sex</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+              {SEX_OPTIONS.map(opt => (
+                <TouchableOpacity key={opt}
+                  style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, backgroundColor: ef.sex === opt ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderColor: ef.sex === opt ? COLOURS.primary : 'rgba(74,123,181,0.2)' }}
+                  onPress={() => setF('sex', ef.sex === opt ? '' : opt)}>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: ef.sex === opt ? '#fff' : COLOURS.primaryDark }}>{opt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <FieldRow label="BMI" value={ef.bmi} onChange={v => setF('bmi', v)} placeholder="e.g. 24.5" keyboardType="numeric" />
+
+            <EditSection title="Study" />
+            <FieldRow label="Group / Condition" value={ef.group} onChange={v => setF('group', v)} placeholder="e.g. Control" />
+            <FieldRow label="Site" value={ef.site} onChange={v => setF('site', v)} placeholder="e.g. London" />
+            <FieldRow label="Session" value={ef.session} onChange={v => setF('session', v)} placeholder="e.g. Baseline" />
+
+            <EditSection title="Clinical" />
+            <FieldRow label="Diagnosis" value={ef.diagnosis} onChange={v => setF('diagnosis', v)} placeholder="e.g. Insomnia disorder" />
+            <FieldRow label="Medication" value={ef.medication} onChange={v => setF('medication', v)} placeholder="e.g. None" />
+            <FieldRow label="Referral" value={ef.referral} onChange={v => setF('referral', v)} placeholder="e.g. GP" />
+
+            <EditSection title="Custom fields" />
+            {(ef.customFields ?? []).map((cf, i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 6, marginTop: 8, alignItems: 'flex-start' }}>
+                <TextInput style={[s.input, { flex: 1 }]} value={cf.label} onChangeText={v => { const c = [...ef.customFields]; c[i] = { ...c[i], label: v }; setF('customFields', c); }} placeholder="Label" placeholderTextColor={COLOURS.textMuted} />
+                <TextInput style={[s.input, { flex: 2 }]} value={cf.value} onChangeText={v => { const c = [...ef.customFields]; c[i] = { ...c[i], value: v }; setF('customFields', c); }} placeholder="Value" placeholderTextColor={COLOURS.textMuted} />
+                <TouchableOpacity onPress={() => setF('customFields', ef.customFields.filter((_, idx) => idx !== i))} style={{ width: 36, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="close-circle" size={18} color={COLOURS.danger} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity onPress={() => setF('customFields', [...(ef.customFields ?? []), { label: '', value: '' }])} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
+              <Ionicons name="add-circle-outline" size={18} color={COLOURS.primary} />
+              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>Add field</Text>
+            </TouchableOpacity>
+
+            <FieldRow label="Notes" value={ef.notes} onChange={v => setF('notes', v)} placeholder="Any additional notes…" multiline />
+
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+              <TouchableOpacity style={s.cancelBtn} onPress={() => setEditing(false)}>
                 <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[s.saveBtn, (!editName.trim() || saving) && { opacity: 0.4 }]}
-                onPress={saveEdit}
-                disabled={!editName.trim() || saving}
-              >
+              <TouchableOpacity style={[s.saveBtn, (!ef.code.trim() || saving) && { opacity: 0.4 }]} onPress={saveEdit} disabled={!ef.code.trim() || saving}>
                 <Ionicons name="checkmark" size={16} color="#fff" />
                 <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{saving ? 'Saving…' : 'Save'}</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
-        <View style={s.profileCard}>
-          <View style={s.avatar}>
-            <Text style={s.avatarText}>{participant.name.charAt(0).toUpperCase()}</Text>
+          <View style={s.profileCard}>
+            <View style={s.avatar}>
+              <Text style={s.avatarText}>{displayName.charAt(0).toUpperCase()}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.name}>{displayName}</Text>
+              {participant.name && participant.code ? <Text style={s.notes}>{participant.name}</Text> : null}
+              <Text style={s.meta}>Added {formatDate(participant.createdAt)}</Text>
+            </View>
+            <View style={s.scoreCount}>
+              <Text style={s.scoreCountNum}>{scored.length}</Text>
+              <Text style={s.scoreCountLabel}>of {allQs.length}</Text>
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={s.name}>{participant.name}</Text>
-            {participant.notes ? <Text style={s.notes}>{participant.notes}</Text> : null}
-            <Text style={s.meta}>Added {formatDate(participant.createdAt)}</Text>
+        )}
+
+        {/* Metadata chips */}
+        {!editing && (participant.age || participant.sex || participant.bmi || participant.group || participant.site || participant.session || participant.diagnosis || participant.medication || participant.referral || participant.notes || participant.customFields?.length > 0) && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+            {participant.age       ? <View style={s.chip}><Text style={s.chipText}>Age: {participant.age}</Text></View> : null}
+            {participant.sex       ? <View style={s.chip}><Text style={s.chipText}>{participant.sex}</Text></View> : null}
+            {participant.bmi       ? <View style={s.chip}><Text style={s.chipText}>BMI: {participant.bmi}</Text></View> : null}
+            {participant.group     ? <View style={[s.chip, s.chipStudy]}><Text style={[s.chipText, s.chipStudyText]}>{participant.group}</Text></View> : null}
+            {participant.site      ? <View style={[s.chip, s.chipStudy]}><Text style={[s.chipText, s.chipStudyText]}>{participant.site}</Text></View> : null}
+            {participant.session   ? <View style={[s.chip, s.chipStudy]}><Text style={[s.chipText, s.chipStudyText]}>{participant.session}</Text></View> : null}
+            {participant.diagnosis ? <View style={[s.chip, s.chipClinical]}><Text style={[s.chipText, s.chipClinicalText]}>{participant.diagnosis}</Text></View> : null}
+            {participant.medication? <View style={[s.chip, s.chipClinical]}><Text style={[s.chipText, s.chipClinicalText]}>{participant.medication}</Text></View> : null}
+            {participant.referral  ? <View style={[s.chip, s.chipClinical]}><Text style={[s.chipText, s.chipClinicalText]}>{participant.referral}</Text></View> : null}
+            {(participant.customFields ?? []).map((cf, i) => cf.label ? <View key={i} style={s.chip}><Text style={s.chipText}>{cf.label}: {cf.value}</Text></View> : null)}
+            {participant.notes     ? <View style={s.chip}><Text style={s.chipText} numberOfLines={2}>📝 {participant.notes}</Text></View> : null}
           </View>
-          <View style={s.scoreCount}>
-            <Text style={s.scoreCountNum}>{scored.length}</Text>
-            <Text style={s.scoreCountLabel}>of {allQs.length}</Text>
-          </View>
-        </View>
         )}
 
         {scored.length > 0 && (
@@ -174,9 +239,9 @@ export default function ParticipantScreen() {
                         style={s.redoBtn}
                         onPress={() => {
                           if (Platform.OS === 'web') {
-                            if (window.confirm(`Re-score ${q.shortTitle} for ${participant.name}? Previous result will be replaced.`)) router.push(`/score/${participant.id}/${q.id}`);
+                            if (window.confirm(`Re-score ${q.shortTitle} for ${displayName}? Previous result will be replaced.`)) router.push(`/score/${participant.id}/${q.id}`);
                           } else {
-                            Alert.alert('Re-score', `Re-score ${q.shortTitle} for ${participant.name}? Previous result will be replaced.`, [
+                            Alert.alert('Re-score', `Re-score ${q.shortTitle} for ${displayName}? Previous result will be replaced.`, [
                               { text: 'Cancel', style: 'cancel' },
                               { text: 'Re-score', onPress: () => router.push(`/score/${participant.id}/${q.id}`) },
                             ]);
@@ -264,7 +329,17 @@ const s = StyleSheet.create({
   startBtn:{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(74,123,181,0.12)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7 },
   startBtnText: { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.primary },
   editBtn: { width: 36, alignItems: 'flex-end' },
-  input:   { backgroundColor: 'rgba(255,255,255,0.80)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
+  // Edit form
+  fieldLabel:  { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 14, marginBottom: 2 },
+  editSection: { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 20, marginBottom: 2, borderBottomWidth: 1, borderBottomColor: 'rgba(74,123,181,0.10)', paddingBottom: 6 },
+  input:   { backgroundColor: 'rgba(255,255,255,0.80)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, marginTop: 6 },
   cancelBtn: { flex: 1, borderRadius: 12, paddingVertical: 12, alignItems: 'center', backgroundColor: 'rgba(74,123,181,0.08)' },
   saveBtn:   { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 12, paddingVertical: 12, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 10, elevation: 4 },
+  // Metadata chips
+  chip:            { backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
+  chipText:        { fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
+  chipStudy:       { backgroundColor: 'rgba(107,63,160,0.08)' },
+  chipStudyText:   { color: COLOURS.purple },
+  chipClinical:    { backgroundColor: 'rgba(220,38,38,0.07)' },
+  chipClinicalText:{ color: '#B91C1C' },
 });

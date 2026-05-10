@@ -33,14 +33,30 @@ export async function saveParticipants(participants) {
   await AsyncStorage.setItem(KEYS.participants, JSON.stringify(participants));
 }
 
-export async function addParticipant(name, notes = '') {
+export async function addParticipant(code, name = '', demographics = {}, study = {}, clinical = {}, customFields = []) {
   const participants = await loadParticipants();
   const newP = {
-    id:        Date.now().toString(),
-    name:      name.trim(),
-    notes:     notes.trim(),
-    createdAt: new Date().toISOString(),
-    results:   {},
+    id:          Date.now().toString(),
+    code:        code.trim(),
+    name:        name.trim(),
+    // Demographics
+    age:         demographics.age ?? '',
+    sex:         demographics.sex ?? '',
+    bmi:         demographics.bmi ?? '',
+    // Study
+    group:       study.group ?? '',
+    site:        study.site ?? '',
+    session:     study.session ?? '',
+    // Clinical
+    diagnosis:   clinical.diagnosis ?? '',
+    medication:  clinical.medication ?? '',
+    referral:    clinical.referral ?? '',
+    // Free fields
+    customFields: customFields,
+    // Legacy
+    notes:       '',
+    createdAt:   new Date().toISOString(),
+    results:     {},
   };
   participants.push(newP);
   await saveParticipants(participants);
@@ -139,10 +155,21 @@ export async function deleteCustomQuestionnaire(id) {
  */
 export function participantsToJSON(participants, questionnaires) {
   const data = participants.map((p) => ({
-    id:        p.id,
-    name:      p.name,
-    notes:     p.notes,
-    createdAt: p.createdAt,
+    id:          p.id,
+    code:        p.code ?? p.name,
+    name:        p.name ?? '',
+    age:         p.age ?? '',
+    sex:         p.sex ?? '',
+    bmi:         p.bmi ?? '',
+    group:       p.group ?? '',
+    site:        p.site ?? '',
+    session:     p.session ?? '',
+    diagnosis:   p.diagnosis ?? '',
+    medication:  p.medication ?? '',
+    referral:    p.referral ?? '',
+    customFields: p.customFields ?? [],
+    notes:       p.notes ?? '',
+    createdAt:   p.createdAt,
     results:   Object.fromEntries(
       Object.entries(p.results ?? {}).map(([qid, r]) => [
         qid,
@@ -168,7 +195,7 @@ export function participantsToJSON(participants, questionnaires) {
  * Produce a CSV string for all participants × all questionnaire scores.
  */
 export function participantsToCSV(participants, questionnaireIds) {
-  const header = ['id', 'name', 'notes', 'createdAt', ...questionnaireIds].join(',');
+  const header = ['id', 'code', 'name', 'age', 'sex', 'bmi', 'group', 'site', 'session', 'diagnosis', 'medication', 'referral', 'notes', 'createdAt', ...questionnaireIds].join(',');
   const rows = participants.map((p) => {
     const scores = questionnaireIds.map((qid) => {
       const r = p.results?.[qid];
@@ -176,7 +203,17 @@ export function participantsToCSV(participants, questionnaireIds) {
       if (typeof r.score === 'object') return JSON.stringify(r.score);
       return String(r.score);
     });
-    return [p.id, `"${p.name}"`, `"${p.notes}"`, p.createdAt, ...scores].join(',');
+    return [
+      p.id,
+      `"${p.code ?? p.name ?? ''}"`,
+      `"${p.name ?? ''}"`,
+      p.age ?? '', p.sex ?? '', p.bmi ?? '',
+      `"${p.group ?? ''}"`, `"${p.site ?? ''}"`, `"${p.session ?? ''}"`,
+      `"${p.diagnosis ?? ''}"`, `"${p.medication ?? ''}"`, `"${p.referral ?? ''}"`,
+      `"${p.notes ?? ''}"`,
+      p.createdAt,
+      ...scores,
+    ].join(',');
   });
   return [header, ...rows].join('\n');
 }
