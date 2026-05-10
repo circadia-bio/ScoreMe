@@ -148,7 +148,7 @@ function QCard({ q, participants, groupField, chartWidth }) {
               <Text style={[qc.sectionLabel, { marginBottom: 8 }]}>COMPLETION BY GROUP</Text>
               {groups.map(g => (
                 <View key={g.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, width: 72 }} numberOfLines={1}>{g.label}</Text>
+                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, flexShrink: 1, minWidth: 40 }} numberOfLines={1}>{g.label}</Text>
                   <View style={{ flex: 1, height: 8, backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 4, overflow: 'hidden' }}>
                     <View style={{ width: `${g.rate * 100}%`, height: '100%', backgroundColor: g.color, borderRadius: 4 }} />
                   </View>
@@ -246,7 +246,7 @@ function CompletionPanel({ participants, allQs }) {
           const col  = rate >= 0.8 ? COLOURS.success : rate >= 0.5 ? COLOURS.warning : COLOURS.primary;
           return (
             <View key={q.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, width: 72 }} numberOfLines={1}>{q.shortTitle}</Text>
+              <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, flexShrink: 1, minWidth: 48 }} numberOfLines={1}>{q.shortTitle}</Text>
               <View style={{ flex: 1, height: 8, backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 4, overflow: 'hidden' }}>
                 <View style={{ width: `${rate * 100}%`, height: '100%', backgroundColor: col, borderRadius: 4 }} />
               </View>
