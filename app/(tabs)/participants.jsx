@@ -412,11 +412,9 @@ export default function ParticipantsScreen() {
         autoCapitalize="none"
         returnKeyType="search"
       />
-      {query.length > 0 && (
-        <TouchableOpacity onPress={() => setQuery('')}>
-          <Ionicons name="close-circle" size={16} color={COLOURS.textMuted} />
-        </TouchableOpacity>
-      )}
+      {query.length > 0
+        ? <TouchableOpacity onPress={() => setQuery('')}><Ionicons name="close-circle" size={16} color={COLOURS.textMuted} /></TouchableOpacity>
+        : null}
     </View>
   );
 
@@ -453,18 +451,18 @@ export default function ParticipantsScreen() {
                   <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: showAdd ? '#fff' : COLOURS.primary }}>{showAdd ? 'Cancel' : 'Add'}</Text>
                 </TouchableOpacity>
               </View>
-              {participants.length > 0 && SearchBar}
-              {participants.length === 0 && !showAdd && (
+              {participants.length > 0 ? SearchBar : null}
+              {participants.length === 0 && !showAdd ? (
                 <View style={{ alignItems: 'center', paddingVertical: 40, gap: 8 }}>
                   <Ionicons name="person-add-outline" size={36} color={COLOURS.textMuted} style={{ opacity: 0.5 }} />
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No participants yet</Text>
                 </View>
               )}
-              {query.trim() && filteredParticipants.length === 0 && participants.length > 0 && (
+              {query.trim() && filteredParticipants.length === 0 && participants.length > 0 ? (
                 <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
                   <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
                 </View>
-              )}
+              ) : null}
               {filteredParticipants.map(p => (
                 <ParticipantRow key={p.id} p={p}
                   selected={!showAdd && selectedId === p.id}
@@ -521,7 +519,7 @@ export default function ParticipantsScreen() {
       <ScreenBackground />
       <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12 }}>
         <Text style={{ fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 12 }}>Participants</Text>
-        {participants.length > 0 && SearchBar}
+        {participants.length > 0 ? SearchBar : null}
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         {participants.length === 0 ? (
@@ -532,11 +530,11 @@ export default function ParticipantsScreen() {
           </View>
         ) : (
           <>
-            {query.trim() && filteredParticipants.length === 0 && (
+            {query.trim() && filteredParticipants.length === 0 ? (
               <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
                 <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
               </View>
-            )}
+            ) : null}
             {filteredParticipants.map(p => {
               const scored = Object.keys(p.results ?? {});
               return (
