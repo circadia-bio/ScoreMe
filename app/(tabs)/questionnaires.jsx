@@ -386,7 +386,7 @@ function SectionHeader({ label, qs, disabledQs, onToggleAll }) {
         <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>
           {allOn ? 'Disable all' : 'Enable all'}
         </Text>
-        <Toggle value={allOn} onValueChange={() => onToggleAll(!allOn)} />
+        <Toggle value={allOn} onValueChange={() => onToggleAll(allOn)} />
       </View>
     </View>
   );
