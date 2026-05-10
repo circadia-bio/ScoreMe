@@ -304,11 +304,11 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
 }
 
 const dp = StyleSheet.create({
-  chip:            { backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 11, paddingVertical: 5, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 4, elevation: 1 },
+  chip:            { backgroundColor: 'rgba(255,255,255,0.72)', borderRadius: 20, paddingHorizontal: 11, paddingVertical: 5, shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 4, elevation: 1 },
   chipText:        { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
-  chipStudy:       { backgroundColor: 'rgba(107,63,160,0.08)', borderColor: 'rgba(107,63,160,0.18)' },
+  chipStudy:       { backgroundColor: 'rgba(107,63,160,0.08)' },
   chipStudyText:   { color: COLOURS.purple },
-  chipClinical:    { backgroundColor: 'rgba(220,38,38,0.06)', borderColor: 'rgba(220,38,38,0.15)' },
+  chipClinical:    { backgroundColor: 'rgba(220,38,38,0.06)' },
   chipClinicalText:{ color: '#B91C1C' },
 });
 
