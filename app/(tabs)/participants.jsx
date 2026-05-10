@@ -208,14 +208,19 @@ export default function ParticipantsScreen() {
   };
 
   const handleDelete = (p) => {
-    Alert.alert('Delete participant', `Remove ${p.name} and all their scores?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        await deleteParticipant(p.id);
-        if (selectedId === p.id) { setSelectedId(null); setScoringQid(null); }
-        load();
-      }},
-    ]);
+    const doDelete = async () => {
+      await deleteParticipant(p.id);
+      if (selectedId === p.id) { setSelectedId(null); setScoringQid(null); }
+      load();
+    };
+    if (Platform.OS === 'web') {
+      if (window.confirm(`Remove "${p.name}" and all their scores? This cannot be undone.`)) doDelete();
+    } else {
+      Alert.alert('Delete participant', `Remove ${p.name} and all their scores?`, [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: doDelete },
+      ]);
+    }
   };
 
   const selected  = participants.find(p => p.id === selectedId) ?? null;
