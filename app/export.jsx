@@ -153,7 +153,7 @@ function ExportContent({ participants, allQs, onClose }) {
               {/* Rows */}
               {scoredParticipants.map((p, i) => (
                 <View key={p.id} style={[pt.row, i % 2 === 1 && pt.rowAlt]}>
-                  <Text style={[pt.cell, { width: 130, fontFamily: FONTS.body, color: COLOURS.primaryDark }]} numberOfLines={1}>{p.name}</Text>
+                  <Text style={[pt.cell, { width: 130, fontFamily: FONTS.body, color: COLOURS.primaryDark }]} numberOfLines={1}>{p.code ?? p.name}</Text>
                   {allQs.map(q => {
                     const r = p.results?.[q.id];
                     const color = r ? (q.interpret ? q.interpret(r.score).color : COLOURS.primary) : null;
