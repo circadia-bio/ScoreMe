@@ -195,12 +195,32 @@ export function participantsToJSON(participants, questionnaires) {
  * Produce a CSV string for all participants × all questionnaire scores.
  */
 export function participantsToCSV(participants, questionnaireIds) {
-  const header = ['id', 'code', 'name', 'age', 'sex', 'bmi', 'group', 'site', 'session', 'diagnosis', 'medication', 'referral', 'notes', 'createdAt', ...questionnaireIds].join(',');
+  // Collect all unique custom field labels across all participants
+  const customLabels = [];
+  for (const p of participants) {
+    for (const cf of p.customFields ?? []) {
+      if (cf.label && !customLabels.includes(cf.label)) customLabels.push(cf.label);
+    }
+  }
+
+  const header = [
+    'id', 'code', 'name', 'age', 'sex', 'bmi',
+    'group', 'site', 'session',
+    'diagnosis', 'medication', 'referral',
+    ...customLabels,
+    'notes', 'createdAt',
+    ...questionnaireIds,
+  ].join(',');
+
   const rows = participants.map((p) => {
+    const customValues = customLabels.map(label => {
+      const cf = (p.customFields ?? []).find(f => f.label === label);
+      return `"${cf?.value ?? ''}"`;
+    });
     const scores = questionnaireIds.map((qid) => {
       const r = p.results?.[qid];
       if (!r) return '';
-      if (typeof r.score === 'object') return JSON.stringify(r.score);
+      if (typeof r.score === 'object') return `"${JSON.stringify(r.score)}"`;
       return String(r.score);
     });
     return [
@@ -210,10 +230,12 @@ export function participantsToCSV(participants, questionnaireIds) {
       p.age ?? '', p.sex ?? '', p.bmi ?? '',
       `"${p.group ?? ''}"`, `"${p.site ?? ''}"`, `"${p.session ?? ''}"`,
       `"${p.diagnosis ?? ''}"`, `"${p.medication ?? ''}"`, `"${p.referral ?? ''}"`,
+      ...customValues,
       `"${p.notes ?? ''}"`,
       p.createdAt,
       ...scores,
     ].join(',');
   });
+
   return [header, ...rows].join('\n');
 }
