@@ -5,12 +5,13 @@
  * Tap the wordmark to open the About sheet.
  */
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking, Image, Alert, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
 import { COLOURS, FONTS, SIZES } from '../theme/typography';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const SIDEBAR_W = 220;
 
@@ -25,6 +26,16 @@ const NAV = [
 function AboutModal({ visible, onClose }) {
   const insets = useSafeAreaInsets();
   const version = Constants.expoConfig?.version ?? '1.0.0';
+
+  const handleReplayOnboarding = async () => {
+    await AsyncStorage.removeItem('scoreme:onboarded');
+    onClose();
+    if (Platform.OS === 'web') {
+      window.location.reload();
+    } else {
+      Alert.alert('Onboarding reset', 'Restart the app to see the onboarding again.');
+    }
+  };
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={am.backdrop} activeOpacity={1} onPress={onClose}>
@@ -58,6 +69,13 @@ function AboutModal({ visible, onClose }) {
               <Text style={am.link}>circadia-lab.uk</Text>
             </TouchableOpacity>
 
+            <View style={am.divider} />
+
+            <TouchableOpacity onPress={handleReplayOnboarding} style={am.replayBtn}>
+              <Ionicons name="refresh-outline" size={14} color={COLOURS.textMuted} />
+              <Text style={am.replayText}>Replay onboarding</Text>
+            </TouchableOpacity>
+
             <Text style={am.heart}>Made with ❤️</Text>
           </View>
         </TouchableOpacity>
@@ -80,6 +98,8 @@ const am = StyleSheet.create({
   name:        { fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark },
   link:        { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary, textDecorationLine: 'underline', marginTop: 4 },
   heart:       { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.textMuted, marginTop: 8 },
+  replayBtn:   { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: 'rgba(74,123,181,0.07)' },
+  replayText:  { fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },
 });
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
