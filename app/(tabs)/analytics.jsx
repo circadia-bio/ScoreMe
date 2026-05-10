@@ -181,24 +181,27 @@ function OverviewCards({ participants, allQs }) {
     : 0;
 
   const items = [
-    { icon: 'people',           label: 'Participants', value: participants.length },
-    { icon: 'checkmark-circle', label: 'Scored',       value: scoredCount },
-    { icon: 'bar-chart',        label: 'Total scores', value: totalScores },
-    { icon: 'pie-chart',        label: 'Avg complete', value: `${avgCompletion}%` },
+    { icon: 'people',           label: 'Participants', value: participants.length,  color: COLOURS.primary, bg: 'rgba(74,123,181,0.12)'  },
+    { icon: 'checkmark-circle', label: 'Scored',       value: scoredCount,           color: COLOURS.success, bg: 'rgba(46,125,50,0.10)'   },
+    { icon: 'bar-chart',        label: 'Total scores', value: totalScores,           color: COLOURS.accent,  bg: 'rgba(224,122,32,0.12)'  },
+    { icon: 'pie-chart',        label: 'Avg complete', value: `${avgCompletion}%`,   color: COLOURS.purple,  bg: 'rgba(107,63,160,0.10)'  },
   ];
 
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
-      {items.map(({ icon, label, value }) => (
-        <BlurView key={label} intensity={40} tint="light"
-          style={{ flex: 1, minWidth: 130, borderRadius: 14, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 14, elevation: 3 }}>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ width: 40, height: 40, borderRadius: 11, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name={icon} size={20} color={COLOURS.primary} />
+      {items.map(({ icon, label, value, color, bg }) => (
+        <BlurView key={label} intensity={44} tint="light"
+          style={{ flex: 1, minWidth: 130, borderRadius: 18, overflow: 'hidden', shadowColor: color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.14, shadowRadius: 14, elevation: 4 }}>
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 14, gap: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ width: 34, height: 34, borderRadius: 9, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name={icon} size={17} color={color} />
+              </View>
+              <Text style={{ fontSize: 26, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
             </View>
-            <View>
-              <Text style={{ fontSize: 22, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
-              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{label}</Text>
+            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
+            <View style={{ height: 3, borderRadius: 2, backgroundColor: bg, overflow: 'hidden' }}>
+              <View style={{ width: '100%', height: '100%', backgroundColor: color, opacity: 0.5 }} />
             </View>
           </View>
         </BlurView>

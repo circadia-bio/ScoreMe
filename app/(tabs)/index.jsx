@@ -252,18 +252,21 @@ export default function DashboardScreen() {
 
               <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
                 {[
-                  { icon: 'people',           label: 'Participants', value: participants.length },
-                  { icon: 'checkmark-circle', label: 'Scored',       value: participants.filter(p => Object.keys(p.results ?? {}).length > 0).length },
-                  { icon: 'bar-chart',        label: 'Total scores', value: participants.reduce((s, p) => s + Object.keys(p.results ?? {}).length, 0) },
-                ].map(({ icon, label, value }) => (
-                  <BlurView key={label} intensity={40} tint="light" style={{ flex: 1, borderRadius: 16, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.10)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 14, elevation: 3 }}>
-                    <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                      <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' }}>
-                        <Ionicons name={icon} size={22} color={COLOURS.primary} />
+                  { icon: 'people',           label: 'Participants', value: participants.length,                                                                          color: COLOURS.primary,  bg: 'rgba(74,123,181,0.12)'  },
+                  { icon: 'checkmark-circle', label: 'Scored',       value: participants.filter(p => Object.keys(p.results ?? {}).length > 0).length,                    color: COLOURS.success,  bg: 'rgba(46,125,50,0.10)'   },
+                  { icon: 'bar-chart',        label: 'Total scores', value: participants.reduce((s, p) => s + Object.keys(p.results ?? {}).length, 0), color: COLOURS.accent,   bg: 'rgba(224,122,32,0.12)'  },
+                ].map(({ icon, label, value, color, bg }) => (
+                  <BlurView key={label} intensity={44} tint="light" style={{ flex: 1, borderRadius: 18, overflow: 'hidden', shadowColor: color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.14, shadowRadius: 14, elevation: 4 }}>
+                    <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 16, gap: 10 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+                          <Ionicons name={icon} size={18} color={color} />
+                        </View>
+                        <Text style={{ fontSize: 28, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
                       </View>
-                      <View>
-                        <Text style={{ fontSize: 26, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{value}</Text>
-                        <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{label}</Text>
+                      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, letterSpacing: 0.3 }}>{label}</Text>
+                      <View style={{ height: 3, borderRadius: 2, backgroundColor: bg, overflow: 'hidden' }}>
+                        <View style={{ width: '100%', height: '100%', backgroundColor: color, opacity: 0.5 }} />
                       </View>
                     </View>
                   </BlurView>
