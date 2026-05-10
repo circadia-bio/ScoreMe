@@ -376,7 +376,7 @@ const s = StyleSheet.create({
   scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
   instructionsBox: { backgroundColor: COLOURS.cardBg, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', padding: 16, marginTop: 16, marginBottom: 8 },
   instructionsText: { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, lineHeight: 24 },
-  itemNumber: { fontSize: SIZES.label, fontFamily: FONTS.body, color: C.primaryLight, textTransform: 'uppercase', marginTop: 20, marginBottom: 6 },
+  itemNumber: { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', marginTop: 20, marginBottom: 6 },
   itemText:   { fontSize: 20, fontFamily: FONTS.heading, color: C.primary, lineHeight: 28, marginBottom: 12 },
   hintBox:    { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: 'rgba(74,123,181,0.08)', borderRadius: 10, padding: 12, marginBottom: 16 },
   hintText:   { flex: 1, fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: C.primary, lineHeight: 22 },
