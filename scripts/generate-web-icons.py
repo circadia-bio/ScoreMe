@@ -22,7 +22,7 @@ SVG    = os.path.join(ASSETS, "favicon.svg")
 with open(SVG, "rb") as f:
     svg_bytes = f.read()
 
-for size, name in [(180, "apple-touch-icon"), (192, "icon-192"), (512, "icon-512")]:
+for size, name in [(180, "apple-touch-icon"), (192, "icon-192"), (512, "icon-512"), (1024, "icon-1024")]:
     out = os.path.join(ASSETS, f"{name}.png")
     cairosvg.svg2png(bytestring=svg_bytes, write_to=out, output_width=size, output_height=size)
     print(f"  {name}.png ({size}×{size})")
