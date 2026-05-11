@@ -31,7 +31,8 @@
       "shortName": "ScoreMe",
       "description": "Research questionnaire scorer · Circadia Lab",
       "themeColor": "#4A7BB5",
-      "backgroundColor": "#EEF5FF"
+      "backgroundColor": "#EEF5FF",
+      "title": "ScoreMe"
     }
   }
 }

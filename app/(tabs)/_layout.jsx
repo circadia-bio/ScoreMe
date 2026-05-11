@@ -29,6 +29,10 @@ export default function TabLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
+    if (typeof document !== 'undefined') document.title = 'ScoreMe';
+  }, []);
+
+  useEffect(() => {
     hasSeenOnboarding().then(seen => { if (!seen) setShowOnboarding(true); });
   }, []);
 
