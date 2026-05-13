@@ -54,8 +54,15 @@ export default function TabLayout() {
         tabBarInactiveTintColor: COLOURS.textMuted,
         tabBarStyle: isDesktop
           ? { display: 'none' }
-          : { backgroundColor: 'rgba(238,245,255,0.97)', borderTopColor: 'rgba(200,223,245,0.6)', borderTopWidth: 1 },
-        tabBarLabelStyle: { fontFamily: FONTS.body, fontSize: 12 },
+          : {
+              backgroundColor: 'rgba(226,237,248,0.97)',
+              borderTopColor: 'rgba(74,123,181,0.15)',
+              borderTopWidth: 1,
+              height: 60,
+              paddingBottom: 8,
+              paddingTop: 6,
+            },
+        tabBarLabelStyle: { fontFamily: FONTS.body, fontSize: 11 },
       }}
     >
       <Tabs.Screen name="index"          options={{ title: 'Dashboard',     tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline"         color={color} size={size} /> }} />

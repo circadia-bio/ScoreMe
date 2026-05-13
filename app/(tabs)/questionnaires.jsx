@@ -560,7 +560,12 @@ export default function QuestionnairesScreen() {
     <View style={{ flex: 1 }}>
       <ScreenBackground />
       <View style={[ms.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={ms.title}>Questionnaires</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
+            <Ionicons name="clipboard" size={20} color="#fff" />
+          </View>
+          <Text style={ms.title}>Questionnaires</Text>
+        </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity
             style={[ms.importBtn, byDomain && { backgroundColor: COLOURS.primary, borderColor: COLOURS.primary }]}

@@ -329,12 +329,15 @@ export default function DashboardScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOURS.primary} />}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <View>
-            <Text style={{ fontSize: 34, fontFamily: FONTS.heading, color: COLOURS.primaryDark, lineHeight: 40 }}>ScoreMe</Text>
-            <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Research Questionnaire Scorer</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Logo row — mirrors desktop sidebar wordmark */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
+              <Ionicons name="document-text" size={20} color="#fff" />
+            </View>
+            <Text style={{ fontSize: 28, fontFamily: FONTS.heading, color: COLOURS.primaryDark, letterSpacing: -0.3 }}>Score<Text style={{ color: COLOURS.accent }}>Me</Text></Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8, paddingTop: 6 }}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity style={mob.iconBtn} onPress={() => router.push('/export')}><Ionicons name="download-outline" size={20} color={COLOURS.primary} /></TouchableOpacity>
             <TouchableOpacity style={mob.iconBtn} onPress={() => router.push('/(tabs)/participants')}><Ionicons name="person-add-outline" size={20} color={COLOURS.primary} /></TouchableOpacity>
           </View>

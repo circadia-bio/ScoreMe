@@ -552,7 +552,12 @@ export default function ParticipantsScreen() {
     <View style={{ flex: 1 }}>
       <ScreenBackground />
       <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12 }}>
-        <Text style={{ fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 12 }}>Participants</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
+            <Ionicons name="people" size={20} color="#fff" />
+          </View>
+          <Text style={{ fontSize: 28, fontFamily: FONTS.heading, color: COLOURS.primaryDark, letterSpacing: -0.3 }}>Participants</Text>
+        </View>
         {participants.length > 0 ? SearchBar : null}
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>

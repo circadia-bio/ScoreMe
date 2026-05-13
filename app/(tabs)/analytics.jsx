@@ -299,9 +299,19 @@ export default function AnalyticsScreen() {
         paddingRight:  isDesktop ? 20 : 16,
       }}
     >
-      <Text style={{ fontSize: isDesktop ? 32 : SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 4 }}>
-        Analytics
-      </Text>
+      {!isDesktop && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
+            <Ionicons name="bar-chart" size={20} color="#fff" />
+          </View>
+          <Text style={{ fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Analytics</Text>
+        </View>
+      )}
+      {isDesktop && (
+        <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 4 }}>
+          Analytics
+        </Text>
+      )}
       <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginBottom: 20 }}>
         Questionnaire outcomes · {participants.length} participant{participants.length !== 1 ? 's' : ''}
       </Text>
@@ -346,7 +356,7 @@ export default function AnalyticsScreen() {
     return <View style={{ flex: 1, backgroundColor: 'transparent' }}>{content}</View>;
   }
   return (
-    <View style={{ flex: 1, backgroundColor: COLOURS.screenBg }}>
+    <View style={{ flex: 1, backgroundColor: '#E2EDF8' }}>
       <ScreenBackground />
       {content}
     </View>
