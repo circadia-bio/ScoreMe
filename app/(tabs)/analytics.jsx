@@ -356,7 +356,7 @@ export default function AnalyticsScreen() {
     return <View style={{ flex: 1, backgroundColor: 'transparent' }}>{content}</View>;
   }
   return (
-    <View style={{ flex: 1, backgroundColor: '#E2EDF8' }}>
+    <View style={{ flex: 1, backgroundColor: '#F2F2F2' }}>
       <ScreenBackground />
       {content}
     </View>

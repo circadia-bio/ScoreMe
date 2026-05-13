@@ -321,7 +321,7 @@ export default function DashboardScreen() {
 
   // ── Mobile / tablet ──────────────────────────────────────────────────────────
   return (
-    <View style={{ flex: 1, backgroundColor: '#E2EDF8' }}>
+    <View style={{ flex: 1, backgroundColor: '#F2F2F2' }}>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 100, gap: 12 }}
         showsVerticalScrollIndicator={false}

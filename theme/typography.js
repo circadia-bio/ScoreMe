@@ -26,7 +26,7 @@ export const SIZES = {
 // ─── Colour palette ────────────────────────────────────────────────────────────
 export const COLOURS = {
   // Backgrounds
-  screenBg:      '#E2EDF8',
+  screenBg: '#F2F2F2',
   cardBg:        'rgba(255,255,255,0.72)',
   cardBorder:    'rgba(255,255,255,0.9)',
 

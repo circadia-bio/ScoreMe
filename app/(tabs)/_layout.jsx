@@ -139,7 +139,7 @@ const s = StyleSheet.create({
 const tb = StyleSheet.create({
   bar:       {
     flexDirection: 'row',
-    backgroundColor: '#E2EDF8',
+    backgroundColor: '#F2F2F2',
     borderTopWidth: 1,
     borderTopColor: 'rgba(74,123,181,0.12)',
     paddingTop: 8,
