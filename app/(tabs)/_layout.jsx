@@ -11,7 +11,7 @@
  */
 import { Tabs, useRouter, usePathname } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS, COLOURS } from '../../theme/typography';
 import { useLayout } from '../../theme/responsive';
@@ -46,29 +46,41 @@ export default function TabLayout() {
     pathname.includes('questionnaires') ? 'questionnaires' :
     pathname.includes('analytics')      ? 'analytics'      : 'dashboard';
 
+  // Custom tab icon — icon in rounded square, matching sidebar nav items
+  const TabIcon = ({ name, nameActive, focused, label }) => (
+    <View style={ti.wrap}>
+      <View style={[ti.box, focused && ti.boxActive]}>
+        <Ionicons
+          name={focused ? nameActive : name}
+          size={20}
+          color={focused ? '#fff' : COLOURS.textMuted}
+        />
+      </View>
+      <Text style={[ti.label, focused && ti.labelActive]}>{label}</Text>
+    </View>
+  );
+
   const tabs = (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor:   COLOURS.primary,
-        tabBarInactiveTintColor: COLOURS.textMuted,
+        tabBarShowLabel: false,
         tabBarStyle: isDesktop
           ? { display: 'none' }
           : {
-              backgroundColor: 'rgba(226,237,248,0.97)',
-              borderTopColor: 'rgba(74,123,181,0.15)',
+              backgroundColor: '#E2EDF8',
+              borderTopColor: 'rgba(74,123,181,0.12)',
               borderTopWidth: 1,
-              height: 60,
-              paddingBottom: 8,
-              paddingTop: 6,
+              height: 72,
+              paddingBottom: 0,
+              paddingTop: 0,
             },
-        tabBarLabelStyle: { fontFamily: FONTS.body, fontSize: 11 },
       }}
     >
-      <Tabs.Screen name="index"          options={{ title: 'Dashboard',     tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline"         color={color} size={size} /> }} />
-      <Tabs.Screen name="participants"   options={{ title: 'Participants',   tabBarIcon: ({ color, size }) => <Ionicons name="people-outline"       color={color} size={size} /> }} />
-      <Tabs.Screen name="questionnaires" options={{ title: 'Questionnaires', tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline"    color={color} size={size} /> }} />
-      <Tabs.Screen name="analytics"      options={{ title: 'Analytics',     tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart-outline"    color={color} size={size} /> }} />
+      <Tabs.Screen name="index"          options={{ tabBarIcon: ({ focused }) => <TabIcon name="grid-outline"      nameActive="grid"       focused={focused} label="Dashboard"     /> }} />
+      <Tabs.Screen name="participants"   options={{ tabBarIcon: ({ focused }) => <TabIcon name="people-outline"    nameActive="people"     focused={focused} label="Participants"  /> }} />
+      <Tabs.Screen name="questionnaires" options={{ tabBarIcon: ({ focused }) => <TabIcon name="clipboard-outline" nameActive="clipboard"  focused={focused} label="Questionnaires" /> }} />
+      <Tabs.Screen name="analytics"      options={{ tabBarIcon: ({ focused }) => <TabIcon name="bar-chart-outline" nameActive="bar-chart" focused={focused} label="Analytics"    /> }} />
     </Tabs>
   );
 
@@ -111,4 +123,12 @@ const s = StyleSheet.create({
   desktopOuter:   { flex: 1 },
   desktopLayout:  { flex: 1, flexDirection: 'row', alignItems: 'stretch', position: 'relative' },
   desktopContent: { flex: 1, overflow: 'hidden' },
+});
+
+const ti = StyleSheet.create({
+  wrap:        { alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 8 },
+  box:         { width: 40, height: 36, borderRadius: 10, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' },
+  boxActive:   { backgroundColor: COLOURS.primary, shadowColor: 'rgba(74,123,181,0.40)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 },
+  label:       { fontSize: 11, fontFamily: FONTS.body, color: COLOURS.textMuted, letterSpacing: 0.1 },
+  labelActive: { color: COLOURS.primary, fontFamily: FONTS.bodyMedium },
 });

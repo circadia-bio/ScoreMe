@@ -1,14 +1,16 @@
 /**
  * components/ScreenBackground.jsx
- * Soft blue gradient background — mirrors SleepDiaries visual identity.
+ * Flat blue base + subtle blob overlays — mirrors DesktopBackground colour.
  */
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import Svg, { Defs, RadialGradient, Stop, Rect, Circle, Ellipse } from 'react-native-svg';
+import { View, StyleSheet } from 'react-native';
+import Svg, { Defs, RadialGradient, Stop, Rect, Ellipse } from 'react-native-svg';
+
+const BG = '#E2EDF8';
 
 export default function ScreenBackground() {
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View style={[StyleSheet.absoluteFill, { backgroundColor: BG }]} pointerEvents="none">
       <Svg
         viewBox="0 0 393 852"
         preserveAspectRatio="xMidYMid slice"
@@ -24,9 +26,7 @@ export default function ScreenBackground() {
             <Stop offset="100%" stopColor="#6B3FA0" stopOpacity="0" />
           </RadialGradient>
         </Defs>
-        {/* Flat base matching DesktopBackground */}
-        <Rect width="393" height="852" fill="#E2EDF8" />
-        {/* Subtle dot grid — same as desktop */}
+        <Rect width="393" height="852" fill={BG} />
         <Ellipse cx="320" cy="140" rx="200" ry="180" fill="url(#blob1)" />
         <Ellipse cx="60"  cy="500" rx="160" ry="200" fill="url(#blob2)" />
         <Ellipse cx="350" cy="750" rx="140" ry="120" fill="url(#blob1)" />

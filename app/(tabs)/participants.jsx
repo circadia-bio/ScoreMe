@@ -549,7 +549,7 @@ export default function ParticipantsScreen() {
 
   // ── Mobile / tablet ──────────────────────────────────────────────────────────
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#E2EDF8' }}>
       <ScreenBackground />
       <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
