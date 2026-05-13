@@ -560,7 +560,7 @@ export default function QuestionnairesScreen() {
     <View style={{ flex: 1 }}>
       <ScreenBackground />
       <View style={[ms.header, { paddingTop: insets.top + 16 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
             <Ionicons name="clipboard" size={20} color="#fff" />
           </View>
@@ -598,7 +598,7 @@ export default function QuestionnairesScreen() {
 }
 
 const ms = StyleSheet.create({
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 12 },
+  header:      { flexDirection: 'column', alignItems: 'flex-start', paddingHorizontal: 16, paddingBottom: 12 },
   title:       { fontSize: SIZES.screenTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark },
   importBtn:   { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   importText:  { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.primary },
