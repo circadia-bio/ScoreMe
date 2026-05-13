@@ -140,8 +140,6 @@ const tb = StyleSheet.create({
   bar:       {
     flexDirection: 'row',
     backgroundColor: '#F2F2F2',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(74,123,181,0.12)',
     paddingTop: 8,
   },
   item:      { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 },
