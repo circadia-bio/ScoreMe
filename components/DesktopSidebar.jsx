@@ -40,7 +40,7 @@ function AboutModal({ visible, onClose }) {
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={am.backdrop} activeOpacity={1} onPress={onClose}>
         <TouchableOpacity activeOpacity={1}>
-          <BlurView intensity={52} tint="light" style={[am.sheet, { paddingBottom: Math.max(insets.bottom, 24) }]}>
+          <BlurView intensity={28} tint="light" style={am.sheet}>
             <View style={am.inner}>
 
               {/* Close */}
@@ -88,8 +88,8 @@ function AboutModal({ visible, onClose }) {
 
 const am = StyleSheet.create({
   backdrop:    { flex: 1, backgroundColor: 'rgba(30,58,95,0.35)', alignItems: 'center', justifyContent: 'center' },
-  sheet:       { width: 300, borderRadius: 24, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.45)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12 },
-  inner:       { padding: 28, alignItems: 'center', gap: 6 },
+  sheet:       { width: 300, borderRadius: 24, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.88)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: 'rgba(74,123,181,0.25)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 32, elevation: 12 },
+  inner:       { padding: 28, paddingBottom: 24, alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.70)', flex: 1 },
   closeBtn:    { position: 'absolute', top: 16, right: 16, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center', zIndex: 1 },
   logo:       { width: 160, height: 60, marginBottom: 4 },
   version:     { fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted },

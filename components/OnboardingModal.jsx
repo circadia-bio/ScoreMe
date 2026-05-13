@@ -56,7 +56,7 @@ export default function OnboardingModal({ visible, onDismiss }) {
         <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onDismiss} />
 
         {/* Square card */}
-        <BlurView intensity={52} tint="light" style={s.card}>
+        <BlurView intensity={28} tint="light" style={s.card}>
           <View style={s.cardInner}>
 
           {/* Close */}
@@ -117,7 +117,7 @@ const s = StyleSheet.create({
     width: 340, height: 340,
     borderRadius: 28,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.45)',
+    backgroundColor: 'rgba(255,255,255,0.88)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
     shadowColor: 'rgba(74,123,181,0.25)',
     shadowOffset: { width: 0, height: 12 },
@@ -125,6 +125,7 @@ const s = StyleSheet.create({
   },
   cardInner: {
     flex: 1, padding: 28,
+    backgroundColor: 'rgba(255,255,255,0.70)',
   },
   closeBtn: {
     position: 'absolute', top: 16, right: 16,
