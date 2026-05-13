@@ -11,8 +11,9 @@
  */
 import { Tabs, useRouter, usePathname } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS, COLOURS } from '../../theme/typography';
 import { useLayout } from '../../theme/responsive';
 import DesktopBackground from '../../components/DesktopBackground';
@@ -46,41 +47,51 @@ export default function TabLayout() {
     pathname.includes('questionnaires') ? 'questionnaires' :
     pathname.includes('analytics')      ? 'analytics'      : 'dashboard';
 
-  // Custom tab icon — icon in rounded square, matching sidebar nav items
-  const TabIcon = ({ name, nameActive, focused, label }) => (
-    <View style={ti.wrap}>
-      <View style={[ti.box, focused && ti.boxActive]}>
-        <Ionicons
-          name={focused ? nameActive : name}
-          size={20}
-          color={focused ? '#fff' : COLOURS.textMuted}
-        />
+  // Custom bottom tab bar — full control over layout
+  const NAV_ITEMS = [
+    { name: 'index',          route: '/(tabs)',                  icon: 'grid-outline',      iconActive: 'grid',       label: 'Dashboard'      },
+    { name: 'participants',   route: '/(tabs)/participants',     icon: 'people-outline',    iconActive: 'people',     label: 'Participants'   },
+    { name: 'questionnaires', route: '/(tabs)/questionnaires',  icon: 'clipboard-outline', iconActive: 'clipboard',  label: 'Questionnaires' },
+    { name: 'analytics',     route: '/(tabs)/analytics',       icon: 'bar-chart-outline', iconActive: 'bar-chart',  label: 'Analytics'     },
+  ];
+
+  function CustomTabBar({ state, navigation }) {
+    const insets = useSafeAreaInsets();
+    return (
+      <View style={[tb.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+        {NAV_ITEMS.map((item, i) => {
+          const focused = state.index === i;
+          return (
+            <TouchableOpacity
+              key={item.name}
+              style={tb.item}
+              onPress={() => navigation.navigate(item.name)}
+              activeOpacity={0.8}
+            >
+              <View style={[tb.box, focused && tb.boxActive]}>
+                <Ionicons
+                  name={focused ? item.iconActive : item.icon}
+                  size={20}
+                  color={focused ? '#fff' : COLOURS.textMuted}
+                />
+              </View>
+              <Text style={[tb.label, focused && tb.labelActive]}>{item.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
-      <Text style={[ti.label, focused && ti.labelActive]}>{label}</Text>
-    </View>
-  );
+    );
+  }
 
   const tabs = (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarStyle: isDesktop
-          ? { display: 'none' }
-          : {
-              backgroundColor: '#E2EDF8',
-              borderTopColor: 'rgba(74,123,181,0.12)',
-              borderTopWidth: 1,
-              height: 72,
-              paddingBottom: 0,
-              paddingTop: 0,
-            },
-      }}
+      tabBar={isDesktop ? () => null : (props) => <CustomTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen name="index"          options={{ tabBarIcon: ({ focused }) => <TabIcon name="grid-outline"      nameActive="grid"       focused={focused} label="Dashboard"     /> }} />
-      <Tabs.Screen name="participants"   options={{ tabBarIcon: ({ focused }) => <TabIcon name="people-outline"    nameActive="people"     focused={focused} label="Participants"  /> }} />
-      <Tabs.Screen name="questionnaires" options={{ tabBarIcon: ({ focused }) => <TabIcon name="clipboard-outline" nameActive="clipboard"  focused={focused} label="Questionnaires" /> }} />
-      <Tabs.Screen name="analytics"      options={{ tabBarIcon: ({ focused }) => <TabIcon name="bar-chart-outline" nameActive="bar-chart" focused={focused} label="Analytics"    /> }} />
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="participants" />
+      <Tabs.Screen name="questionnaires" />
+      <Tabs.Screen name="analytics" />
     </Tabs>
   );
 
@@ -125,10 +136,17 @@ const s = StyleSheet.create({
   desktopContent: { flex: 1, overflow: 'hidden' },
 });
 
-const ti = StyleSheet.create({
-  wrap:        { alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 8 },
-  box:         { width: 40, height: 36, borderRadius: 10, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' },
-  boxActive:   { backgroundColor: COLOURS.primary, shadowColor: 'rgba(74,123,181,0.40)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 },
-  label:       { fontSize: 11, fontFamily: FONTS.body, color: COLOURS.textMuted, letterSpacing: 0.1 },
+const tb = StyleSheet.create({
+  bar:       {
+    flexDirection: 'row',
+    backgroundColor: '#E2EDF8',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(74,123,181,0.12)',
+    paddingTop: 8,
+  },
+  item:      { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 },
+  box:       { width: 40, height: 36, borderRadius: 10, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' },
+  boxActive: { backgroundColor: COLOURS.primary, shadowColor: 'rgba(74,123,181,0.40)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 },
+  label:     { fontSize: 11, fontFamily: FONTS.body, color: COLOURS.textMuted, letterSpacing: 0.1 },
   labelActive: { color: COLOURS.primary, fontFamily: FONTS.bodyMedium },
 });
