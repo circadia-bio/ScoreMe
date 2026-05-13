@@ -230,4 +230,4 @@ See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full 
 
 Released under the [MIT License](./LICENSE).
 
-Copyright © Lucas França, Mario Leocadio-Miguel, 2025
+Copyright © Lucas França, Mario Leocadio-Miguel, 2026
