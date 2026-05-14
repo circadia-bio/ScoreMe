@@ -30,6 +30,7 @@ It is part of the Circadia Lab toolchain and shares its visual identity with [Sl
 - 📤 **CSV and JSON export** — CSV includes all participant metadata fields and custom fields as dynamic columns, with latest score per questionnaire; JSON includes full timestamped score history with item-level answers; preview table in the export panel
 - 🖥️ **Desktop split-panel layout** — left participant list, right detail/scoring/edit panel, glassmorphic sidebar with About modal
 - 🌐 **Cross-platform** — runs as a web app, iOS app, and Android app from the same codebase
+- 🌍 **Localisation** — English and Brazilian Portuguese (PT-BR), detected automatically from the device locale
 - 🎉 **First-run onboarding** — 3-slide centred modal walkthrough, shown once; resettable from the About modal
 
 ---
@@ -62,6 +63,10 @@ ScoreMe/
 │       └── chartUtils.js        Descriptive stats, grouping, palette helpers
 ├── data/
 │   └── questionnaires.js        8 built-in instruments + compileQuestionnaire()
+├── i18n/
+│   ├── index.js                 Locale detection + t() helper
+│   ├── en.js                    English strings
+│   └── pt-BR.js                 Brazilian Portuguese strings
 ├── storage/
 │   └── storage.js               AsyncStorage CRUD, score history, export helpers,
 │                                 disabled-Qs, onboarding flag
@@ -192,6 +197,30 @@ See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full 
 
 ---
 
+## 🌍 Localisation
+
+ScoreMe detects the device locale at startup using `expo-localization` and selects the matching translation bundle, falling back to English for unsupported locales.
+
+**Supported languages:**
+
+| Code | Language | Status |
+|---|---|---|
+| `en` | English | ✅ Default |
+| `pt-BR` | Portuguese (Brazil) | ✅ Complete |
+
+All UI strings are keyed in `i18n/en.js` and `i18n/pt-BR.js`. To add a new language, duplicate either file and update `i18n/index.js` to register the new locale tag.
+
+The `t()` helper supports `{{variable}}` interpolation and `_one` / `_other` pluralisation:
+
+```js
+import t from '../i18n';
+
+t('dashboard.title')                          // "Dashboard" / "Painel"
+t('export.participants', { count: 3 })        // "3 participants" / "3 participantes"
+```
+
+---
+
 ## 📦 Dependencies
 
 | Package | Version | Purpose |
@@ -201,8 +230,9 @@ See [`docs/questionnaire-schema.md`](docs/questionnaire-schema.md) for the full 
 | `expo-blur` | ~14 | Glassmorphic BlurView components |
 | `expo-document-picker` | ~55 | JSON import from device |
 | `expo-file-system` | ~18 | File write for CSV/JSON export |
-| `expo-sharing` | ~55 | Share sheet for export |
 | `expo-font` | ~55 | Custom font loading |
+| `expo-localization` | ~55 | Device locale detection for i18n |
+| `expo-sharing` | ~55 | Share sheet for export |
 | `@react-native-async-storage/async-storage` | 2.2 | Persistent storage |
 | `react-native-safe-area-context` | 5.6 | Safe area insets |
 | `react-native-svg` | 15.15 | SVG charts in analytics tab |
