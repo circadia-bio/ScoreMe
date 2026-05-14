@@ -1,13 +1,5 @@
 /**
  * app/(tabs)/_layout.jsx
- *
- * Exact music-log pattern:
- *   Desktop: desktopLayout (flex:1, position:relative) contains
- *     - DesktopSidebar (position:absolute, width:220, left:0)
- *     - desktopContent (flex:1) — screens render here
- *   Mobile: standard bottom tab bar
- *
- * Screens handle their own paddingLeft to clear the sidebar.
  */
 import { Tabs, useRouter, usePathname } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -21,6 +13,7 @@ import DesktopSidebar from '../../components/DesktopSidebar';
 import OnboardingModal from '../../components/OnboardingModal';
 import { DesktopExportModal } from '../export';
 import { hasSeenOnboarding, markOnboardingComplete } from '../../storage/storage';
+import t from '../../i18n';
 
 export default function TabLayout() {
   const { isDesktop } = useLayout();
@@ -47,12 +40,11 @@ export default function TabLayout() {
     pathname.includes('questionnaires') ? 'questionnaires' :
     pathname.includes('analytics')      ? 'analytics'      : 'dashboard';
 
-  // Custom bottom tab bar — full control over layout
   const NAV_ITEMS = [
-    { name: 'index',          route: '/(tabs)',                  icon: 'grid-outline',      iconActive: 'grid',       label: 'Dashboard'      },
-    { name: 'participants',   route: '/(tabs)/participants',     icon: 'people-outline',    iconActive: 'people',     label: 'Participants'   },
-    { name: 'questionnaires', route: '/(tabs)/questionnaires',  icon: 'clipboard-outline', iconActive: 'clipboard',  label: 'Questionnaires' },
-    { name: 'analytics',     route: '/(tabs)/analytics',       icon: 'bar-chart-outline', iconActive: 'bar-chart',  label: 'Analytics'     },
+    { name: 'index',          route: '/(tabs)',                  icon: 'grid-outline',      iconActive: 'grid',       labelKey: 'tabs.dashboard'      },
+    { name: 'participants',   route: '/(tabs)/participants',     icon: 'people-outline',    iconActive: 'people',     labelKey: 'tabs.participants'   },
+    { name: 'questionnaires', route: '/(tabs)/questionnaires',  icon: 'clipboard-outline', iconActive: 'clipboard',  labelKey: 'tabs.questionnaires' },
+    { name: 'analytics',      route: '/(tabs)/analytics',       icon: 'bar-chart-outline', iconActive: 'bar-chart',  labelKey: 'tabs.analytics'      },
   ];
 
   function CustomTabBar({ state, navigation }) {
@@ -75,7 +67,7 @@ export default function TabLayout() {
                   color={focused ? '#fff' : COLOURS.textMuted}
                 />
               </View>
-              <Text style={[tb.label, focused && tb.labelActive]}>{item.label}</Text>
+              <Text style={[tb.label, focused && tb.labelActive]}>{t(item.labelKey)}</Text>
             </TouchableOpacity>
           );
         })}
@@ -99,7 +91,6 @@ export default function TabLayout() {
     return (
       <View style={s.desktopOuter}>
         <DesktopBackground />
-        {/* desktopLayout: flex row, position relative — sidebar is absolute inside */}
         <View style={s.desktopLayout}>
           <DesktopSidebar
             activeTab={activeTab}
@@ -111,7 +102,6 @@ export default function TabLayout() {
             }}
             onExport={() => isDesktop ? setShowExport(true) : router.push('/export')}
           />
-          {/* desktopContent: flex 1, screens render here */}
           <View style={s.desktopContent}>
             {tabs}
           </View>
@@ -137,11 +127,7 @@ const s = StyleSheet.create({
 });
 
 const tb = StyleSheet.create({
-  bar:       {
-    flexDirection: 'row',
-    backgroundColor: '#F2F2F2',
-    paddingTop: 8,
-  },
+  bar:       { flexDirection: 'row', backgroundColor: '#F2F2F2', paddingTop: 8 },
   item:      { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 },
   box:       { width: 40, height: 36, borderRadius: 10, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' },
   boxActive: { backgroundColor: COLOURS.primary, shadowColor: 'rgba(74,123,181,0.40)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 },

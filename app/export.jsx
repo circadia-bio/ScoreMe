@@ -17,6 +17,7 @@ import { FONTS, SIZES, COLOURS } from '../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../theme/responsive';
 import { loadParticipants, participantsToCSV, participantsToJSON, loadCustomQuestionnaires, loadDisabledQs, getLatestResult } from '../storage/storage';
 import { QUESTIONNAIRES } from '../data/questionnaires';
+import t from '../i18n';
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -42,9 +43,9 @@ async function doExport(content, filename, mime) {
     const path = `${FileSystem.cacheDirectory}${filename}`;
     await FileSystem.writeAsStringAsync(path, content, { encoding: FileSystem.EncodingType.UTF8 });
     if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(path, { mimeType: mime, dialogTitle: 'Export ScoreMe data' });
+      await Sharing.shareAsync(path, { mimeType: mime, dialogTitle: t('export.shareDialog') });
     } else {
-      Alert.alert('Saved', path);
+      Alert.alert(t('export.saved'), path);
     }
   }
 }
@@ -58,18 +59,18 @@ function ExportContent({ participants, allQs, onClose }) {
   const totalScores = participants.reduce((s, p) => s + Object.keys(p.results ?? {}).length, 0);
 
   const handleCSV = async () => {
-    if (!participants.length) { Alert.alert('Nothing to export', 'Add and score some participants first.'); return; }
+    if (!participants.length) { Alert.alert(t('export.nothingToExport'), t('export.nothingToExportSub')); return; }
     setExportingCSV(true);
     try { await doExport(participantsToCSV(participants, allQs.map(q => q.id)), `scoreme_${Date.now()}.csv`, 'text/csv'); }
-    catch (e) { Alert.alert('Export failed', e.message); }
+    catch (e) { Alert.alert(t('export.failed'), e.message); }
     finally { setExportingCSV(false); }
   };
 
   const handleJSON = async () => {
-    if (!participants.length) { Alert.alert('Nothing to export', 'Add and score some participants first.'); return; }
+    if (!participants.length) { Alert.alert(t('export.nothingToExport'), t('export.nothingToExportSub')); return; }
     setExportingJSON(true);
     try { await doExport(participantsToJSON(participants, allQs), `scoreme_${Date.now()}.json`, 'application/json'); }
-    catch (e) { Alert.alert('Export failed', e.message); }
+    catch (e) { Alert.alert(t('export.failed'), e.message); }
     finally { setExportingJSON(false); }
   };
 
@@ -79,9 +80,9 @@ function ExportContent({ participants, allQs, onClose }) {
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ gap: 2 }}>
-          <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Export Data</Text>
+          <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('export.title')}</Text>
           <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>
-            {participants.length} participant{participants.length !== 1 ? 's' : ''} · {totalScores} score{totalScores !== 1 ? 's' : ''}
+            {t('export.participants', { count: participants.length })} · {t('export.scores', { count: totalScores })}
           </Text>
         </View>
         {onClose && (
@@ -94,9 +95,9 @@ function ExportContent({ participants, allQs, onClose }) {
       {/* Stat pills */}
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {[
-          { icon: 'people-outline',           label: 'Participants', value: participants.length,        color: COLOURS.primary, bg: 'rgba(74,123,181,0.12)' },
-          { icon: 'checkmark-circle-outline', label: 'Scored',       value: scoredParticipants.length, color: COLOURS.success, bg: 'rgba(46,125,50,0.10)'  },
-          { icon: 'bar-chart-outline',         label: 'Total scores', value: totalScores,               color: COLOURS.accent,  bg: 'rgba(224,122,32,0.12)' },
+          { icon: 'people-outline',           label: t('export.stats.participants'), value: participants.length,        color: COLOURS.primary, bg: 'rgba(74,123,181,0.12)' },
+          { icon: 'checkmark-circle-outline', label: t('export.stats.scored'),       value: scoredParticipants.length, color: COLOURS.success, bg: 'rgba(46,125,50,0.10)'  },
+          { icon: 'bar-chart-outline',         label: t('export.stats.totalScores'), value: totalScores,               color: COLOURS.accent,  bg: 'rgba(224,122,32,0.12)' },
         ].map(({ icon, label, value, color, bg }) => (
           <BlurView key={label} intensity={36} tint="light" style={{ flex: 1, borderRadius: 14, overflow: 'hidden', shadowColor: color, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 3 }}>
             <View style={{ backgroundColor: 'rgba(255,255,255,0.52)', padding: 12, gap: 6 }}>
@@ -117,15 +118,15 @@ function ExportContent({ participants, allQs, onClose }) {
 
       {/* Export buttons */}
       <View style={{ gap: 10 }}>
-        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>EXPORT</Text>
+        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>{t('export.exportLabel')}</Text>
 
         <TouchableOpacity style={[ec.btn, ec.btnPrimary, exportingCSV && { opacity: 0.5 }]} onPress={handleCSV} disabled={exportingCSV} activeOpacity={0.85}>
           <View style={ec.btnIcon}>
             <Ionicons name="document-text-outline" size={20} color={COLOURS.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={ec.btnTitle}>{exportingCSV ? 'Exporting…' : 'Export as CSV'}</Text>
-            <Text style={ec.btnSub}>Scores only · one row per participant</Text>
+            <Text style={ec.btnTitle}>{exportingCSV ? t('export.csvExporting') : t('export.csv')}</Text>
+            <Text style={ec.btnSub}>{t('export.csvSub')}</Text>
           </View>
           <Ionicons name="download-outline" size={18} color={COLOURS.primary} />
         </TouchableOpacity>
@@ -135,8 +136,8 @@ function ExportContent({ participants, allQs, onClose }) {
             <Ionicons name="code-slash-outline" size={20} color="#fff" />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[ec.btnTitle, { color: '#fff' }]}>{exportingJSON ? 'Exporting…' : 'Export as JSON'}</Text>
-            <Text style={[ec.btnSub, { color: 'rgba(255,255,255,0.72)' }]}>Full item-level answers + metadata</Text>
+            <Text style={[ec.btnTitle, { color: '#fff' }]}>{exportingJSON ? t('export.jsonExporting') : t('export.json')}</Text>
+            <Text style={[ec.btnSub, { color: 'rgba(255,255,255,0.72)' }]}>{t('export.jsonSub')}</Text>
           </View>
           <Ionicons name="download-outline" size={18} color="#fff" />
         </TouchableOpacity>
@@ -146,18 +147,16 @@ function ExportContent({ participants, allQs, onClose }) {
       {scoredParticipants.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>
-            PREVIEW ({scoredParticipants.length} participant{scoredParticipants.length !== 1 ? 's' : ''})
+            {t('export.preview')} ({t('export.participants', { count: scoredParticipants.length })})
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <BlurView intensity={36} tint="light" style={{ borderRadius: 14, overflow: 'hidden' }}>
-              {/* Header */}
               <View style={[pt.row, pt.headerRow]}>
-                <Text style={[pt.cell, pt.headerCell, { width: 130 }]}>Participant</Text>
+                <Text style={[pt.cell, pt.headerCell, { width: 130 }]}>{t('tabs.participants')}</Text>
                 {allQs.map(q => (
                   <Text key={q.id} style={[pt.cell, pt.headerCell, { width: 76 }]}>{q.shortTitle}</Text>
                 ))}
               </View>
-              {/* Rows */}
               {scoredParticipants.map((p, i) => (
                 <View key={p.id} style={[pt.row, i % 2 === 1 && pt.rowAlt]}>
                   <Text style={[pt.cell, { width: 130, fontFamily: FONTS.body, color: COLOURS.primaryDark }]} numberOfLines={1}>{p.code ?? p.name}</Text>
@@ -186,9 +185,9 @@ function ExportContent({ participants, allQs, onClose }) {
       {participants.length === 0 && (
         <View style={{ alignItems: 'center', paddingVertical: 40, gap: 10 }}>
           <Ionicons name="document-outline" size={48} color={COLOURS.textMuted} style={{ opacity: 0.4 }} />
-          <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>No data yet</Text>
+          <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('export.noDataTitle')}</Text>
           <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24 }}>
-            Add participants and complete questionnaires to export results.
+            {t('export.noDataSub')}
           </Text>
         </View>
       )}
@@ -256,9 +255,6 @@ export default function ExportScreen() {
     });
   }, []));
 
-  // On desktop, the sidebar's Export button pushes /export as a route —
-  // we instead show a floating panel. Redirect back and let the tab handle it.
-  // For simplicity, just render the content full-screen on desktop too.
   return (
     <View style={{ flex: 1, backgroundColor: isDesktop ? 'transparent' : COLOURS.screenBg }}>
       {!isDesktop && <ScreenBackground />}
@@ -274,5 +270,4 @@ export default function ExportScreen() {
   );
 }
 
-// Export the modal for use by the desktop sidebar
 export { DesktopExportModal };

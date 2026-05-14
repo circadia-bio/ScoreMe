@@ -17,6 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
+import t from '../i18n';
 
 const C = {
   primary:      COLOURS.primary,
@@ -64,8 +65,8 @@ const Scale010Input = ({ value, onChange }) => {
         })}
       </View>
       <View style={s.scale010Labels}>
-        <Text style={s.scale010Anchor}>Strongly disagree</Text>
-        <Text style={s.scale010Anchor}>Strongly agree</Text>
+        <Text style={s.scale010Anchor}>{t('runner.stronglyDisagree')}</Text>
+        <Text style={s.scale010Anchor}>{t('runner.stronglyAgree')}</Text>
       </View>
     </View>
   );
@@ -80,7 +81,7 @@ const YesNoInput = ({ value, onChange }) => (
         <TouchableOpacity key={opt}
           style={[s.yesNoBtn, sel && { backgroundColor: C.primary, shadowColor: 'rgba(74,123,181,0.35)', shadowRadius: 12, elevation: 5 }]}
           onPress={() => onChange(opt)} activeOpacity={0.8}>
-          <Text style={[s.yesNoText, { color: sel ? '#fff' : C.primary }]}>{opt === 'yes' ? 'Yes' : 'No'}</Text>
+          <Text style={[s.yesNoText, { color: sel ? '#fff' : C.primary }]}>{opt === 'yes' ? t('runner.yes') : t('runner.no')}</Text>
         </TouchableOpacity>
       );
     })}
@@ -131,7 +132,7 @@ const TimeInput = ({ value, onChange }) => {
           </React.Fragment>
         ))}
       </View>
-      <Text style={[s.stepHint, { color: C.primary }]}>hold for ±1 min</Text>
+      <Text style={[s.stepHint, { color: C.primary }]}>{t('runner.holdHint')}</Text>
     </View>
   );
 };
@@ -206,7 +207,7 @@ const ResultScreen = ({ questionnaire, score, onClose }) => {
       <View style={s.resultCard}>
         <View style={s.resultCardHeader}>
           <Ionicons name="checkmark-circle" size={18} color={interpretation.color} />
-          <Text style={[s.resultCardTitle, { color: interpretation.color }]}>Interpretation</Text>
+          <Text style={[s.resultCardTitle, { color: interpretation.color }]}>{t('runner.interpretation')}</Text>
         </View>
         <Text style={s.resultDesc}>{interpretation.description}</Text>
       </View>
@@ -225,10 +226,10 @@ const ResultScreen = ({ questionnaire, score, onClose }) => {
         )}
       </View>
 
-      {/* Done button — fixed size, not flex-fill */}
+      {/* Done button */}
       <TouchableOpacity style={s.doneBtn} onPress={onClose} activeOpacity={0.85}>
         <Ionicons name="checkmark" size={20} color="#fff" />
-        <Text style={s.doneBtnText}>Done</Text>
+        <Text style={s.doneBtnText}>{t('runner.done')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -315,7 +316,7 @@ export default function QuestionnaireRunner({ questionnaire, onComplete, onBack 
                 <Text style={s.instructionsText}>{questionnaire.instructions}</Text>
               </View>
             )}
-            <Text style={s.itemNumber}>Item {item?.number} of {total}</Text>
+            <Text style={s.itemNumber}>{t('runner.itemOf', { current: item?.number, total })}</Text>
             <Text style={s.itemText}>{item?.text}</Text>
             {item?.hint && (
               <View style={s.hintBox}>
@@ -345,12 +346,12 @@ export default function QuestionnaireRunner({ questionnaire, onComplete, onBack 
           <View style={[s.navRow, { paddingBottom: insets.bottom + 12 }]}>
             <TouchableOpacity style={s.backBtn} onPress={() => currentIndex > 0 ? setCurrentIndex((i) => i - 1) : onBack()}>
               <Ionicons name="chevron-back" size={22} color={C.primary} />
-              <Text style={s.backBtnText}>Back</Text>
+              <Text style={s.backBtnText}>{t('runner.back')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[s.nextBtn, !canProceed && s.nextBtnDisabled, { backgroundColor: C.primary }]}
               onPress={handleNext} disabled={!canProceed}>
-              <Text style={s.nextBtnText}>{currentIndex < total - 1 ? 'Next' : 'Finish'}</Text>
+              <Text style={s.nextBtnText}>{currentIndex < total - 1 ? t('runner.next') : t('runner.finish')}</Text>
               <Ionicons name="chevron-forward" size={22} color="#fff" />
             </TouchableOpacity>
           </View>

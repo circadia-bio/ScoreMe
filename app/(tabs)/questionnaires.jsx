@@ -1,10 +1,5 @@
 /**
  * app/(tabs)/questionnaires.jsx — Questionnaire library
- *
- * Desktop: music-log split pattern.
- *   Left  — selectable list of questionnaires
- *   Right — detail panel: what it measures, scoring, scale, reference
- * Mobile/tablet: ScreenBackground + compact cards
  */
 import React, { useState, useCallback } from 'react';
 import {
@@ -21,6 +16,7 @@ import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { QUESTIONNAIRES, compileQuestionnaire } from '../../data/questionnaires';
 import { loadCustomQuestionnaires, saveCustomQuestionnaire, deleteCustomQuestionnaire, loadDisabledQs, setQDisabled } from '../../storage/storage';
+import t from '../../i18n';
 
 async function importJSON(onDone) {
   try {
@@ -29,27 +25,24 @@ async function importJSON(onDone) {
     const response = await fetch(result.assets[0].uri);
     const parsed   = JSON.parse(await response.text());
     if (!parsed.id || !parsed.title || !Array.isArray(parsed.items)) {
-      Alert.alert('Invalid questionnaire', 'The JSON must have at minimum: id, title, items[].');
+      Alert.alert(t('questionnaires.importFailed'), t('questionnaires.importInvalid'));
       return;
     }
-    compileQuestionnaire(parsed); // build score() and interpret() from declarative fields
+    compileQuestionnaire(parsed);
     await saveCustomQuestionnaire(parsed);
     onDone();
-    Alert.alert('Imported!', `"${parsed.title}" added to your library.`);
+    Alert.alert(t('questionnaires.importedTitle'), t('questionnaires.importedBody', { title: parsed.title }));
   } catch (e) {
-    Alert.alert('Import failed', e.message);
+    Alert.alert(t('questionnaires.importFailed'), e.message);
   }
 }
 
-// Get score bands — prefer declarative scoreBands, fall back to probing interpret()
 function getScoreBands(q) {
-  // Use declarative bands if available (sorted correctly for display)
   if (Array.isArray(q.scoreBands) && q.scoreBands.length > 0) {
     return q.scoreBandDirection === 'desc'
-      ? [...q.scoreBands].sort((a, b) => b.min - a.min) // highest first for desc scales
+      ? [...q.scoreBands].sort((a, b) => b.min - a.min)
       : [...q.scoreBands].sort((a, b) => a.min - b.min);
   }
-  // Fall back: probe interpret() for imported questionnaires without declarative bands
   if (!q.interpret || typeof q.maxScore !== 'number') return null;
   const bands = [];
   const seen  = new Set();
@@ -62,25 +55,12 @@ function getScoreBands(q) {
   return bands.map((b, i) => ({ ...b, max: i < bands.length - 1 ? bands[i + 1].min - 1 : q.maxScore }));
 }
 
-// Infer item type label
 function typeLabel(type) {
-  switch (type) {
-    case 'scale_0_3':    return '0–3 scale';
-    case 'scale_0_4':    return '0–4 scale';
-    case 'scale_0_10':   return '0–10 scale';
-    case 'scale_1_10':   return '1–10 scale';
-    case 'single_choice':return 'single choice';
-    case 'yes_no':       return 'yes / no';
-    case 'frequency_3':  return 'frequency';
-    case 'frequency_4':  return 'frequency';
-    case 'time':         return 'time (HH:MM)';
-    case 'duration_min': return 'duration (min)';
-    case 'number':       return 'number';
-    default:             return type;
-  }
+  const key = `questionnaires.itemTypes.${type}`;
+  const val = t(key);
+  return val === key ? type : val;
 }
 
-// Unique item types used in the questionnaire
 function itemTypes(items) {
   return [...new Set(items.map(i => typeLabel(i.type)))].join(', ');
 }
@@ -88,10 +68,7 @@ function itemTypes(items) {
 // ─── Custom pill toggle ──────────────────────────────────────────────────────
 function Toggle({ value, onValueChange }) {
   const anim = React.useRef(new Animated.Value(value ? 1 : 0)).current;
-  React.useEffect(() => {
-    // Snap immediately on mount, animate on subsequent changes
-    anim.setValue(value ? 1 : 0);
-  }, []);
+  React.useEffect(() => { anim.setValue(value ? 1 : 0); }, []);
   React.useEffect(() => {
     Animated.spring(anim, { toValue: value ? 1 : 0, useNativeDriver: false, speed: 40, bounciness: 4 }).start();
   }, [value]);
@@ -114,8 +91,7 @@ const tog = StyleSheet.create({
 function QRow({ q, selected, onPress, onDelete, disabled, onToggle }) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <BlurView intensity={selected ? 52 : 36} tint="light"
-        style={{ overflow: 'hidden', borderBottomWidth: 0 }}>
+      <BlurView intensity={selected ? 52 : 36} tint="light" style={{ overflow: 'hidden', borderBottomWidth: 0 }}>
         <View style={[qr.row, selected && qr.rowSelected, disabled && qr.rowDisabled]}>
           <View style={[qr.iconWrap, selected && qr.iconWrapSelected, disabled && qr.iconWrapDisabled]}>
             <Ionicons name="clipboard-outline" size={17} color={selected ? '#fff' : disabled ? COLOURS.textMuted : COLOURS.primary} />
@@ -125,7 +101,7 @@ function QRow({ q, selected, onPress, onDelete, disabled, onToggle }) {
               <Text style={[qr.title, selected && { color: COLOURS.primary }, disabled && { color: COLOURS.textMuted }]}>{q.title}</Text>
               {q.beta && <View style={qr.betaChip}><Text style={qr.betaText}>BETA</Text></View>}
             </View>
-            <Text style={[qr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} items{q.domain ? ` · ${q.domain}` : ''}</Text>
+            <Text style={[qr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} {t('questionnaires.items').toLowerCase()}{q.domain ? ` · ${q.domain}` : ''}</Text>
           </View>
           <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
           {onDelete && (
@@ -158,7 +134,7 @@ function DetailPanel({ q }) {
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="clipboard-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
       <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5 }}>
-        Select a questionnaire to view details
+        {t('questionnaires.selectDetail')}
       </Text>
     </View>
   );
@@ -197,7 +173,7 @@ function DetailPanel({ q }) {
       {/* What it measures */}
       {q.construct && (
         <>
-          <Text style={dp.sectionLabel}>WHAT IT MEASURES</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.whatItMeasures')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark, marginBottom: 6 }}>{q.construct}</Text>
@@ -212,9 +188,9 @@ function DetailPanel({ q }) {
       {/* Quick stats */}
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {[
-          { icon: 'list-outline',   label: 'Items',     value: String(q.items?.length ?? '?') },
-          { icon: 'shapes-outline', label: 'Format',    value: itemTypes(q.items ?? []) },
-          ...(typeof q.maxScore === 'number' ? [{ icon: 'bar-chart-outline', label: 'Max score', value: String(q.maxScore) }] : []),
+          { icon: 'list-outline',   label: t('questionnaires.items'),    value: String(q.items?.length ?? '?') },
+          { icon: 'shapes-outline', label: t('questionnaires.format'),   value: itemTypes(q.items ?? []) },
+          ...(typeof q.maxScore === 'number' ? [{ icon: 'bar-chart-outline', label: t('questionnaires.maxScore'), value: String(q.maxScore) }] : []),
         ].map(({ icon, label, value }) => (
           <BlurView key={label} intensity={36} tint="light" style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}>
             <View style={{ backgroundColor: 'rgba(255,255,255,0.50)', padding: 12, gap: 4, alignItems: 'center' }}>
@@ -229,7 +205,7 @@ function DetailPanel({ q }) {
       {/* Instructions */}
       {q.instructions && (
         <>
-          <Text style={dp.sectionLabel}>INSTRUCTIONS</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.instructions')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark, lineHeight: 26 }}>{q.instructions}</Text>
@@ -241,7 +217,7 @@ function DetailPanel({ q }) {
       {/* Scoring note */}
       {q.scoringNote && (
         <>
-          <Text style={dp.sectionLabel}>SCORING METHOD</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.scoringMethod')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 24 }}>{q.scoringNote}</Text>
@@ -253,7 +229,7 @@ function DetailPanel({ q }) {
       {/* Score bands */}
       {bands && bands.length > 0 && (
         <>
-          <Text style={dp.sectionLabel}>SCORE INTERPRETATION</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.interpretation')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               {bands.map((b, i) => (
@@ -278,7 +254,7 @@ function DetailPanel({ q }) {
       {/* Languages */}
       {q.languages && q.languages.length > 0 && (
         <>
-          <Text style={dp.sectionLabel}>VALIDATED LANGUAGES</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.languages')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={[dp.cardInner, { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }]}>
               {q.languages.map(lang => (
@@ -294,7 +270,7 @@ function DetailPanel({ q }) {
       {/* Reference */}
       {q.reference && (
         <>
-          <Text style={dp.sectionLabel}>REFERENCE</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.reference')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.reference}</Text>
@@ -306,7 +282,7 @@ function DetailPanel({ q }) {
       {/* Credit */}
       {q.credit && q.credit !== q.reference && (
         <>
-          <Text style={dp.sectionLabel}>CREDIT</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.credit')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.credit}</Text>
@@ -318,7 +294,7 @@ function DetailPanel({ q }) {
       {/* Copyright */}
       {q.copyright && (
         <>
-          <Text style={dp.sectionLabel}>COPYRIGHT</Text>
+          <Text style={dp.sectionLabel}>{t('questionnaires.copyright')}</Text>
           <BlurView intensity={36} tint="light" style={dp.card}>
             <View style={dp.cardInner}>
               <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, lineHeight: 22 }}>{q.copyright}</Text>
@@ -326,7 +302,6 @@ function DetailPanel({ q }) {
           </BlurView>
         </>
       )}
-
     </ScrollView>
   );
 }
@@ -352,14 +327,14 @@ function MobileQRow({ q, isLast, onDelete, disabled, onToggle }) {
             <Text style={[mr.title, disabled && { color: COLOURS.textMuted }]}>{q.title}</Text>
             {q.beta && <View style={qr.betaChip}><Text style={qr.betaText}>BETA</Text></View>}
           </View>
-          <Text style={[mr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} items</Text>
+          <Text style={[mr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} {t('questionnaires.items').toLowerCase()}</Text>
         </View>
-          <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
-          {onDelete && (
-            <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
-            </TouchableOpacity>
-          )}
+        <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
+        {onDelete && (
+          <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
+          </TouchableOpacity>
+        )}
       </View>
       {!isLast && <View style={{ height: 1, backgroundColor: 'rgba(74,123,181,0.07)', marginHorizontal: 14 }} />}
     </View>
@@ -370,7 +345,6 @@ const mr = StyleSheet.create({
   iconWrap: { width: 34, height: 34, borderRadius: 9, backgroundColor: 'rgba(74,123,181,0.10)', alignItems: 'center', justifyContent: 'center' },
   title:    { fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark },
   meta:     { fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.primary, marginTop: 2 },
-  lockBadge:{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(74,123,181,0.06)', alignItems: 'center', justifyContent: 'center' },
 });
 
 // ─── Section header with toggle-all ──────────────────────────────────────────
@@ -381,10 +355,9 @@ function SectionHeader({ label, qs, disabledQs, onToggleAll }) {
       <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>
         {label} ({qs.length})
       </Text>
-      {/* Plain View — no outer TouchableOpacity; only the Toggle itself is tappable */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>
-          {allOn ? 'Disable all' : 'Enable all'}
+          {allOn ? t('questionnaires.disableAll') : t('questionnaires.enableAll')}
         </Text>
         <Toggle value={allOn} onValueChange={() => onToggleAll(allOn)} />
       </View>
@@ -392,7 +365,6 @@ function SectionHeader({ label, qs, disabledQs, onToggleAll }) {
   );
 }
 
-// ─── Group questionnaires by domain ─────────────────────────────────────────────
 function groupByDomain(qs) {
   const map = {};
   for (const q of qs) {
@@ -407,10 +379,10 @@ function groupByDomain(qs) {
 export default function QuestionnairesScreen() {
   const insets = useSafeAreaInsets();
   const { isDesktop } = useLayout();
-  const [customQs,     setCustomQs]     = useState([]);
-  const [selectedId,   setSelectedId]   = useState(null);
-  const [disabledQs,   setDisabledQs]   = useState(new Set());
-  const [byDomain,     setByDomain]     = useState(false);
+  const [customQs,   setCustomQs]   = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [disabledQs, setDisabledQs] = useState(new Set());
+  const [byDomain,   setByDomain]   = useState(false);
 
   const load = useCallback(async () => {
     const [custom, disabled] = await Promise.all([loadCustomQuestionnaires(), loadDisabledQs()]);
@@ -434,9 +406,9 @@ export default function QuestionnairesScreen() {
   }, []);
 
   const handleDelete = (q) => {
-    Alert.alert('Remove questionnaire', `Remove "${q.title}"? Scores already collected are not affected.`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Remove', style: 'destructive', onPress: async () => {
+    Alert.alert(t('questionnaires.removeTitle'), t('questionnaires.removeBody', { title: q.title }), [
+      { text: t('questionnaires.removeCancel'), style: 'cancel' },
+      { text: t('questionnaires.removeConfirm'), style: 'destructive', onPress: async () => {
         await deleteCustomQuestionnaire(q.id);
         if (selectedId === q.id) setSelectedId(null);
         load();
@@ -447,21 +419,12 @@ export default function QuestionnairesScreen() {
   const allQs    = [...QUESTIONNAIRES, ...customQs];
   const selected = allQs.find(q => q.id === selectedId) ?? null;
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
   const renderSection = (qs, label, isCustom = false) => (
     <View key={label} style={{ marginBottom: 16 }}>
-      <SectionHeader
-        label={label}
-        qs={qs}
-        disabledQs={disabledQs}
-        onToggleAll={(disable) => handleToggleAll(qs, disable)}
-      />
+      <SectionHeader label={label} qs={qs} disabledQs={disabledQs} onToggleAll={(disable) => handleToggleAll(qs, disable)} />
       <View style={{ borderRadius: 14, overflow: 'hidden', shadowColor: 'rgba(74,123,181,0.08)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 2 }}>
         {qs.map(q => (
-          <QRow
-            key={q.id} q={q}
-            selected={selectedId === q.id}
-            disabled={disabledQs.has(q.id)}
+          <QRow key={q.id} q={q} selected={selectedId === q.id} disabled={disabledQs.has(q.id)}
             onToggle={(val) => handleToggle(q.id, val)}
             onPress={() => setSelectedId(prev => prev === q.id ? null : q.id)}
             onDelete={isCustom ? () => handleDelete(q) : undefined}
@@ -473,12 +436,7 @@ export default function QuestionnairesScreen() {
 
   const renderMobileSection = (qs, label, isCustom = false) => (
     <View key={label}>
-      <SectionHeader
-        label={label}
-        qs={qs}
-        disabledQs={disabledQs}
-        onToggleAll={(disable) => handleToggleAll(qs, disable)}
-      />
+      <SectionHeader label={label} qs={qs} disabledQs={disabledQs} onToggleAll={(disable) => handleToggleAll(qs, disable)} />
       <View style={ms.card}>
         {qs.map((q, i) => (
           <MobileQRow key={q.id} q={q} isLast={i === qs.length - 1}
@@ -491,16 +449,10 @@ export default function QuestionnairesScreen() {
     </View>
   );
 
-  // ── Group by domain mode ───────────────────────────────────────────────────
-  const domainGroups     = byDomain ? groupByDomain(allQs) : null;
-  const builtInDomains   = byDomain ? groupByDomain(QUESTIONNAIRES) : null;
-  const customDomains    = byDomain && customQs.length > 0 ? groupByDomain(customQs) : null;
-
   // ── Desktop ──────────────────────────────────────────────────────────────────
   if (isDesktop) {
     return (
       <View style={{ flex: 1 }}>
-        {/* Glass card — left half */}
         <View style={{
           position: 'absolute', left: 0, right: '50%', top: 12, bottom: 12,
           borderRadius: 20,
@@ -510,28 +462,24 @@ export default function QuestionnairesScreen() {
         }} />
 
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          {/* Left col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, overflow: 'hidden' }}>
-            <ScrollView
-              contentContainerStyle={{ paddingTop: 24, paddingBottom: 40, paddingLeft: SIDEBAR_TOTAL + 20, paddingRight: 20 }}
-              showsVerticalScrollIndicator={false}
-            >
+            <ScrollView contentContainerStyle={{ paddingTop: 24, paddingBottom: 40, paddingLeft: SIDEBAR_TOTAL + 20, paddingRight: 20 }} showsVerticalScrollIndicator={false}>
               <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 12 }}>Questionnaires</Text>
+                <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark, marginBottom: 12 }}>{t('questionnaires.title')}</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   <TouchableOpacity
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: byDomain ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: byDomain ? COLOURS.primary : 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 }}
                     onPress={() => setByDomain(v => !v)}
                   >
                     <Ionicons name="albums-outline" size={15} color={byDomain ? '#fff' : COLOURS.primary} />
-                    <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: byDomain ? '#fff' : COLOURS.primary }}>By domain</Text>
+                    <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: byDomain ? '#fff' : COLOURS.primary }}>{t('questionnaires.byDomain')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 }}
                     onPress={() => importJSON(load)}
                   >
                     <Ionicons name="cloud-upload-outline" size={15} color={COLOURS.primary} />
-                    <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: COLOURS.primary }}>Import JSON</Text>
+                    <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: COLOURS.primary }}>{t('questionnaires.importJSON')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -539,14 +487,13 @@ export default function QuestionnairesScreen() {
               {byDomain
                 ? groupByDomain(allQs).map(([domain, qs]) => renderSection(qs, domain, qs.some(q => customQs.find(c => c.id === q.id))))
                 : <>
-                    {renderSection(QUESTIONNAIRES, `Built-in`)}
-                    {customQs.length > 0 && renderSection(customQs, 'Custom', true)}
+                    {renderSection(QUESTIONNAIRES, t('questionnaires.builtIn'))}
+                    {customQs.length > 0 && renderSection(customQs, t('questionnaires.custom'), true)}
                   </>
               }
             </ScrollView>
           </View>
 
-          {/* Right col — detail panel */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, marginRight: 12 }}>
             <DetailPanel q={selected} />
           </View>
@@ -564,7 +511,7 @@ export default function QuestionnairesScreen() {
           <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
             <Ionicons name="clipboard" size={20} color="#fff" />
           </View>
-          <Text style={ms.title}>Questionnaires</Text>
+          <Text style={ms.title}>{t('questionnaires.title')}</Text>
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity
@@ -572,11 +519,11 @@ export default function QuestionnairesScreen() {
             onPress={() => setByDomain(v => !v)}
           >
             <Ionicons name="albums-outline" size={16} color={byDomain ? '#fff' : COLOURS.primary} />
-            <Text style={[ms.importText, byDomain && { color: '#fff' }]}>By domain</Text>
+            <Text style={[ms.importText, byDomain && { color: '#fff' }]}>{t('questionnaires.byDomain')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={ms.importBtn} onPress={() => importJSON(load)}>
             <Ionicons name="cloud-upload-outline" size={16} color={COLOURS.primary} />
-            <Text style={ms.importText}>Import</Text>
+            <Text style={ms.importText}>{t('questionnaires.import')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -584,13 +531,13 @@ export default function QuestionnairesScreen() {
         {byDomain
           ? groupByDomain(allQs).map(([domain, qs]) => renderMobileSection(qs, domain, qs.some(q => customQs.find(c => c.id === q.id))))
           : <>
-              {renderMobileSection(QUESTIONNAIRES, 'Built-in')}
-              {customQs.length > 0 && renderMobileSection(customQs, 'Custom', true)}
+              {renderMobileSection(QUESTIONNAIRES, t('questionnaires.builtIn'))}
+              {customQs.length > 0 && renderMobileSection(customQs, t('questionnaires.custom'), true)}
             </>
         }
         <View style={ms.hint}>
           <Ionicons name="information-circle-outline" size={17} color={COLOURS.primary} />
-          <Text style={ms.hintText}>Import custom questionnaires as JSON files following the same schema as the built-ins.</Text>
+          <Text style={ms.hintText}>{t('questionnaires.importHint')}</Text>
         </View>
       </ScrollView>
     </View>
@@ -603,7 +550,6 @@ const ms = StyleSheet.create({
   importBtn:   { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2 },
   importText:  { fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.primary },
   content:     { paddingHorizontal: 16, gap: 10 },
-  sectionLabel:{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8 },
   card:        { backgroundColor: COLOURS.cardBg, borderRadius: 16, borderWidth: 1, borderColor: COLOURS.cardBorder, overflow: 'hidden' },
   hint:        { flexDirection: 'row', gap: 10, backgroundColor: 'rgba(74,123,181,0.07)', borderRadius: 12, padding: 14, marginTop: 8 },
   hintText:    { flex: 1, fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.primary, lineHeight: 20 },

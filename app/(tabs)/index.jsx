@@ -22,6 +22,7 @@ import { loadParticipants, saveResult, getLatestResult } from '../../storage/sto
 import { loadCustomQuestionnaires } from '../../storage/storage';
 import { loadDisabledQs } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
+import t from '../../i18n';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
@@ -46,7 +47,7 @@ function ParticipantRow({ p, selected, onPress, totalQs }) {
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
             {p.name && p.code ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
-            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{n}/{totalQs} scored</Text>
+            <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{t('dashboard.scoredCount', { n, total: totalQs })}</Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color={selected ? COLOURS.primary : COLOURS.textMuted} />
         </View>
@@ -60,7 +61,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
   if (!p) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
-      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5 }}>Select a participant</Text>
+      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5 }}>{t('dashboard.selectParticipant')}</Text>
       <Image source={require('../../assets/images/logo.png')} style={{ position: 'absolute', bottom: 24, right: 24, width: 120, height: 45, opacity: 0.25 }} resizeMode="contain" />
     </View>
   );
@@ -80,7 +81,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
           {p.name && p.code ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{p.name}</Text> : null}
-          <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Added {formatDate(p.createdAt)}</Text>
+          <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('participants.added', { date: formatDate(p.createdAt) })}</Text>
         </View>
         <TouchableOpacity onPress={onClose} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.6)', alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="close" size={18} color={COLOURS.textMuted} />
@@ -89,10 +90,10 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
       <View style={{ height: 5, borderRadius: 3, backgroundColor: '#DDE8F5', overflow: 'hidden', marginBottom: 6 }}>
         <View style={{ height: '100%', borderRadius: 3, width: `${pct * 100}%`, backgroundColor: col }} />
       </View>
-      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {allQs.length} scored</Text>
+      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{t('participants.ofScored', { scored: scored.length, total: allQs.length })}</Text>
 
       {scored.length > 0 && <>
-        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>RESULTS</Text>
+        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>{t('participants.results')}</Text>
         {scored.map(q => {
           const r = getLatestResult(p, q.id); const c = interpColor(q, r.score);
           return (
@@ -112,7 +113,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                   </View>
                 </View>
                 <TouchableOpacity style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 }} onPress={() => onScore(q.id)}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Redo</Text>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>{t('participants.redo')}</Text>
                 </TouchableOpacity>
               </View>
             </BlurView>
@@ -121,7 +122,7 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
       </>}
 
       {unscored.length > 0 && <>
-        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginTop: scored.length > 0 ? 16 : 0 }}>SCORE NOW</Text>
+        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginTop: scored.length > 0 ? 16 : 0 }}>{t('participants.scoreNow')}</Text>
         {unscored.map(q => (
           <TouchableOpacity key={q.id} onPress={() => onScore(q.id)} activeOpacity={0.8} style={{ marginBottom: 10 }}>
             <BlurView intensity={30} tint="light" style={{ borderRadius: 14, overflow: 'hidden' }}>
@@ -135,10 +136,10 @@ function DetailPanel({ p, onScore, onClose, allQs }) {
                       {q.timeframe && <View style={{ backgroundColor: 'rgba(224,122,32,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.accent }}>{q.timeframe}</Text></View>}
                     </View>
                   )}
-                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {q.items.length} items</Text>
+                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {t('participants.items', { n: q.items.length })}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: COLOURS.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: '#fff' }}>Start</Text>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: '#fff' }}>{t('participants.start')}</Text>
                   <Ionicons name="chevron-forward" size={14} color="#fff" />
                 </View>
               </View>
@@ -181,7 +182,7 @@ function MobileCard({ p, onPress, allQs }) {
           })}
         </View>
       )}
-      {n === 0 && <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, fontStyle: 'italic' }}>No questionnaires scored yet</Text>}
+      {n === 0 && <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, fontStyle: 'italic' }}>{t('participants.scoredN', { n: 0 })}</Text>}
       <View style={{ height: 4, borderRadius: 2, backgroundColor: '#DDE8F5', overflow: 'hidden' }}>
         <View style={{ height: '100%', borderRadius: 2, width: `${pct * 100}%`, backgroundColor: col }} />
       </View>
@@ -247,14 +248,14 @@ export default function DashboardScreen() {
               showsVerticalScrollIndicator={false}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOURS.primary} />}
             >
-              <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Dashboard</Text>
-              <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginBottom: 20 }}>Research Questionnaire Scorer</Text>
+              <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('dashboard.title')}</Text>
+              <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginBottom: 20 }}>{t('dashboard.subtitle')}</Text>
 
               <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
                 {[
-                  { icon: 'people',           label: 'Participants', value: participants.length,                                                                          color: COLOURS.primary,  bg: 'rgba(74,123,181,0.12)'  },
-                  { icon: 'checkmark-circle', label: 'Scored',       value: participants.filter(p => Object.keys(p.results ?? {}).length > 0).length,                    color: COLOURS.success,  bg: 'rgba(46,125,50,0.10)'   },
-                  { icon: 'bar-chart',        label: 'Total scores', value: participants.reduce((s, p) => s + Object.keys(p.results ?? {}).length, 0), color: COLOURS.accent,   bg: 'rgba(224,122,32,0.12)'  },
+                  { icon: 'people',           label: t('dashboard.stats.participants'), value: participants.length,                                                                          color: COLOURS.primary,  bg: 'rgba(74,123,181,0.12)'  },
+                  { icon: 'checkmark-circle', label: t('dashboard.stats.scored'),       value: participants.filter(p => Object.keys(p.results ?? {}).length > 0).length,                    color: COLOURS.success,  bg: 'rgba(46,125,50,0.10)'   },
+                  { icon: 'bar-chart',        label: t('dashboard.stats.totalScores'),  value: participants.reduce((s, p) => s + Object.keys(p.results ?? {}).length, 0), color: COLOURS.accent,   bg: 'rgba(224,122,32,0.12)'  },
                 ].map(({ icon, label, value, color, bg }) => (
                   <BlurView key={label} intensity={44} tint="light" style={{ flex: 1, borderRadius: 18, overflow: 'hidden', shadowColor: color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.14, shadowRadius: 14, elevation: 4 }}>
                     <View style={{ backgroundColor: 'rgba(255,255,255,0.55)', padding: 16, gap: 10 }}>
@@ -274,16 +275,16 @@ export default function DashboardScreen() {
               </View>
 
               <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>
-                PARTICIPANTS ({participants.length})
+                {t('tabs.participants').toUpperCase()} ({participants.length})
               </Text>
 
               {participants.length === 0 ? (
                 <View style={{ alignItems: 'center', paddingVertical: 40, gap: 10 }}>
                   <Ionicons name="people-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.5 }} />
-                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No participants yet</Text>
+                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('dashboard.noParticipants')}</Text>
                   <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 10, elevation: 4 }} onPress={() => router.push('/(tabs)/participants')}>
                     <Ionicons name="add" size={16} color="#fff" />
-                    <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>Add participant</Text>
+                    <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{t('dashboard.addParticipant')}</Text>
                   </TouchableOpacity>
                 </View>
               ) : participants.map(p => (
@@ -328,7 +329,6 @@ export default function DashboardScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOURS.primary} />}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Logo row — mirrors desktop sidebar wordmark */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
               <Ionicons name="document-text" size={20} color="#fff" />
@@ -344,16 +344,16 @@ export default function DashboardScreen() {
         {participants.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 48, gap: 12 }}>
             <Ionicons name="people-outline" size={52} color={COLOURS.textMuted} />
-            <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>No participants yet</Text>
-            <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24, paddingHorizontal: 20 }}>Add participants in the Participants tab, then score them on any questionnaire.</Text>
+            <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('dashboard.noParticipants')}</Text>
+            <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24, paddingHorizontal: 20 }}>{t('dashboard.noParticipantsSub')}</Text>
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLOURS.primary, borderRadius: 14, paddingHorizontal: 20, paddingVertical: 12, marginTop: 8, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 12, elevation: 5 }} onPress={() => router.push('/(tabs)/participants')}>
               <Ionicons name="add" size={18} color="#fff" />
-              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>Add first participant</Text>
+              <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>{t('dashboard.addFirst')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <>
-            <Text style={mob.label}>PARTICIPANTS ({participants.length})</Text>
+            <Text style={mob.label}>{t('tabs.participants').toUpperCase()} ({participants.length})</Text>
             <View style={isTablet ? { flexDirection: 'row', flexWrap: 'wrap', gap: 10 } : { gap: 10 }}>
               {participants.map(p => (
                 <View key={p.id} style={isTablet && { width: '48.5%' }}>
@@ -364,8 +364,8 @@ export default function DashboardScreen() {
             <TouchableOpacity style={mob.exportCard} onPress={() => router.push('/export')} activeOpacity={0.85}>
               <Ionicons name="download-outline" size={22} color={COLOURS.primary} />
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>Export data</Text>
-                <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Download scores as CSV or full JSON</Text>
+                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{t('dashboard.exportData')}</Text>
+                <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('dashboard.exportDataSub')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={COLOURS.textMuted} />
             </TouchableOpacity>

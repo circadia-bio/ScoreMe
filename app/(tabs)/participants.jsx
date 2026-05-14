@@ -1,8 +1,5 @@
 /**
  * app/(tabs)/participants.jsx — Participant management
- *
- * Desktop: music-log split pattern. Scoring opens inline in the right panel.
- * Mobile/tablet: compact cards + FAB.
  */
 import React, { useState, useCallback } from 'react';
 import {
@@ -22,6 +19,7 @@ import { loadParticipants, addParticipant, deleteParticipant, saveResult, update
 import { loadCustomQuestionnaires } from '../../storage/storage';
 import { loadDisabledQs } from '../../storage/storage';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
+import t from '../../i18n';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
@@ -47,7 +45,7 @@ function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: selected ? COLOURS.primary : COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
               {p.name ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
-              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {n} scored</Text>
+              <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{t('participants.added', { date: formatDate(p.createdAt) })} · {t('participants.scoredN', { n })}</Text>
             </View>
             <Ionicons name="chevron-forward" size={15} color={selected ? COLOURS.primary : COLOURS.textMuted} />
           </TouchableOpacity>
@@ -62,7 +60,12 @@ function ParticipantRow({ p, selected, onPress, onDelete, totalQs }) {
 }
 
 // ─── Shared field helpers ─────────────────────────────────────────────────────
-const SEX_OPTIONS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+const SEX_OPTIONS = [
+  { key: 'male',      label: () => t('participants.sexOptions.male')      },
+  { key: 'female',    label: () => t('participants.sexOptions.female')    },
+  { key: 'nonBinary', label: () => t('participants.sexOptions.nonBinary') },
+  { key: 'preferNot', label: () => t('participants.sexOptions.preferNot') },
+];
 
 function FieldInput({ label, value, onChange, placeholder, multiline, keyboardType, required }) {
   return (
@@ -81,13 +84,13 @@ function FieldInput({ label, value, onChange, placeholder, multiline, keyboardTy
 function SexPicker({ value, onChange }) {
   return (
     <View style={{ marginTop: 12 }}>
-      <Text style={af.label}>Sex</Text>
+      <Text style={af.label}>{t('participants.fieldSex')}</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
         {SEX_OPTIONS.map(opt => (
-          <TouchableOpacity key={opt} activeOpacity={0.8}
-            style={[af.sexBtn, value === opt && af.sexBtnActive]}
-            onPress={() => onChange(value === opt ? '' : opt)}>
-            <Text style={[af.sexBtnText, value === opt && af.sexBtnTextActive]}>{opt}</Text>
+          <TouchableOpacity key={opt.key} activeOpacity={0.8}
+            style={[af.sexBtn, value === opt.key && af.sexBtnActive]}
+            onPress={() => onChange(value === opt.key ? '' : opt.key)}>
+            <Text style={[af.sexBtnText, value === opt.key && af.sexBtnTextActive]}>{opt.label()}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -118,30 +121,30 @@ function ParticipantForm({ fields, setField, onSubmit, onCancel, submitting, isE
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 2 }} keyboardShouldPersistTaps="handled">
 
-      <FormSection title="Identity" />
-      <FieldInput label="Participant Code" value={fields.code} onChange={v => setField('code', v)} placeholder="e.g. P001" required />
-      <FieldInput label="Name" value={fields.name} onChange={v => setField('name', v)} placeholder="Full name (optional)" />
+      <FormSection title={t('participants.sectionIdentity')} />
+      <FieldInput label={t('participants.fieldCode')} value={fields.code} onChange={v => setField('code', v)} placeholder={t('participants.fieldCodePh')} required />
+      <FieldInput label={t('participants.fieldName')} value={fields.name} onChange={v => setField('name', v)} placeholder={t('participants.fieldNamePh')} />
 
-      <FormSection title="Demographics" />
-      <FieldInput label="Age" value={fields.age} onChange={v => setField('age', v)} placeholder="e.g. 34" keyboardType="numeric" />
+      <FormSection title={t('participants.sectionDemographics')} />
+      <FieldInput label={t('participants.fieldAge')} value={fields.age} onChange={v => setField('age', v)} placeholder={t('participants.fieldAgePh')} keyboardType="numeric" />
       <SexPicker value={fields.sex} onChange={v => setField('sex', v)} />
-      <FieldInput label="BMI" value={fields.bmi} onChange={v => setField('bmi', v)} placeholder="e.g. 24.5" keyboardType="numeric" />
+      <FieldInput label={t('participants.fieldBmi')} value={fields.bmi} onChange={v => setField('bmi', v)} placeholder={t('participants.fieldBmiPh')} keyboardType="numeric" />
 
-      <FormSection title="Study" />
-      <FieldInput label="Group / Condition" value={fields.group} onChange={v => setField('group', v)} placeholder="e.g. Control, Treatment A" />
-      <FieldInput label="Site" value={fields.site} onChange={v => setField('site', v)} placeholder="e.g. London" />
-      <FieldInput label="Session" value={fields.session} onChange={v => setField('session', v)} placeholder="e.g. Baseline, Week 4" />
+      <FormSection title={t('participants.sectionStudy')} />
+      <FieldInput label={t('participants.fieldGroup')} value={fields.group} onChange={v => setField('group', v)} placeholder={t('participants.fieldGroupPh')} />
+      <FieldInput label={t('participants.fieldSite')} value={fields.site} onChange={v => setField('site', v)} placeholder={t('participants.fieldSitePh')} />
+      <FieldInput label={t('participants.fieldSession')} value={fields.session} onChange={v => setField('session', v)} placeholder={t('participants.fieldSessionPh')} />
 
-      <FormSection title="Clinical" />
-      <FieldInput label="Diagnosis" value={fields.diagnosis} onChange={v => setField('diagnosis', v)} placeholder="e.g. Insomnia disorder" />
-      <FieldInput label="Medication" value={fields.medication} onChange={v => setField('medication', v)} placeholder="e.g. None" />
-      <FieldInput label="Referral" value={fields.referral} onChange={v => setField('referral', v)} placeholder="e.g. GP, self-referred" />
+      <FormSection title={t('participants.sectionClinical')} />
+      <FieldInput label={t('participants.fieldDiagnosis')} value={fields.diagnosis} onChange={v => setField('diagnosis', v)} placeholder={t('participants.fieldDiagnosisPh')} />
+      <FieldInput label={t('participants.fieldMedication')} value={fields.medication} onChange={v => setField('medication', v)} placeholder={t('participants.fieldMedicationPh')} />
+      <FieldInput label={t('participants.fieldReferral')} value={fields.referral} onChange={v => setField('referral', v)} placeholder={t('participants.fieldReferralPh')} />
 
-      <FormSection title="Custom fields" />
+      <FormSection title={t('participants.sectionCustom')} />
       {(fields.customFields ?? []).map((cf, i) => (
         <View key={i} style={{ flexDirection: 'row', gap: 6, marginTop: 10, alignItems: 'center' }}>
-          <TextInput style={[af.input, { flex: 1 }]} value={cf.label} onChangeText={v => updateCustomField(i, 'label', v)} placeholder="Label" placeholderTextColor={COLOURS.textMuted} />
-          <TextInput style={[af.input, { flex: 2 }]} value={cf.value} onChangeText={v => updateCustomField(i, 'value', v)} placeholder="Value" placeholderTextColor={COLOURS.textMuted} />
+          <TextInput style={[af.input, { flex: 1 }]} value={cf.label} onChangeText={v => updateCustomField(i, 'label', v)} placeholder={t('participants.fieldLabel')} placeholderTextColor={COLOURS.textMuted} />
+          <TextInput style={[af.input, { flex: 2 }]} value={cf.value} onChangeText={v => updateCustomField(i, 'value', v)} placeholder={t('participants.fieldValue')} placeholderTextColor={COLOURS.textMuted} />
           <TouchableOpacity onPress={() => removeCustomField(i)} style={{ width: 32, height: 44, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="close-circle" size={18} color={COLOURS.danger} />
           </TouchableOpacity>
@@ -149,16 +152,16 @@ function ParticipantForm({ fields, setField, onSubmit, onCancel, submitting, isE
       ))}
       <TouchableOpacity onPress={addCustomField} style={af.addFieldBtn}>
         <Ionicons name="add-circle-outline" size={17} color={COLOURS.primary} />
-        <Text style={{ fontSize: 14, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>Add field</Text>
+        <Text style={{ fontSize: 14, fontFamily: FONTS.bodyMedium, color: COLOURS.primary }}>{t('participants.addField')}</Text>
       </TouchableOpacity>
 
-      <FormSection title="Notes" />
-      <FieldInput label="" value={fields.notes} onChange={v => setField('notes', v)} placeholder="Any additional notes…" multiline />
+      <FormSection title={t('participants.sectionNotes')} />
+      <FieldInput label="" value={fields.notes} onChange={v => setField('notes', v)} placeholder={t('participants.fieldNotePh')} multiline />
 
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 24 }}>
         {onCancel && (
           <TouchableOpacity style={af.cancelBtn} onPress={onCancel}>
-            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>Cancel</Text>
+            <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primary }}>{t('participants.cancel')}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -166,7 +169,7 @@ function ParticipantForm({ fields, setField, onSubmit, onCancel, submitting, isE
           onPress={onSubmit} disabled={!fields.code?.trim() || submitting} activeOpacity={0.85}>
           <Ionicons name={isEdit ? 'checkmark' : 'person-add'} size={17} color="#fff" />
           <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: '#fff' }}>
-            {submitting ? (isEdit ? 'Saving…' : 'Adding…') : (isEdit ? 'Save changes' : 'Add Participant')}
+            {submitting ? (isEdit ? t('participants.saving') : t('participants.adding')) : (isEdit ? t('participants.saveChanges') : t('participants.addParticipant'))}
           </Text>
         </TouchableOpacity>
       </View>
@@ -194,7 +197,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
   if (!p) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
       <Ionicons name="person-outline" size={40} color={COLOURS.textMuted} style={{ opacity: 0.35 }} />
-      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5, textAlign: 'center' }}>{'Select a participant\nor add a new one'}</Text>
+      <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, opacity: 0.5, textAlign: 'center' }}>{t('participants.selectOrAdd')}</Text>
       <Image source={require('../../assets/images/logo.png')} style={{ position: 'absolute', bottom: 24, right: 24, width: 120, height: 45, opacity: 0.25 }} resizeMode="contain" />
     </View>
   );
@@ -214,7 +217,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
           {p.name ? <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }}>{p.name}</Text> : null}
-          <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>Added {formatDate(p.createdAt)}</Text>
+          <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('participants.added', { date: formatDate(p.createdAt) })}</Text>
         </View>
         <TouchableOpacity onPress={onClose} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.6)', alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="close" size={18} color={COLOURS.textMuted} />
@@ -226,14 +229,14 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       <View style={{ height: 5, borderRadius: 3, backgroundColor: '#DDE8F5', overflow: 'hidden', marginBottom: 6 }}>
         <View style={{ height: '100%', borderRadius: 3, width: `${pct * 100}%`, backgroundColor: col }} />
       </View>
-      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{scored.length} of {allQs.length} scored</Text>
+      <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: col, marginBottom: 16 }}>{t('participants.ofScored', { scored: scored.length, total: allQs.length })}</Text>
 
       {/* Participant metadata chips */}
       {(p.age || p.sex || p.bmi || p.group || p.site || p.session || p.diagnosis || p.medication || p.referral || p.notes || (p.customFields?.length > 0)) && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-          {p.age      ? <View style={dp.chip}><Text style={dp.chipText}>Age {p.age}</Text></View> : null}
-          {p.sex      ? <View style={dp.chip}><Text style={dp.chipText}>{p.sex}</Text></View> : null}
-          {p.bmi      ? <View style={dp.chip}><Text style={dp.chipText}>BMI {p.bmi}</Text></View> : null}
+          {p.age      ? <View style={dp.chip}><Text style={dp.chipText}>{t('participants.fieldAge')} {p.age}</Text></View> : null}
+          {p.sex      ? <View style={dp.chip}><Text style={dp.chipText}>{t(`participants.sexOptions.${p.sex}`)}</Text></View> : null}
+          {p.bmi      ? <View style={dp.chip}><Text style={dp.chipText}>{t('participants.fieldBmi')} {p.bmi}</Text></View> : null}
           {p.group    ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.group}</Text></View> : null}
           {p.site     ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.site}</Text></View> : null}
           {p.session  ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.session}</Text></View> : null}
@@ -246,7 +249,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       )}
 
       {scored.length > 0 && <>
-        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>RESULTS</Text>
+        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>{t('participants.results')}</Text>
         {scored.map(q => {
           const r = getLatestResult(p, q.id); const c = interpColor(q, r.score);
           return (
@@ -266,7 +269,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
                   </View>
                 </View>
                 <TouchableOpacity style={{ backgroundColor: 'rgba(74,123,181,0.10)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.12)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 }} onPress={() => onScore(q.id)}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>Redo</Text>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: COLOURS.primary }}>{t('participants.redo')}</Text>
                 </TouchableOpacity>
               </View>
             </BlurView>
@@ -275,7 +278,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       </>}
 
       {unscored.length > 0 && <>
-        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginTop: scored.length > 0 ? 18 : 0 }}>SCORE NOW</Text>
+        <Text style={{ fontSize: SIZES.label, fontFamily: FONTS.body, color: COLOURS.accent, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginTop: scored.length > 0 ? 18 : 0 }}>{t('participants.scoreNow')}</Text>
         {unscored.map(q => (
           <TouchableOpacity key={q.id} onPress={() => onScore(q.id)} activeOpacity={0.8} style={{ marginBottom: 10 }}>
             <BlurView intensity={30} tint="light" style={{ borderRadius: 14, overflow: 'hidden' }}>
@@ -289,10 +292,10 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
                       {q.timeframe && <View style={{ backgroundColor: 'rgba(224,122,32,0.08)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ fontSize: 11, fontFamily: FONTS.bodyMedium, color: COLOURS.accent }}>{q.timeframe}</Text></View>}
                     </View>
                   )}
-                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {q.items.length} items</Text>
+                  <Text style={{ fontSize: 12, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 3 }}>{q.shortTitle} · {t('participants.items', { n: q.items.length })}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: COLOURS.primary, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: '#fff' }}>Start</Text>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.body, color: '#fff' }}>{t('participants.start')}</Text>
                   <Ionicons name="chevron-forward" size={13} color="#fff" />
                 </View>
               </View>
@@ -330,9 +333,9 @@ export default function ParticipantsScreen() {
   const [adding,     setAdding]     = useState(false);
   const [saving,     setSaving]     = useState(false);
   const [scoringQid, setScoringQid] = useState(null);
-  const [allQs,        setAllQs]        = useState(QUESTIONNAIRES);
-  const [query,        setQuery]         = useState('');
-  const [sortBy,       setSortBy]        = useState('added'); // 'added' | 'alpha' | 'completion'
+  const [allQs,      setAllQs]      = useState(QUESTIONNAIRES);
+  const [query,      setQuery]      = useState('');
+  const [sortBy,     setSortBy]     = useState('added');
 
   const load = useCallback(async () => {
     const [ps, customQs, disabledQs] = await Promise.all([loadParticipants(), loadCustomQuestionnaires(), loadDisabledQs()]);
@@ -374,12 +377,13 @@ export default function ParticipantsScreen() {
       if (selectedId === p.id) { setSelectedId(null); setScoringQid(null); }
       load();
     };
+    const msg = t('participants.deleteConfirm', { name: p.name });
     if (Platform.OS === 'web') {
-      if (window.confirm(`Remove "${p.name}" and all their scores? This cannot be undone.`)) doDelete();
+      if (window.confirm(msg)) doDelete();
     } else {
-      Alert.alert('Delete participant', `Remove ${p.name} and all their scores?`, [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: doDelete },
+      Alert.alert(t('participants.title'), msg, [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.delete'), style: 'destructive', onPress: doDelete },
       ]);
     }
   };
@@ -413,9 +417,9 @@ export default function ParticipantsScreen() {
   })();
 
   const SORT_OPTIONS = [
-    { id: 'added',      icon: 'time-outline',       label: 'Added' },
-    { id: 'alpha',      icon: 'text-outline',        label: 'A–Z' },
-    { id: 'completion', icon: 'checkmark-circle-outline', label: '% Done' },
+    { id: 'added',      icon: 'time-outline',              label: t('participants.sort.added')      },
+    { id: 'alpha',      icon: 'text-outline',              label: t('participants.sort.alpha')      },
+    { id: 'completion', icon: 'checkmark-circle-outline',  label: t('participants.sort.completion') },
   ];
 
   const SearchBar = (
@@ -424,7 +428,7 @@ export default function ParticipantsScreen() {
         <Ionicons name="search" size={16} color={COLOURS.textMuted} />
         <TextInput
           style={{ flex: 1, fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.primaryDark }}
-          placeholder="Search by code, name, group…"
+          placeholder={t('participants.searchPlaceholder')}
           placeholderTextColor={COLOURS.textMuted}
           value={query}
           onChangeText={setQuery}
@@ -472,29 +476,28 @@ export default function ParticipantsScreen() {
         }} />
 
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          {/* Left col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, overflow: 'hidden' }}>
             <ScrollView contentContainerStyle={{ paddingTop: 24, paddingBottom: 40, paddingLeft: SIDEBAR_TOTAL + 20, paddingRight: 20 }} showsVerticalScrollIndicator={false}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>Participants</Text>
+                <Text style={{ fontSize: 32, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('participants.title')}</Text>
                 <TouchableOpacity
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: showAdd ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderWidth: 1, borderColor: showAdd ? COLOURS.primary : 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, shadowColor: 'rgba(74,123,181,0.20)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 3 }}
                   onPress={() => { setShowAdd(!showAdd); setSelectedId(null); setScoringQid(null); }}
                 >
                   <Ionicons name={showAdd ? 'close' : 'person-add-outline'} size={16} color={showAdd ? '#fff' : COLOURS.primary} />
-                  <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: showAdd ? '#fff' : COLOURS.primary }}>{showAdd ? 'Cancel' : 'Add'}</Text>
+                  <Text style={{ fontSize: 14, fontFamily: FONTS.body, color: showAdd ? '#fff' : COLOURS.primary }}>{showAdd ? t('participants.cancel') : t('participants.add')}</Text>
                 </TouchableOpacity>
               </View>
               {participants.length > 0 ? SearchBar : null}
               {participants.length === 0 && !showAdd ? (
                 <View style={{ alignItems: 'center', paddingVertical: 40, gap: 8 }}>
                   <Ionicons name="person-add-outline" size={36} color={COLOURS.textMuted} style={{ opacity: 0.5 }} />
-                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No participants yet</Text>
+                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('participants.noParticipants')}</Text>
                 </View>
               ) : null}
               {query.trim() && filteredParticipants.length === 0 && participants.length > 0 ? (
                 <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
-                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
+                  <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('participants.noMatches', { query })}</Text>
                 </View>
               ) : null}
               {filteredParticipants.map(p => (
@@ -508,7 +511,6 @@ export default function ParticipantsScreen() {
             </ScrollView>
           </View>
 
-          {/* Right col */}
           <View style={{ flex: 1, marginTop: 12, marginBottom: 12, marginRight: 12 }}>
             {showAdd ? (
               <View style={{ flex: 1 }}>
@@ -527,19 +529,9 @@ export default function ParticipantsScreen() {
                 </BlurView>
               </View>
             ) : scoringQ && selected ? (
-              <QuestionnaireRunner
-                questionnaire={scoringQ}
-                onComplete={handleScoringComplete}
-                onBack={() => setScoringQid(null)}
-              />
+              <QuestionnaireRunner questionnaire={scoringQ} onComplete={handleScoringComplete} onBack={() => setScoringQid(null)} />
             ) : (
-              <DetailPanel
-                p={selected}
-                allQs={allQs}
-                onScore={handleScore}
-                onEdit={() => selected && handleEdit(selected)}
-                onClose={() => { setSelectedId(null); setShowEdit(false); }}
-              />
+              <DetailPanel p={selected} allQs={allQs} onScore={handleScore} onEdit={() => selected && handleEdit(selected)} onClose={() => { setSelectedId(null); setShowEdit(false); }} />
             )}
           </View>
         </View>
@@ -556,7 +548,7 @@ export default function ParticipantsScreen() {
           <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: COLOURS.primary, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(74,123,181,0.35)', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 4 }}>
             <Ionicons name="people" size={20} color="#fff" />
           </View>
-          <Text style={{ fontSize: 28, fontFamily: FONTS.heading, color: COLOURS.primaryDark, letterSpacing: -0.3 }}>Participants</Text>
+          <Text style={{ fontSize: 28, fontFamily: FONTS.heading, color: COLOURS.primaryDark, letterSpacing: -0.3 }}>{t('participants.title')}</Text>
         </View>
         {participants.length > 0 ? SearchBar : null}
       </View>
@@ -564,14 +556,14 @@ export default function ParticipantsScreen() {
         {participants.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 64, gap: 10 }}>
             <Ionicons name="person-add-outline" size={52} color={COLOURS.textMuted} />
-            <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>No participants yet</Text>
-            <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24, paddingHorizontal: 24 }}>Add participants to begin scoring questionnaires.</Text>
+            <Text style={{ fontSize: SIZES.sectionTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('participants.noParticipants')}</Text>
+            <Text style={{ fontSize: SIZES.bodySmall, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary, textAlign: 'center', lineHeight: 24, paddingHorizontal: 24 }}>{t('dashboard.noParticipantsSub')}</Text>
           </View>
         ) : (
           <>
             {query.trim() && filteredParticipants.length === 0 ? (
               <View style={{ alignItems: 'center', paddingVertical: 24, gap: 6 }}>
-                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>No matches for "{query}"</Text>
+                <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted }}>{t('participants.noMatches', { query })}</Text>
               </View>
             ) : null}
             {filteredParticipants.map(p => {
@@ -585,7 +577,7 @@ export default function ParticipantsScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: SIZES.body, fontFamily: FONTS.body, color: COLOURS.primaryDark }}>{p.code ?? p.name}</Text>
                       {p.name && p.code ? <Text style={{ fontSize: SIZES.caption, fontFamily: FONTS.bodyMedium, color: COLOURS.textSecondary }} numberOfLines={1}>{p.name}</Text> : null}
-                      <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>Added {formatDate(p.createdAt)} · {scored.length} scored</Text>
+                      <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 2 }}>{t('participants.added', { date: formatDate(p.createdAt) })} · {t('participants.scoredN', { n: scored.length })}</Text>
                     </View>
                     <TouchableOpacity style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(220,38,38,0.08)', alignItems: 'center', justifyContent: 'center' }} onPress={(e) => { e.stopPropagation(); handleDelete(p); }}>
                       <Ionicons name="trash-outline" size={18} color={COLOURS.danger} />
@@ -607,11 +599,7 @@ export default function ParticipantsScreen() {
       </ScrollView>
 
       {/* FAB */}
-      <TouchableOpacity
-        style={[ms.fab, { bottom: insets.bottom + 24 }]}
-        onPress={() => setShowAdd(true)}
-        activeOpacity={0.85}
-      >
+      <TouchableOpacity style={[ms.fab, { bottom: insets.bottom + 24 }]} onPress={() => setShowAdd(true)} activeOpacity={0.85}>
         <Ionicons name="person-add" size={22} color="#fff" />
       </TouchableOpacity>
 
@@ -621,8 +609,8 @@ export default function ParticipantsScreen() {
           <BlurView intensity={40} tint="light" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.6)' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: insets.top + 20, paddingBottom: 16, backgroundColor: 'rgba(255,255,255,0.4)' }}>
               <View>
-                <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>New Participant</Text>
-                <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 1 }}>Fill in at least a code to continue</Text>
+                <Text style={{ fontSize: SIZES.cardTitle, fontFamily: FONTS.heading, color: COLOURS.primaryDark }}>{t('participants.newParticipant')}</Text>
+                <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: COLOURS.textMuted, marginTop: 1 }}>{t('participants.newParticipantSub')}</Text>
               </View>
               <TouchableOpacity onPress={() => { setShowAdd(false); setNewFieldsState(EMPTY_FIELDS); }}
                 style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(74,123,181,0.08)', alignItems: 'center', justifyContent: 'center' }}>
