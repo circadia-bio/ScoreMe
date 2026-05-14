@@ -21,7 +21,8 @@
     "scheme": "scoreme",
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-localization"
     ],
     "web": {
       "bundler": "metro",
