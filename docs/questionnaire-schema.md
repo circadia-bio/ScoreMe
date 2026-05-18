@@ -265,6 +265,8 @@ Before importing, confirm:
 
 The following instruments are included in ScoreMe as built-ins and can serve as structural reference when creating custom JSON:
 
+### Sleep domain
+
 | ID | Instrument | Items | Scoring | Domain |
 |---|---|---|---|---|
 | `ess` | Epworth Sleepiness Scale | 8 × scale_0_3 | Sum | Sleep |
@@ -276,4 +278,41 @@ The following instruments are included in ScoreMe as built-ins and can serve as 
 | `stopbang` | STOP-BANG | 8 × yes_no | Sum | Sleep |
 | `kss` | Karolinska Sleepiness Scale | 1 × scale_1_10 | Sum | Sleep |
 
-Full source definitions are in `data/questionnaires.js`.
+### Mental Health domain *(beta)*
+
+| ID | Instrument | Items | Scoring |
+|---|---|---|---|
+| `phq2` | PHQ-2 (depression screener) | 2 × frequency_4 | Sum |
+| `phq9` | PHQ-9 (depression severity) | 9 × frequency_4 | Sum |
+| `phq15` | PHQ-15 (somatic symptoms) | 15 × single_choice | Sum |
+| `gad7` | GAD-7 (anxiety severity) | 7 × frequency_4 | Sum |
+| `gad2` | GAD-2 (anxiety screener) | 2 × frequency_4 | Sum |
+| `bdi2` | BDI-II (Beck Depression Inventory) | 21 × single_choice | Sum |
+| `bai` | BAI (Beck Anxiety Inventory) | 21 × single_choice | Sum |
+| `dass21` | DASS-21 (depression/anxiety/stress) | 21 × single_choice | Composite |
+| `panss` | PANSS (schizophrenia — clinician-rated) | 30 × single_choice | Composite |
+| `stai_s` | STAI State subscale | 20 × single_choice | Composite |
+| `stai_t` | STAI Trait subscale | 20 × single_choice | Composite |
+
+### Wellbeing domain *(beta)*
+
+| ID | Instrument | Items | Scoring |
+|---|---|---|---|
+| `whoqol_bref` | WHOQOL-BREF (quality of life) | 26 × single_choice | Composite |
+| `macarthur_sss` | MacArthur Subjective Social Status | 2 × scale_1_10 | Sum |
+
+### Physical Activity domain *(beta)*
+
+| ID | Instrument | Items | Scoring |
+|---|---|---|---|
+| `ipaq_short` | IPAQ Short Form | 7 mixed | Composite (MET-min/week) |
+| `gpaq` | GPAQ v2 | 16 mixed | Composite (MET-min/week) |
+
+### Neurodevelopmental domain *(beta)*
+
+| ID | Instrument | Items | Scoring |
+|---|---|---|---|
+| `gsq` | Glasgow Sensory Questionnaire | 28 × single_choice | Sum |
+| `aq10` | AQ-10 (autistic traits screener, from AQ-50) | 10 × single_choice | Composite |
+
+Full source definitions are in `data/questionnaires.js` and `data/questionnaires_extended.js`.

@@ -1,3 +1,5 @@
+import { EXTENDED_QUESTIONNAIRES } from './questionnaires_extended.js';
+
 /**
  * data/questionnaires.js — Questionnaire definitions for ScoreMe
  *
@@ -538,7 +540,7 @@ export const KSS = {
 };
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
-export const QUESTIONNAIRES = [ESS, ISI, DBAS16, MEQ, PSQI, RUSATED, STOPBANG, KSS];
+export const QUESTIONNAIRES = [ESS, ISI, DBAS16, MEQ, PSQI, RUSATED, STOPBANG, KSS, ...EXTENDED_QUESTIONNAIRES];
 export const getQuestionnaire = (id) => QUESTIONNAIRES.find((q) => q.id === id) ?? null;
 
 // ─── compileQuestionnaire ─────────────────────────────────────────────────────
