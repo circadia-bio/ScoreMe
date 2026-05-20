@@ -88,7 +88,7 @@ ScoreMe/
 ├── docs/
 │   └── questionnaire-schema.md  Full schema reference + LLM prompt template
 └── scripts/
-    └── setup.js                 Copies fonts + logo.png from SleepDiaries sibling repo
+    └── setup.js                 Copies fonts from SleepDiaries sibling repo
 ```
 
 ---
@@ -107,7 +107,7 @@ ScoreMe/
 git clone https://github.com/circadia-bio/ScoreMe
 cd ScoreMe
 npm install
-node scripts/setup.js     # copies fonts + logo.png from SleepDiaries
+node scripts/setup.js     # copies fonts from SleepDiaries
 ```
 
 > If SleepDiaries is not present, `setup.js` will skip missing files gracefully and the app will fall back to system fonts.

@@ -22,8 +22,7 @@ const copies = [
   { src: 'assets/fonts/Afacad-Bold.ttf',         dst: 'assets/fonts/Afacad-Bold.ttf'         },
   { src: 'assets/fonts/Afacad-Medium.ttf',       dst: 'assets/fonts/Afacad-Medium.ttf'       },
   { src: 'assets/fonts/Afacad-Regular.ttf',      dst: 'assets/fonts/Afacad-Regular.ttf'      },
-  // images
-  { src: 'assets/images/logo.png',               dst: 'assets/images/logo.png'               },
+  // images — logo.png lives in ScoreMe/assets/images/ directly, not copied from SleepDiaries
   // icon & splash (optional — ScoreMe can use its own later)
   { src: 'assets/favicon.png',                   dst: 'assets/favicon.png'                   },
   { src: 'assets/icon.png',                      dst: 'assets/icon.png'                      },
