@@ -19,7 +19,7 @@ It is part of the Circadia Lab toolchain and shares its visual identity with [Sl
 
 ## ✨ Features
 
-- 📋 **8 built-in validated instruments** — ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
+- 📋 **25 built-in validated instruments** across 5 clinical domains — Sleep (ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS), Mental Health (PHQ-2, PHQ-9, PHQ-15, GAD-7, GAD-2, BDI-II, BAI, DASS-21, PANSS, STAI-S, STAI-T), Wellbeing (WHOQOL-BREF, MacArthur SSS), Physical Activity (IPAQ-S, GPAQ), and Neurodevelopmental (GSQ, AQ-10)
 - 👥 **Rich participant profiles** — mandatory participant code plus optional name, demographics (age, sex, BMI), study fields (group, site, session), clinical fields (diagnosis, medication, referral), and arbitrary custom key–value pairs
 - 🔍 **Search and sort** — filter participants by code, name, group, site, or session; sort by date added, A–Z, or completion %
 - 🎯 **Step-by-step questionnaire runner** — one item at a time, automatic scoring and interpretation on completion, coloured result badge with glow shadow
@@ -30,7 +30,7 @@ It is part of the Circadia Lab toolchain and shares its visual identity with [Sl
 - 📤 **CSV and JSON export** — CSV includes all participant metadata fields and custom fields as dynamic columns, with latest score per questionnaire; JSON includes full timestamped score history with item-level answers; preview table in the export panel
 - 🖥️ **Desktop split-panel layout** — left participant list, right detail/scoring/edit panel, glassmorphic sidebar with About modal
 - 🌐 **Cross-platform** — runs as a web app, iOS app, and Android app from the same codebase
-- 🌍 **Localisation** — English and Brazilian Portuguese (PT-BR), detected automatically from the device locale
+- 🌍 **Localisation** — English and Brazilian Portuguese (PT-BR) for both UI strings and instrument content (item text, response options, instructions, score band labels), detected automatically from the device locale
 - 🎉 **First-run onboarding** — 3-slide centred modal walkthrough, shown once; resettable from the About modal
 
 ---
@@ -52,7 +52,7 @@ ScoreMe/
 │       ├── questionnaires.jsx   Questionnaire library + toggles + domain grouping
 │       └── analytics.jsx        Score distributions, stats table, completion rates
 ├── components/
-│   ├── QuestionnaireRunner.jsx  Step-by-step runner (desktop + mobile)
+│   ├── QuestionnaireRunner.jsx  Step-by-step runner (desktop + mobile); applies localise()
 │   ├── OnboardingModal.jsx      First-run centred square modal
 │   ├── ScreenBackground.jsx     SVG gradient background (mobile)
 │   ├── DesktopBackground.jsx    Dot-grid pattern background (desktop)
@@ -62,11 +62,22 @@ ScoreMe/
 │       ├── CompletionBar.jsx    Horizontal completion rate bars
 │       └── chartUtils.js        Descriptive stats, grouping, palette helpers
 ├── data/
-│   └── questionnaires.js        8 built-in instruments + compileQuestionnaire()
+│   ├── questionnaires.js        Compatibility shim — re-exports from questionnaires/index.js
+│   └── questionnaires/
+│       ├── index.js             Central registry — QUESTIONNAIRES, getQuestionnaire,
+│       │                        compileQuestionnaire; imports all domain files
+│       ├── sleep.js             ESS, ISI, DBAS-16, MEQ, PSQI, RU-SATED, STOP-BANG, KSS
+│       ├── mental_health.js     PHQ-2, PHQ-9, PHQ-15, GAD-7, GAD-2, BDI-II, BAI,
+│       │                        DASS-21, PANSS, STAI-S, STAI-T
+│       ├── wellbeing.js         WHOQOL-BREF, MacArthur SSS
+│       ├── physical_activity.js IPAQ-S, GPAQ
+│       ├── neurodevelopmental.js GSQ, AQ-10
+│       └── utils.js             localise(questionnaire, locale) — merges pt-BR translations
+│                                over the base EN instrument object at runtime
 ├── i18n/
 │   ├── index.js                 Locale detection + t() helper
-│   ├── en.js                    English strings
-│   └── pt-BR.js                 Brazilian Portuguese strings
+│   ├── en.js                    English UI strings
+│   └── pt-BR.js                 Brazilian Portuguese UI strings
 ├── storage/
 │   └── storage.js               AsyncStorage CRUD, score history, export helpers,
 │                                 disabled-Qs, onboarding flag
@@ -154,39 +165,30 @@ The minimum required fields are `id`, `title`, and `items`. A complete example:
 
 ```json
 {
-  "id": "gad2",
-  "title": "Generalised Anxiety Disorder 2-item Scale",
-  "shortTitle": "GAD-2",
+  "id": "pss10",
+  "title": "Perceived Stress Scale — 10 items",
+  "shortTitle": "PSS-10",
   "domain": "Mental Health",
-  "construct": "Anxiety screening",
-  "timeframe": "Past two weeks",
-  "maxScore": 6,
-  "scoringMethod": { "type": "sum", "items": ["gad2_1", "gad2_2"] },
+  "construct": "Perceived stress",
+  "timeframe": "Past month",
+  "maxScore": 40,
+  "scoringMethod": { "type": "sum", "items": ["pss1","pss2","pss3","pss4","pss5","pss6","pss7","pss8","pss9","pss10"] },
   "scoreBands": [
-    { "min": 0, "max": 2, "label": "Minimal anxiety",  "color": "#2E7D32", "description": "Minimal anxiety symptoms." },
-    { "min": 3, "max": 6, "label": "Possible anxiety", "color": "#DC2626", "description": "Possible anxiety disorder. Consider further assessment." }
+    { "min": 0,  "max": 13, "label": "Low stress",      "color": "#2E7D32", "description": "Low perceived stress." },
+    { "min": 14, "max": 26, "label": "Moderate stress",  "color": "#F59E0B", "description": "Moderate perceived stress." },
+    { "min": 27, "max": 40, "label": "High stress",      "color": "#DC2626", "description": "High perceived stress." }
   ],
   "items": [
     {
-      "id": "gad2_1", "number": 1,
-      "text": "Feeling nervous, anxious, or on edge",
+      "id": "pss1", "number": 1,
+      "text": "In the last month, how often have you been upset because of something that happened unexpectedly?",
       "type": "frequency_4",
       "options": [
-        { "value": 0, "label": "Not at all" },
-        { "value": 1, "label": "Several days" },
-        { "value": 2, "label": "More than half the days" },
-        { "value": 3, "label": "Nearly every day" }
-      ]
-    },
-    {
-      "id": "gad2_2", "number": 2,
-      "text": "Not being able to stop or control worrying",
-      "type": "frequency_4",
-      "options": [
-        { "value": 0, "label": "Not at all" },
-        { "value": 1, "label": "Several days" },
-        { "value": 2, "label": "More than half the days" },
-        { "value": 3, "label": "Nearly every day" }
+        { "value": 0, "label": "Never" },
+        { "value": 1, "label": "Almost never" },
+        { "value": 2, "label": "Sometimes" },
+        { "value": 3, "label": "Fairly often" },
+        { "value": 4, "label": "Very often" }
       ]
     }
   ]
@@ -208,7 +210,9 @@ ScoreMe detects the device locale at startup using `expo-localization` and selec
 | `en` | English | ✅ Default |
 | `pt-BR` | Portuguese (Brazil) | ✅ Complete |
 
-All UI strings are keyed in `i18n/en.js` and `i18n/pt-BR.js`. To add a new language, duplicate either file and update `i18n/index.js` to register the new locale tag.
+### UI strings
+
+All interface strings are keyed in `i18n/en.js` and `i18n/pt-BR.js`. To add a new language, duplicate either file and register the new locale tag in `i18n/index.js`.
 
 The `t()` helper supports `{{variable}}` interpolation and `_one` / `_other` pluralisation:
 
@@ -218,6 +222,22 @@ import t from '../i18n';
 t('dashboard.title')                          // "Dashboard" / "Painel"
 t('export.participants', { count: 3 })        // "3 participants" / "3 participantes"
 ```
+
+### Instrument content translations
+
+Item text, response option labels, instructions, hints, and score band labels for all 25 built-in instruments are translated inside a `translations` block on each instrument definition. The `localise(questionnaire, locale)` helper in `data/questionnaires/utils.js` merges the requested locale over the base English object at runtime, with per-key English fallback for any missing keys.
+
+```js
+// Applied automatically in QuestionnaireRunner before rendering:
+import { localise } from '../data/questionnaires/utils';
+import { locale }   from '../i18n';
+
+const q = localise(questionnaire, locale);
+// q.instructions, q.items[n].text, q.items[n].options[n].label
+// are now in the device locale where translations exist
+```
+
+Fields intentionally left in English: `title`, `shortTitle`, `version`, `reference`, `credit`, `copyright`, `construct`, `constructDescription` — these are proper names and citations.
 
 ---
 
@@ -252,12 +272,17 @@ t('export.participants', { count: 3 })        // "3 participants" / "3 participa
 ## 🤝 Related Tools
 
 - 🌙 [**SleepDiaries**](https://github.com/circadia-bio/SleepDiaries) — participant-facing sleep diary app; shares visual identity and font assets with ScoreMe
+- 🔬 [**tallieR**](https://github.com/circadia-bio/tallieR) — companion R package for importing ScoreMe JSON exports, rescoring questionnaires, and returning tidy data frames
 - 🔬 [**circadia-bio**](https://github.com/circadia-bio) — the Circadia Lab GitHub organisation
 
 ---
 
 ## 📄 Licence
 
-Released under the [MIT License](./LICENSE).
+![](assets/images/logo.png)
 
 Copyright © Lucas França, Mario Leocadio-Miguel, 2026
+
+Released under the [MIT License](./LICENSE).
+
+> **Note on third-party questionnaire instruments:** The validated questionnaires included in this app are the intellectual property of their respective authors and institutions. Their inclusion in this open-source repository does not grant any rights to use them beyond what is permitted by each instrument's licence. See the `credit` and `copyright` fields in `data/questionnaires/` for per-instrument details.
