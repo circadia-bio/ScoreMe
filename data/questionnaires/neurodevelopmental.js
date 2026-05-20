@@ -81,6 +81,48 @@ export const GSQ = {
     if (score <= 84) return { label: 'Moderate sensory sensitivity', color: '#EA580C', description: 'Moderate sensory processing difficulties.' };
     return                 { label: 'High sensory sensitivity',      color: '#DC2626', description: 'High level of sensory processing difficulties.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'A seguir está uma lista de experiências do cotidiano. Por favor, indique o quanto cada uma delas tem sido um problema para você.',
+      items: {
+        gsq_1:  { text: 'Luzes piscantes (ex.: lâmpadas fluorescentes, reflexões, luz solar filtrando por folhas)' },
+        gsq_2:  { text: 'Luzes fortes' },
+        gsq_3:  { text: 'Cores intensas ou brilhantes' },
+        gsq_4:  { text: 'Percepção de profundidade (ex.: calcular distâncias)' },
+        gsq_5:  { text: 'Sons altos (ex.: música em um shopping)' },
+        gsq_6:  { text: 'Sons súbitos ou inesperados (ex.: alarme, tosse)' },
+        gsq_7:  { text: 'Sons agudos' },
+        gsq_8:  { text: 'Certas frequências de som' },
+        gsq_9:  { text: 'Roupas apertadas ou que tocam certas partes do corpo (ex.: pescoço, pulsos)' },
+        gsq_10: { text: 'Roupas com certas texturas (ex.: material áspero)' },
+        gsq_11: { text: 'Etiquetas nas roupas' },
+        gsq_12: { text: 'Ser tocado(a) ou esbarrado(a) por outras pessoas' },
+        gsq_13: { text: 'Perfumes ou colônias fortes' },
+        gsq_14: { text: 'Cheiro de comida' },
+        gsq_15: { text: 'Odor corporal de outras pessoas' },
+        gsq_16: { text: 'Cheiros químicos (ex.: produtos de limpeza)' },
+        gsq_17: { text: 'Gostos ou sabores fortes' },
+        gsq_18: { text: 'Texturas misturadas nos alimentos' },
+        gsq_19: { text: 'Alimentos muito quentes ou muito frios' },
+        gsq_20: { text: 'Texturas específicas de alimentos' },
+        gsq_21: { text: 'Saber onde seu corpo está no espaço (ex.: subestimar a altura de degraus)' },
+        gsq_22: { text: 'Dificuldade em saber com que força está pressionando um objeto' },
+        gsq_23: { text: 'Calcular a força a ser usada (ex.: quebrar coisas sem querer)' },
+        gsq_24: { text: 'Saber onde estão seus membros sem olhar para eles' },
+        gsq_25: { text: 'Viajar de carro, ônibus ou barco' },
+        gsq_26: { text: 'Montanhas-russas ou experiências similares' },
+        gsq_27: { text: 'Observar objetos em movimento rápido' },
+        gsq_28: { text: 'Elevadores em movimento' },
+      },
+      scoreBands: [
+        { label: 'Baixa sensibilidade sensorial',     description: 'Baixo nível de dificuldades de processamento sensorial.' },
+        { label: 'Sensibilidade sensorial leve',      description: 'Dificuldades leves de processamento sensorial.' },
+        { label: 'Sensibilidade sensorial moderada',  description: 'Dificuldades moderadas de processamento sensorial.' },
+        { label: 'Alta sensibilidade sensorial',      description: 'Alto nível de dificuldades de processamento sensorial.' },
+      ],
+    },
+  },
 };
 
 // ─── AQ-10 ────────────────────────────────────────────────────────────────────
@@ -130,6 +172,28 @@ export const AQ10 = {
   interpret: (score) => {
     if (score <= 5) return { label: 'Below threshold',                     color: '#2E7D32', description: 'Score below the clinical referral threshold.' };
     return               { label: 'Above threshold — consider referral',  color: '#DC2626', description: 'Score at or above the recommended referral threshold. Consider clinical assessment.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Por favor, leia cada afirmação com atenção e avalie o quanto ela se aplica a você.',
+      items: {
+        aq10_1:  { text: 'Frequentemente noto sons pequenos que os outros não percebem' },
+        aq10_2:  { text: 'Geralmente me concentro mais no quadro geral do que nos pequenos detalhes' },
+        aq10_3:  { text: 'Acho fácil fazer mais de uma coisa ao mesmo tempo' },
+        aq10_4:  { text: 'Se há uma interrupção, consigo retomar o que estava fazendo muito rapidamente' },
+        aq10_5:  { text: 'Acho fácil “ler nas entrelinhas” quando alguém está falando comigo' },
+        aq10_6:  { text: 'Sei dizer quando alguém que está me ouvindo está ficando entediado' },
+        aq10_7:  { text: 'Quando estou lendo uma história, acho difícil descobrir as intenções dos personagens' },
+        aq10_8:  { text: 'Gosto de colecionar informações sobre categorias de coisas (ex.: tipos de carro, pássaros, trens, plantas etc.)' },
+        aq10_9:  { text: 'Acho fácil descobrir o que uma pessoa está pensando ou sentindo apenas olhando para o seu rosto' },
+        aq10_10: { text: 'Acho difícil entender as intenções das pessoas' },
+      },
+      scoreBands: [
+        { label: 'Abaixo do limiar',                             description: 'Pontuação abaixo do limiar de encaminhamento clínico.' },
+        { label: 'Acima do limiar — considere encaminhamento', description: 'Pontuação igual ou acima do limiar recomendado. Considere avaliação clínica.' },
+      ],
+    },
   },
 };
 

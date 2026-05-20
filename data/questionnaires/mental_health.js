@@ -85,6 +85,20 @@ export const PHQ2 = {
     if (score <= 2) return { label: 'Negative screen', color: '#2E7D32', description: 'Negative screen for depression.' };
     return               { label: 'Positive screen',  color: '#DC2626', description: 'Positive screen. Consider follow-up with PHQ-9 or clinical evaluation.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Nas últimas 2 semanas, com que frequência você foi incomodado(a) por algum dos problemas a seguir?',
+      items: {
+        phq2_1: { text: 'Pouco interesse ou prazer em fazer as coisas' },
+        phq2_2: { text: 'Sentir-se para baixo, deprimido(a) ou sem perspectiva' },
+      },
+      scoreBands: [
+        { label: 'Triagem negativa', description: 'Triagem negativa para depressão.' },
+        { label: 'Triagem positiva', description: 'Triagem positiva. Considere seguimento com PHQ-9 ou avaliação clínica.' },
+      ],
+    },
+  },
 };
 
 // ─── PHQ-9 ────────────────────────────────────────────────────────────────────
@@ -131,6 +145,30 @@ export const PHQ9 = {
     if (score <= 14) return { label: 'Moderate depression', color: '#EA580C', description: 'Moderate depression. Consider treatment plan.' };
     if (score <= 19) return { label: 'Moderately severe',   color: '#DC2626', description: 'Moderately severe depression. Active treatment warranted.' };
     return                 { label: 'Severe depression',    color: '#7C2D12', description: 'Severe depression. Immediate treatment or referral indicated.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Nas últimas 2 semanas, com que frequência você foi incomodado(a) por algum dos problemas a seguir?',
+      items: {
+        phq9_1: { text: 'Pouco interesse ou prazer em fazer as coisas' },
+        phq9_2: { text: 'Sentir-se para baixo, deprimido(a) ou sem perspectiva' },
+        phq9_3: { text: 'Dificuldade para pegar no sono ou permanecer dormindo, ou dormir demais' },
+        phq9_4: { text: 'Sentir-se cansado(a) ou com pouca energia' },
+        phq9_5: { text: 'Falta de apetite ou comer em excesso' },
+        phq9_6: { text: 'Sentir-se mal consigo mesmo(a) — ou achar que é um fracasso ou que decepcionou a si mesmo(a) ou à sua família' },
+        phq9_7: { text: 'Dificuldade para se concentrar nas coisas, como ler o jornal ou assistir à televisão' },
+        phq9_8: { text: 'Mover-se ou falar tão devagar que outras pessoas poderiam ter notado? Ou ao contrário — estar tão agitado(a) ou inquieto(a) que ficou andando de um lado para o outro muito mais do que de costume' },
+        phq9_9: { text: 'Pensamentos de que seria melhor estar morto(a) ou de se machucar de alguma forma' },
+      },
+      scoreBands: [
+        { label: 'Depressão mínima',          description: 'Sintomas depressivos mínimos ou ausentes.' },
+        { label: 'Depressão leve',            description: 'Depressão leve. Monitoramento recomendado.' },
+        { label: 'Depressão moderada',        description: 'Depressão moderada. Considere plano de tratamento.' },
+        { label: 'Depressão moderadamente grave', description: 'Depressão moderadamente grave. Tratamento ativo indicado.' },
+        { label: 'Depressão grave',           description: 'Depressão grave. Tratamento imediato ou encaminhamento indicado.' },
+      ],
+    },
   },
 };
 
@@ -183,6 +221,35 @@ export const PHQ15 = {
     if (score <= 14) return { label: 'Medium somatic symptoms',  color: '#EA580C', description: 'Medium somatic symptom severity. Consider clinical review.' };
     return                 { label: 'High somatic symptoms',     color: '#DC2626', description: 'High somatic symptom burden. Clinical attention warranted.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Nas últimas 4 semanas, o quanto você foi incomodado(a) por algum dos problemas a seguir?',
+      items: {
+        phq15_1:  { text: 'Dor de estômago', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_2:  { text: 'Dor nas costas', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_3:  { text: 'Dor nos braços, pernas ou articulações (joelhos, quadris etc.)', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_4:  { text: 'Cólicas menstruais ou outros problemas com o ciclo (somente mulheres)', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_5:  { text: 'Dores de cabeça', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_6:  { text: 'Dor no peito', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_7:  { text: 'Tontura', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_8:  { text: 'Desmaio', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_9:  { text: 'Sensação de coração acelerado ou disparado', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_10: { text: 'Falta de ar', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_11: { text: 'Dor ou problemas durante relações sexuais', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_12: { text: 'Constipação, fezes soltas ou diarreia', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_13: { text: 'Náusea, gases ou má digestão', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_14: { text: 'Sentir-se cansado(a) ou com pouca energia', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+        phq15_15: { text: 'Problemas para dormir', options: [{ label: 'Nada incomodado(a)' }, { label: 'Um pouco incomodado(a)' }, { label: 'Muito incomodado(a)' }] },
+      },
+      scoreBands: [
+        { label: 'Sintomas somáticos mínimos', description: 'Carga mínima de sintomas somáticos.' },
+        { label: 'Sintomas somáticos baixos',  description: 'Baixa gravidade de sintomas somáticos.' },
+        { label: 'Sintomas somáticos médios',  description: 'Gravidade média de sintomas somáticos. Considere avaliação clínica.' },
+        { label: 'Sintomas somáticos elevados', description: 'Alta carga de sintomas somáticos. Atenção clínica indicada.' },
+      ],
+    },
+  },
 };
 
 // ─── GAD-7 ────────────────────────────────────────────────────────────────────
@@ -226,6 +293,27 @@ export const GAD7 = {
     if (score <= 14) return { label: 'Moderate anxiety', color: '#EA580C', description: 'Moderate anxiety. Consider further assessment.' };
     return                 { label: 'Severe anxiety',    color: '#DC2626', description: 'Severe anxiety. Active treatment indicated.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Nas últimas 2 semanas, com que frequência você foi incomodado(a) por algum dos problemas a seguir?',
+      items: {
+        gad7_1: { text: 'Sentir-se nervoso(a), ansioso(a) ou no limite' },
+        gad7_2: { text: 'Não conseguir parar ou controlar as preocupações' },
+        gad7_3: { text: 'Preocupar-se demais com as mais diversas coisas' },
+        gad7_4: { text: 'Dificuldade para relaxar' },
+        gad7_5: { text: 'Ficar tão agitado(a) que é difícil ficar parado(a)' },
+        gad7_6: { text: 'Ficar facilmente aborrecido(a) ou irritado(a)' },
+        gad7_7: { text: 'Sentir medo como se algo terrível fosse acontecer' },
+      },
+      scoreBands: [
+        { label: 'Ansiedade mínima',   description: 'Sintomas de ansiedade mínimos.' },
+        { label: 'Ansiedade leve',     description: 'Ansiedade leve. Considere monitoramento.' },
+        { label: 'Ansiedade moderada', description: 'Ansiedade moderada. Considere avaliação adicional.' },
+        { label: 'Ansiedade grave',    description: 'Ansiedade grave. Tratamento ativo indicado.' },
+      ],
+    },
+  },
 };
 
 // ─── GAD-2 ────────────────────────────────────────────────────────────────────
@@ -259,6 +347,20 @@ export const GAD2 = {
   interpret: (score) => {
     if (score <= 2) return { label: 'Negative screen', color: '#2E7D32', description: 'Negative screen for generalised anxiety.' };
     return               { label: 'Positive screen',  color: '#DC2626', description: 'Positive screen. Consider follow-up with GAD-7 or clinical evaluation.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Nas últimas 2 semanas, com que frequência você foi incomodado(a) por algum dos problemas a seguir?',
+      items: {
+        gad2_1: { text: 'Sentir-se nervoso(a), ansioso(a) ou no limite' },
+        gad2_2: { text: 'Não conseguir parar ou controlar as preocupações' },
+      },
+      scoreBands: [
+        { label: 'Triagem negativa', description: 'Triagem negativa para ansiedade generalizada.' },
+        { label: 'Triagem positiva', description: 'Triagem positiva. Considere seguimento com GAD-7 ou avaliação clínica.' },
+      ],
+    },
   },
 };
 
@@ -317,6 +419,41 @@ export const BDI2 = {
     if (score <= 28) return { label: 'Moderate depression', color: '#EA580C', description: 'Moderate depression.' };
     return                 { label: 'Severe depression',    color: '#DC2626', description: 'Severe depression.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Este questionário é composto por 21 grupos de afirmações. Por favor, leia cada grupo com atenção. Depois, escolha a afirmação de cada grupo que melhor descreve como você tem se sentido nas últimas duas semanas, incluindo hoje.',
+      items: {
+        bdi2_1:  { text: 'Tristeza', options: [{ label: 'Não me sinto triste.' }, { label: 'Sinto-me triste na maior parte do tempo.' }, { label: 'Estou sempre triste.' }, { label: 'Estou tão triste ou infeliz que não consigo suportar.' }] },
+        bdi2_2:  { text: 'Pessimismo', options: [{ label: 'Não estou desanimado(a) em relação ao meu futuro.' }, { label: 'Sinto-me mais desanimado(a) em relação ao meu futuro do que antes.' }, { label: 'Não espero que as coisas melhorem para mim.' }, { label: 'Sinto que meu futuro não tem esperança e só vai piorar.' }] },
+        bdi2_3:  { text: 'Fracassos do passado', options: [{ label: 'Não me sinto um fracasso.' }, { label: 'Fracassei mais do que deveria.' }, { label: 'Quando olho para trás, vejo muitos fracassos.' }, { label: 'Sinto que sou um fracasso total como pessoa.' }] },
+        bdi2_4:  { text: 'Perda de prazer', options: [{ label: 'Tenho tanto prazer nas coisas quanto antes.' }, { label: 'Não tenho tanto prazer nas coisas como costumava ter.' }, { label: 'Tenho muito pouco prazer nas coisas que costumava gostar.' }, { label: 'Não consigo ter nenhum prazer nas coisas que costumava gostar.' }] },
+        bdi2_5:  { text: 'Sentimentos de culpa', options: [{ label: 'Não me sinto particularmente culpado(a).' }, { label: 'Sinto-me culpado(a) por muitas coisas que fiz ou deveria ter feito.' }, { label: 'Sinto-me bastante culpado(a) na maior parte do tempo.' }, { label: 'Sinto-me culpado(a) o tempo todo.' }] },
+        bdi2_6:  { text: 'Sentimentos de punição', options: [{ label: 'Não sinto que estou sendo punido(a).' }, { label: 'Sinto que posso ser punido(a).' }, { label: 'Espero ser punido(a).' }, { label: 'Sinto que estou sendo punido(a).' }] },
+        bdi2_7:  { text: 'Autodepreciação', options: [{ label: 'Sinto o mesmo em relação a mim de sempre.' }, { label: 'Perdi a confiança em mim mesmo(a).' }, { label: 'Estou decepcionado(a) comigo mesmo(a).' }, { label: 'Não gosto de mim mesmo(a).' }] },
+        bdi2_8:  { text: 'Autocrítica', options: [{ label: 'Não me critico ou culpo mais do que o normal.' }, { label: 'Sou mais crítico(a) de mim mesmo(a) do que costumava ser.' }, { label: 'Critico-me por todas as minhas falhas.' }, { label: 'Culpo-me por tudo de ruim que acontece.' }] },
+        bdi2_9:  { text: 'Pensamentos suicidas', options: [{ label: 'Não tenho pensamentos de me matar.' }, { label: 'Tenho pensamentos de me matar, mas não os realizaria.' }, { label: 'Gostaria de me matar.' }, { label: 'Me mataria se tivesse oportunidade.' }] },
+        bdi2_10: { text: 'Choro', options: [{ label: 'Não choro mais do que antes.' }, { label: 'Choro mais do que costumava.' }, { label: 'Choro por qualquer coisa.' }, { label: 'Sinto vontade de chorar, mas não consigo.' }] },
+        bdi2_11: { text: 'Agitação', options: [{ label: 'Não estou mais agitado(a) do que de costume.' }, { label: 'Sinto-me mais agitado(a) do que de costume.' }, { label: 'Estou tão agitado(a) que é difícil ficar parado(a).' }, { label: 'Estou tão agitado(a) que preciso me mexer ou fazer algo o tempo todo.' }] },
+        bdi2_12: { text: 'Perda de interesse', options: [{ label: 'Não perdi o interesse pelas outras pessoas ou atividades.' }, { label: 'Estou menos interessado(a) nos outros ou em coisas do que antes.' }, { label: 'Perdi a maior parte do interesse pelas outras pessoas ou coisas.' }, { label: 'É difícil me interessar por qualquer coisa.' }] },
+        bdi2_13: { text: 'Indecisão', options: [{ label: 'Tomo decisões tão bem quanto antes.' }, { label: 'Acho mais difícil do que de costume tomar decisões.' }, { label: 'Tenho muito mais dificuldade em tomar decisões do que antes.' }, { label: 'Tenho dificuldade para tomar qualquer decisão.' }] },
+        bdi2_14: { text: 'Inutilidade', options: [{ label: 'Não me sinto inútil.' }, { label: 'Não me considero tão valioso(a) e útil como costumava.' }, { label: 'Sinto-me mais inútil do que os outros.' }, { label: 'Sinto-me completamente inútil.' }] },
+        bdi2_15: { text: 'Perda de energia', options: [{ label: 'Tenho tanta energia quanto sempre tive.' }, { label: 'Tenho menos energia do que costumava ter.' }, { label: 'Não tenho energia suficiente para fazer muitas coisas.' }, { label: 'Não tenho energia suficiente para fazer nada.' }] },
+        bdi2_16: { text: 'Mudança no padrão de sono', options: [{ label: 'Não houve mudança no meu padrão de sono.' }, { label: 'Durmo um pouco mais / menos do que de costume.' }, { label: 'Durmo muito mais / menos do que de costume.' }, { label: 'Durmo a maior parte do dia / acordo 1–2 horas mais cedo e não consigo voltar a dormir.' }] },
+        bdi2_17: { text: 'Irritabilidade', options: [{ label: 'Não estou mais irritado(a) do que de costume.' }, { label: 'Estou mais irritado(a) do que de costume.' }, { label: 'Estou muito mais irritado(a) do que de costume.' }, { label: 'Estou irritado(a) o tempo todo.' }] },
+        bdi2_18: { text: 'Mudança no apetite', options: [{ label: 'Não houve mudança no meu apetite.' }, { label: 'Meu apetite está um pouco menor / maior do que de costume.' }, { label: 'Meu apetite está muito menor / maior do que antes.' }, { label: 'Não tenho apetite nenhum / Tenho fome o tempo todo.' }] },
+        bdi2_19: { text: 'Dificuldade de concentração', options: [{ label: 'Consigo me concentrar tão bem quanto antes.' }, { label: 'Não consigo me concentrar tão bem quanto de costume.' }, { label: 'É difícil manter a atenção por muito tempo.' }, { label: 'Não consigo me concentrar em nada.' }] },
+        bdi2_20: { text: 'Cansaço ou fadiga', options: [{ label: 'Não estou mais cansado(a) ou fatigado(a) do que de costume.' }, { label: 'Canso-me mais facilmente do que de costume.' }, { label: 'Estou cansado(a) demais para fazer muitas coisas.' }, { label: 'Estou cansado(a) demais para fazer qualquer coisa.' }] },
+        bdi2_21: { text: 'Perda de interesse por sexo', options: [{ label: 'Não percebi mudança recente no meu interesse por sexo.' }, { label: 'Tenho menos interesse por sexo do que costumava ter.' }, { label: 'Tenho quase nenhum interesse por sexo.' }, { label: 'Perdi completamente o interesse por sexo.' }] },
+      },
+      scoreBands: [
+        { label: 'Depressão mínima',   description: 'Depressão mínima.' },
+        { label: 'Depressão leve',     description: 'Depressão leve.' },
+        { label: 'Depressão moderada', description: 'Depressão moderada.' },
+        { label: 'Depressão grave',    description: 'Depressão grave.' },
+      ],
+    },
+  },
 };
 
 // ─── BAI ──────────────────────────────────────────────────────────────────────
@@ -373,6 +510,41 @@ export const BAI = {
     if (score <= 15) return { label: 'Mild anxiety',     color: '#F59E0B', description: 'Mild anxiety.' };
     if (score <= 25) return { label: 'Moderate anxiety', color: '#EA580C', description: 'Moderate anxiety.' };
     return                 { label: 'Severe anxiety',    color: '#DC2626', description: 'Severe anxiety.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Abaixo está uma lista de sintomas comuns de ansiedade. Por favor, leia cada item com atenção. Indique o quanto você foi incomodado(a) por esse sintoma durante a última semana, incluindo hoje.',
+      items: {
+        bai1:  { text: 'Dormência ou formigamento', options: [{ label: 'Nada' }, { label: 'Levemente — não me incomodou muito' }, { label: 'Moderadamente — foi desagradável, mas suportável' }, { label: 'Gravemente — mal consegui suportar' }] },
+        bai2:  { text: 'Sensação de calor', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai3:  { text: 'Fraqueza nas pernas', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai4:  { text: 'Incapaz de relaxar', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai5:  { text: 'Medo de que algo terrível aconteça', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai6:  { text: 'Tontura ou vertigem', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai7:  { text: 'Coração acelerado ou palpitante', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai8:  { text: 'Instabilidade', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai9:  { text: 'Apavorado(a) ou com muito medo', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai10: { text: 'Nervosismo', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai11: { text: 'Sensação de sufocamento', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai12: { text: 'Tremor nas mãos', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai13: { text: 'Tremor ou instabilidade geral', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai14: { text: 'Medo de perder o controle', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai15: { text: 'Dificuldade para respirar', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai16: { text: 'Medo de morrer', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai17: { text: 'Assustado(a)', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai18: { text: 'Indigestão ou desconforto abdominal', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai19: { text: 'Sensação de desmaio', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai20: { text: 'Rosto ruborizado', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+        bai21: { text: 'Suores quentes ou frios', options: [{ label: 'Nada' }, { label: 'Levemente' }, { label: 'Moderadamente' }, { label: 'Gravemente' }] },
+      },
+      scoreBands: [
+        { label: 'Ansiedade mínima',   description: 'Ansiedade mínima.' },
+        { label: 'Ansiedade leve',     description: 'Ansiedade leve.' },
+        { label: 'Ansiedade moderada', description: 'Ansiedade moderada.' },
+        { label: 'Ansiedade grave',    description: 'Ansiedade grave.' },
+      ],
+    },
   },
 };
 
@@ -434,6 +606,40 @@ export const DASS21 = {
     if (s <= 13) return { label: 'Normal-Mild',    color: '#2E7D32', description: 'Total score in the normal to mild range. Refer to subscale breakdown.' };
     if (s <= 28) return { label: 'Moderate',       color: '#F59E0B', description: 'Moderate overall distress. Refer to subscale breakdown.' };
     return             { label: 'Severe-Extreme',  color: '#DC2626', description: 'Severe to extreme distress. Clinical evaluation recommended.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Por favor, leia cada afirmação e indique um número de 0 a 3 que indica o quanto a afirmação se aplicou a você durante a última semana. Não há respostas certas ou erradas.',
+      items: {
+        dass21_1:  { text: 'Tive dificuldade em me acalmar' },
+        dass21_2:  { text: 'Percebi que minha boca estava seca' },
+        dass21_3:  { text: 'Não consegui sentir nenhum sentimento positivo' },
+        dass21_4:  { text: 'Tive dificuldade para respirar (ex.: respiração muito rápida, falta de ar sem esforço físico)' },
+        dass21_5:  { text: 'Tive dificuldade em tomar iniciativa para fazer as coisas' },
+        dass21_6:  { text: 'Tive tendência a reagir de forma exagerada às situações' },
+        dass21_7:  { text: 'Senti tremores (ex.: nas mãos)' },
+        dass21_8:  { text: 'Senti que estava usando muita energia nervosa' },
+        dass21_9:  { text: 'Fiquei preocupado(a) com situações em que poderia entrar em pânico e me envergonhar' },
+        dass21_10: { text: 'Senti que não tinha nada para esperar com prazer' },
+        dass21_11: { text: 'Percebi que estava ficando agitado(a)' },
+        dass21_12: { text: 'Tive dificuldade em relaxar' },
+        dass21_13: { text: 'Senti-me desanimado(a) e deprimido(a)' },
+        dass21_14: { text: 'Fui intolerante com qualquer coisa que me impedisse de continuar o que estava fazendo' },
+        dass21_15: { text: 'Senti que estava perto de entrar em pânico' },
+        dass21_16: { text: 'Não consegui me entusiasmar com nada' },
+        dass21_17: { text: 'Senti que não tinha muito valor como pessoa' },
+        dass21_18: { text: 'Percebi que estava bastante sensível' },
+        dass21_19: { text: 'Percebi as batidas do meu coração sem esforço físico (ex.: sensação de aumento da frequência cardíaca, coração falhando)' },
+        dass21_20: { text: 'Senti medo sem nenhum motivo aparente' },
+        dass21_21: { text: 'Senti que a vida não tinha sentido' },
+      },
+      scoreBands: [
+        { label: 'Normal–Leve',        description: 'Pontuação total na faixa normal a leve. Consulte os resultados por subescala.' },
+        { label: 'Moderado',           description: 'Sofrimento geral moderado. Consulte os resultados por subescala.' },
+        { label: 'Grave–Extremo',      description: 'Sofrimento grave a extremo. Avaliação clínica recomendada.' },
+      ],
+    },
   },
 };
 
@@ -510,6 +716,50 @@ export const PANSS = {
     if (s <= 95) return { label: 'Moderate',                color: '#EA580C', description: 'Moderate psychopathology.' };
     return             { label: 'Severe-Extreme',           color: '#DC2626', description: 'Severe to extreme psychopathology.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Esta escala é destinada à administração por clínico. Avalie cada item em uma escala de 7 pontos com base em sua entrevista clínica e todas as informações disponíveis da última semana.',
+      items: {
+        panss_p1: { text: 'Delírios', hint: 'Crenças infundadas, não realistas e idiossincráticas.' },
+        panss_p2: { text: 'Desorganização conceitual', hint: 'Processo de pensamento desorganizado, com perturbação do sequenciamento orientado a objetivos.' },
+        panss_p3: { text: 'Comportamento alucinatório' },
+        panss_p4: { text: 'Excitação' },
+        panss_p5: { text: 'Grandiosidade' },
+        panss_p6: { text: 'Desconfiança/perseguição' },
+        panss_p7: { text: 'Hostilidade' },
+        panss_n1: { text: 'Afeto embotado' },
+        panss_n2: { text: 'Retraimento emocional' },
+        panss_n3: { text: 'Fraco rapport' },
+        panss_n4: { text: 'Retraimento social passivo/apático' },
+        panss_n5: { text: 'Dificuldade no pensamento abstrato' },
+        panss_n6: { text: 'Falta de espontaneidade e fluência da conversa' },
+        panss_n7: { text: 'Pensamento estereotipado' },
+        panss_g1:  { text: 'Preocupação somática' },
+        panss_g2:  { text: 'Ansiedade' },
+        panss_g3:  { text: 'Sentimentos de culpa' },
+        panss_g4:  { text: 'Tensão' },
+        panss_g5:  { text: 'Maneirismos e postura' },
+        panss_g6:  { text: 'Depressão' },
+        panss_g7:  { text: 'Retardo motor' },
+        panss_g8:  { text: 'Falta de cooperação' },
+        panss_g9:  { text: 'Conteúdo incomum do pensamento' },
+        panss_g10: { text: 'Desorientação' },
+        panss_g11: { text: 'Atenção prejudicada' },
+        panss_g12: { text: 'Falta de julgamento e insight' },
+        panss_g13: { text: 'Distúrbio da volição' },
+        panss_g14: { text: 'Controle deficiente dos impulsos' },
+        panss_g15: { text: 'Preocupação' },
+        panss_g16: { text: 'Esquiva social ativa' },
+      },
+      scoreBands: [
+        { label: 'Psicopatologia mínima', description: 'Carga mínima de sintomas.' },
+        { label: 'Leve',                  description: 'Psicopatologia leve.' },
+        { label: 'Moderada',              description: 'Psicopatologia moderada.' },
+        { label: 'Grave–Extrema',         description: 'Psicopatologia grave a extrema.' },
+      ],
+    },
+  },
 };
 
 // ─── STAI-S ───────────────────────────────────────────────────────────────────
@@ -572,6 +822,39 @@ export const STAI_S = {
     if (score <= 44) return { label: 'Moderate state anxiety', color: '#F59E0B', description: 'Moderate state anxiety.' };
     return                 { label: 'High state anxiety',      color: '#DC2626', description: 'High state anxiety.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Abaixo estão uma série de afirmações que as pessoas usam para se descrever. Leia cada afirmação e selecione a opção adequada para indicar como você se sente AGORA, ou seja, neste momento.',
+      items: {
+        stais_1:  { text: 'Sinto-me calmo(a)' },
+        stais_2:  { text: 'Sinto-me seguro(a)' },
+        stais_3:  { text: 'Estou tenso(a)' },
+        stais_4:  { text: 'Sinto-me sob pressão' },
+        stais_5:  { text: 'Sinto-me à vontade' },
+        stais_6:  { text: 'Sinto-me perturbado(a)' },
+        stais_7:  { text: 'Estou preocupado(a) no momento com possíveis infortúnios' },
+        stais_8:  { text: 'Sinto-me satisfeito(a)' },
+        stais_9:  { text: 'Sinto-me com medo' },
+        stais_10: { text: 'Sinto-me confortável' },
+        stais_11: { text: 'Sinto-me autoconfiante' },
+        stais_12: { text: 'Sinto-me nervoso(a)' },
+        stais_13: { text: 'Estou agitado(a)' },
+        stais_14: { text: 'Sinto-me indeciso(a)' },
+        stais_15: { text: 'Estou relaxado(a)' },
+        stais_16: { text: 'Sinto-me contente' },
+        stais_17: { text: 'Estou preocupado(a)' },
+        stais_18: { text: 'Sinto-me confuso(a)' },
+        stais_19: { text: 'Sinto-me firme' },
+        stais_20: { text: 'Sinto-me bem' },
+      },
+      scoreBands: [
+        { label: 'Ansiedade-estado baixa',     description: 'Baixa ansiedade neste momento.' },
+        { label: 'Ansiedade-estado moderada',  description: 'Ansiedade-estado moderada.' },
+        { label: 'Ansiedade-estado elevada',   description: 'Ansiedade-estado elevada.' },
+      ],
+    },
+  },
 };
 
 // ─── STAI-T ───────────────────────────────────────────────────────────────────
@@ -633,6 +916,39 @@ export const STAI_T = {
     if (score <= 37) return { label: 'Low trait anxiety',      color: '#2E7D32', description: 'Low anxiety proneness.' };
     if (score <= 44) return { label: 'Moderate trait anxiety', color: '#F59E0B', description: 'Moderate trait anxiety.' };
     return                 { label: 'High trait anxiety',      color: '#DC2626', description: 'High trait anxiety.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Abaixo estão uma série de afirmações que as pessoas usam para se descrever. Leia cada afirmação e selecione a opção que indica como você geralmente se sente.',
+      items: {
+        stait_21: { text: 'Sinto-me bem' },
+        stait_22: { text: 'Sinto-me nervoso(a) e agitado(a)' },
+        stait_23: { text: 'Sinto-me satisfeito(a) comigo mesmo(a)' },
+        stait_24: { text: 'Gostaria de ser tão feliz quanto os outros parecem ser' },
+        stait_25: { text: 'Sinto-me um fracasso' },
+        stait_26: { text: 'Sinto-me descansado(a)' },
+        stait_27: { text: 'Sou calmo(a), tranquilo(a) e controlado(a)' },
+        stait_28: { text: 'Sinto que as dificuldades estão se acumulando de tal forma que não consigo superá-las' },
+        stait_29: { text: 'Preocupo-me demais com coisas que na verdade não importam' },
+        stait_30: { text: 'Sou feliz' },
+        stait_31: { text: 'Tenho pensamentos perturbadores' },
+        stait_32: { text: 'Falta-me autoconfiança' },
+        stait_33: { text: 'Sinto-me seguro(a)' },
+        stait_34: { text: 'Tomo decisões com facilidade' },
+        stait_35: { text: 'Sinto-me inadequado(a)' },
+        stait_36: { text: 'Estou contente' },
+        stait_37: { text: 'Algum pensamento sem importância fica rodando na minha cabeça e me incomoda' },
+        stait_38: { text: 'Fico tão abalado(a) com as decepções que não consigo tirá-las da cabeça' },
+        stait_39: { text: 'Sou uma pessoa estável' },
+        stait_40: { text: 'Fico tenso(a) ou agitado(a) quando penso nas minhas preocupações e interesses recentes' },
+      },
+      scoreBands: [
+        { label: 'Ansiedade-traço baixa',     description: 'Baixa propensão à ansiedade.' },
+        { label: 'Ansiedade-traço moderada',  description: 'Ansiedade-traço moderada.' },
+        { label: 'Ansiedade-traço elevada',   description: 'Ansiedade-traço elevada.' },
+      ],
+    },
   },
 };
 

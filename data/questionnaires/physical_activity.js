@@ -50,6 +50,26 @@ export const IPAQ_SHORT = {
     if (score < 3000) return { label: 'Minimally active (Moderate)', color: '#F59E0B', description: 'Minimally active. Meets some but not all activity guidelines.' };
     return                  { label: 'HEPA Active (High)',           color: '#2E7D32', description: 'Health-enhancing physical activity level.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Gostaríamos de saber os tipos de atividade física que as pessoas praticam como parte de seu cotidiano. As perguntas a seguir referem-se ao tempo que você gastou sendo fisicamente ativo(a) nos últimos 7 dias.',
+      items: {
+        ipaq_vigd:  { text: 'Nos últimos 7 dias, em quantos dias você realizou atividades físicas VIGOROSAS, como levantamento de peso, cavar, aerobic ou pedalar rápido?', unit: 'dias' },
+        ipaq_vigm:  { text: 'Quanto tempo no total você gasta POR DIA fazendo atividades físicas vigorosas?', unit: 'min', hint: 'Digite 0 se não realizou atividade vigorosa.' },
+        ipaq_modd:  { text: 'Nos últimos 7 dias, em quantos dias você realizou atividades físicas MODERADAS, como carregar pesos leves, pedalar em ritmo regular ou jogar tênis em dupla?', unit: 'dias' },
+        ipaq_modm:  { text: 'Quanto tempo no total você gasta POR DIA fazendo atividades físicas moderadas?', unit: 'min', hint: 'Digite 0 se não realizou atividade moderada.' },
+        ipaq_walkd: { text: 'Nos últimos 7 dias, em quantos dias você caminhou por pelo menos 10 minutos seguidos?', unit: 'dias' },
+        ipaq_walkm: { text: 'Quanto tempo no total você gasta POR DIA caminhando?', unit: 'min', hint: 'Inclua caminhadas no trabalho, em casa, para deslocamento e por lazer ou esporte.' },
+        ipaq_sitm:  { text: 'Nos últimos 7 dias, quanto tempo você ficou SENTADO(A) durante um dia de semana?', unit: 'min', hint: 'Inclua o tempo sentado(a) no trabalho, em casa, estudando e durante o lazer.' },
+      },
+      scoreBands: [
+        { label: 'Inativo (Baixo)',               description: 'Nível baixo de atividade física. Não atinge as recomendações de atividade.' },
+        { label: 'Minimamente ativo (Moderado)',  description: 'Minimamente ativo. Atinge parcialmente as recomendações.' },
+        { label: 'Ativo (Alto)',                  description: 'Nível de atividade física promotor de saúde.' },
+      ],
+    },
+  },
 };
 
 // ─── GPAQ ─────────────────────────────────────────────────────────────────────
@@ -107,6 +127,34 @@ export const GPAQ = {
   interpret: (score) => {
     if (score < 600) return { label: 'Insufficiently active', color: '#DC2626', description: 'Insufficient physical activity. Below WHO minimum recommendations.' };
     return                 { label: 'Sufficiently active',    color: '#2E7D32', description: 'Sufficient physical activity. Meets WHO minimum recommendations.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Vou perguntar sobre o tempo que você gasta realizando diferentes tipos de atividade física em uma semana típica. Responda às perguntas mesmo que você não se considere uma pessoa fisicamente ativa.',
+      items: {
+        gpaq_p1:  { text: 'O seu trabalho envolve atividade de intensidade VIGOROSA, que causa grande aumento da respiração ou frequência cardíaca por pelo menos 10 minutos seguidos?' },
+        gpaq_p2:  { text: 'Em uma semana típica, quantos dias você realiza atividades de intensidade vigorosa no trabalho?', unit: 'dias' },
+        gpaq_p3:  { text: 'Quanto tempo você gasta realizando atividades de intensidade vigorosa no trabalho em um dia típico?', unit: 'min' },
+        gpaq_p4:  { text: 'O seu trabalho envolve atividade de intensidade MODERADA, que causa pequeno aumento da respiração ou frequência cardíaca por pelo menos 10 minutos seguidos?' },
+        gpaq_p5:  { text: 'Em uma semana típica, quantos dias você realiza atividades de intensidade moderada no trabalho?', unit: 'dias' },
+        gpaq_p6:  { text: 'Quanto tempo você gasta realizando atividades de intensidade moderada no trabalho em um dia típico?', unit: 'min' },
+        gpaq_p7:  { text: 'Você caminha ou usa bicicleta por pelo menos 10 minutos seguidos para ir e voltar de lugares?' },
+        gpaq_p8:  { text: 'Em uma semana típica, quantos dias você caminha ou pedala por pelo menos 10 minutos seguidos para se deslocar?', unit: 'dias' },
+        gpaq_p9:  { text: 'Quanto tempo você gasta caminhando ou pedalando para se deslocar em um dia típico?', unit: 'min' },
+        gpaq_p10: { text: 'Você pratica esportes, exercícios ou atividades recreativas de intensidade VIGOROSA que causam grande aumento da respiração ou frequência cardíaca por pelo menos 10 minutos seguidos?' },
+        gpaq_p11: { text: 'Em uma semana típica, quantos dias você pratica esportes, exercícios ou atividades recreativas de intensidade vigorosa?', unit: 'dias' },
+        gpaq_p12: { text: 'Quanto tempo você gasta praticando esportes, exercícios ou atividades recreativas de intensidade vigorosa em um dia típico?', unit: 'min' },
+        gpaq_p13: { text: 'Você pratica esportes, exercícios ou atividades recreativas de intensidade MODERADA que causam pequeno aumento da respiração ou frequência cardíaca por pelo menos 10 minutos seguidos?' },
+        gpaq_p14: { text: 'Em uma semana típica, quantos dias você pratica esportes, exercícios ou atividades recreativas de intensidade moderada?', unit: 'dias' },
+        gpaq_p15: { text: 'Quanto tempo você gasta praticando esportes, exercícios ou atividades recreativas de intensidade moderada em um dia típico?', unit: 'min' },
+        gpaq_p16: { text: 'Quanto tempo você passa SENTADO(A) ou reclinado(a) em um dia típico?', unit: 'min', hint: 'Inclua o tempo no trabalho, em casa, no deslocamento e com amigos.' },
+      },
+      scoreBands: [
+        { label: 'Insuficientemente ativo(a)', description: 'Atividade física insuficiente. Abaixo das recomendações mínimas da OMS.' },
+        { label: 'Suficientemente ativo(a)',   description: 'Atividade física suficiente. Atinge as recomendações mínimas da OMS.' },
+      ],
+    },
   },
 };
 

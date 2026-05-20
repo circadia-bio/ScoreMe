@@ -75,6 +75,28 @@ export const ESS = {
     if (score <= 15) return { label: 'Excessive',  color: '#EA580C', description: 'Excessive daytime sleepiness. Consider clinical review.' };
     return                 { label: 'Severe',      color: '#DC2626', description: 'Severe excessive daytime sleepiness. Recommend medical advice.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Qual é a probabilidade de você cochilar ou adormecer nas seguintes situações, em contraste com sentir-se apenas cansado(a)? Isso se refere ao seu modo de vida habitual em tempos recentes.',
+      items: {
+        ess1: { text: 'Sentado(a) e lendo' },
+        ess2: { text: 'Assistindo TV' },
+        ess3: { text: 'Sentado(a), quieto(a), em um lugar público (por ex., teatro ou reunião)' },
+        ess4: { text: 'Como passageiro(a) de carro por uma hora sem parar' },
+        ess5: { text: 'Deitado(a) para descansar à tarde, quando as circunstâncias permitem' },
+        ess6: { text: 'Sentado(a) e conversando com alguém' },
+        ess7: { text: 'Sentado(a), quieto(a), após o almoço sem álcool' },
+        ess8: { text: 'Em um carro, parado por alguns minutos no trânsito' },
+      },
+      scoreBands: [
+        { label: 'Normal',     description: 'Sonolência diurna dentro da faixa normal.' },
+        { label: 'Limítrofe',  description: 'Pontuação limítrofe. Considere monitorar os hábitos de sono.' },
+        { label: 'Excessiva',  description: 'Sonolência diurna excessiva. Considere avaliação clínica.' },
+        { label: 'Grave',      description: 'Sonolência diurna excessiva grave. Recomenda-se orientação médica.' },
+      ],
+    },
+  },
 };
 
 // ─── ISI ──────────────────────────────────────────────────────────────────────
@@ -122,6 +144,27 @@ export const ISI = {
     if (score <= 14) return { label: 'Subthreshold insomnia',              color: '#F59E0B', description: 'Subthreshold insomnia. Consider sleep hygiene education.' };
     if (score <= 21) return { label: 'Clinical insomnia (moderate)',        color: '#EA580C', description: 'Moderate clinical insomnia. Consider professional support.' };
     return                 { label: 'Clinical insomnia (severe)',          color: '#DC2626', description: 'Severe clinical insomnia. Recommend medical evaluation.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Para cada uma das questões a seguir, avalie a gravidade atual do seu problema de insônia nas últimas duas semanas.',
+      items: {
+        isi1: { text: 'Dificuldade para pegar no sono', options: [{ label: 'Nenhuma' }, { label: 'Leve' }, { label: 'Moderada' }, { label: 'Grave' }, { label: 'Muito grave' }] },
+        isi2: { text: 'Dificuldade para manter o sono', options: [{ label: 'Nenhuma' }, { label: 'Leve' }, { label: 'Moderada' }, { label: 'Grave' }, { label: 'Muito grave' }] },
+        isi3: { text: 'Problema de acordar muito cedo', options: [{ label: 'Nenhum' }, { label: 'Leve' }, { label: 'Moderado' }, { label: 'Grave' }, { label: 'Muito grave' }] },
+        isi4: { text: 'Qual é o seu nível de satisfação/insatisfação com o seu padrão de sono atual?', options: [{ label: 'Muito satisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Neutro(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Muito insatisfeito(a)' }] },
+        isi5: { text: 'Em que medida você considera que o seu problema de sono interfere no seu funcionamento diário?', options: [{ label: 'De maneira alguma' }, { label: 'Um pouco' }, { label: 'Razoavelmente' }, { label: 'Muito' }, { label: 'Extremamente' }] },
+        isi6: { text: 'Em que medida o seu problema de sono é perceptível para os outros em termos de prejuízo na sua qualidade de vida?', options: [{ label: 'De maneira alguma' }, { label: 'Raramente' }, { label: 'Razoavelmente' }, { label: 'Muito' }, { label: 'Extremamente' }] },
+        isi7: { text: 'O quanto você está preocupado(a) ou angustiado(a) com o seu problema de sono atual?', options: [{ label: 'De maneira alguma' }, { label: 'Um pouco' }, { label: 'Razoavelmente' }, { label: 'Muito' }, { label: 'Extremamente' }] },
+      },
+      scoreBands: [
+        { label: 'Sem insônia clinicamente significativa', description: 'Sem insônia clinicamente significativa.' },
+        { label: 'Insônia sublimiar',                      description: 'Insônia sublimiar. Considere orientação sobre higiene do sono.' },
+        { label: 'Insônia clínica (moderada)',             description: 'Insônia clínica moderada. Considere suporte profissional.' },
+        { label: 'Insônia clínica (grave)',                description: 'Insônia clínica grave. Recomenda-se avaliação médica.' },
+      ],
+    },
   },
 };
 
@@ -178,6 +221,34 @@ export const DBAS16 = {
   interpret: (score) => {
     if (score <= 4) return { label: 'Within normal range',        color: '#2E7D32', description: 'Beliefs and attitudes about sleep are broadly within the normal range.' };
     return                { label: 'Clinically relevant beliefs', color: '#EA580C', description: 'Dysfunctional beliefs about sleep that may be worth exploring in therapy.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'A seguir estão afirmações que refletem crenças e atitudes das pessoas sobre o sono. Por favor, indique em que medida você concorda ou discorda de cada afirmação. Use uma escala de 0 (discordo totalmente) a 10 (concordo totalmente).',
+      items: {
+        dbas1:  { text: 'Preciso de 8 horas de sono para me sentir descansado(a) e funcionar bem durante o dia.' },
+        dbas2:  { text: 'Quando não durmo o tempo suficiente em uma noite, preciso compensar no dia seguinte cochilando ou dormindo mais na noite seguinte.' },
+        dbas3:  { text: 'Estou preocupado(a) que a insônia crônica possa ter consequências graves para minha saúde física.' },
+        dbas4:  { text: 'Estou com medo de perder o controle sobre minha capacidade de dormir.' },
+        dbas5:  { text: 'Depois de uma noite de sono ruim, sei que isso vai interferir nas minhas atividades no dia seguinte.' },
+        dbas6:  { text: 'Para me sentir alerta e funcionar bem durante o dia, acredito que seria melhor tomar um remédio para dormir do que passar uma noite mal dormida.' },
+        dbas7:  { text: 'Quando me sinto irritado(a), deprimido(a) ou ansioso(a) durante o dia, é principalmente porque não dormi bem na noite anterior.' },
+        dbas8:  { text: 'Quando durmo mal em uma noite, sei que vai atrapalhar minha rotina de sono por toda a semana.' },
+        dbas9:  { text: 'Sem uma noite de sono adequada, mal consigo funcionar no dia seguinte.' },
+        dbas10: { text: 'Nunca consigo prever se vou ter uma noite de sono boa ou ruim.' },
+        dbas11: { text: 'Tenho pouca capacidade de lidar com as consequências negativas de um sono perturbado.' },
+        dbas12: { text: 'Quando me sinto cansado(a), sem energia ou simplesmente não funciono bem durante o dia, é geralmente porque não dormi bem na noite anterior.' },
+        dbas13: { text: 'Acredito que a insônia seja essencialmente resultado de um desequilíbrio químico.' },
+        dbas14: { text: 'Sinto que a insônia está arruinando minha capacidade de aproveitar a vida e me impedindo de fazer o que quero.' },
+        dbas15: { text: 'A medicação é provavelmente a única solução para a falta de sono.' },
+        dbas16: { text: 'Evito ou cancelo compromissos (sociais, familiares) após uma noite de sono ruim.' },
+      },
+      scoreBands: [
+        { label: 'Dentro da faixa normal',        description: 'Crenças e atitudes sobre o sono estão em geral dentro da faixa normal.' },
+        { label: 'Crenças clinicamente relevantes', description: 'Crenças disfuncionais sobre o sono que podem ser exploradas em terapia.' },
+      ],
+    },
   },
 };
 
@@ -241,6 +312,40 @@ export const MEQ = {
     if (score >= 42) return { label: 'Intermediate type',     color: '#2E7D32', description: 'Intermediate chronotype — neither strongly morning nor evening.' };
     if (score >= 31) return { label: 'Moderate evening type', color: '#6366F1', description: 'Moderate preference for evenings.' };
     return                 { label: 'Definite evening type',  color: '#7C3AED', description: 'Definite evening type (night owl).' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Por favor, leia cada questão com atenção antes de responder. Responda TODAS as questões. Cada questão deve ser respondida independentemente das outras. Responda de acordo com o que você realmente sente, não como acha que deveria se sentir.',
+      items: {
+        meq1:  { text: 'Considerando apenas o seu próprio ritmo de "sentir-se bem", a que horas você se levantaria se fosse totalmente livre para planejar o seu dia?', options: [{ label: '5h–6h30' }, { label: '6h30–7h45' }, { label: '7h45–9h45' }, { label: '9h45–11h' }, { label: '11h–12h' }] },
+        meq2:  { text: 'Considerando apenas o seu próprio ritmo de "sentir-se bem", a que horas você iria dormir se fosse totalmente livre para planejar sua noite?', options: [{ label: '20h–21h' }, { label: '21h–22h15' }, { label: '22h15–0h30' }, { label: '0h30–1h45' }, { label: '1h45–3h' }] },
+        meq3:  { text: 'Se houver um horário específico no qual você precisa acordar de manhã, o quanto você depende de um despertador?', options: [{ label: 'Nada dependente' }, { label: 'Levemente dependente' }, { label: 'Razoavelmente dependente' }, { label: 'Muito dependente' }] },
+        meq4:  { text: 'Em condições ambientais adequadas, com que facilidade você acorda de manhã?', options: [{ label: 'Nada fácil' }, { label: 'Não muito fácil' }, { label: 'Razoavelmente fácil' }, { label: 'Muito fácil' }] },
+        meq5:  { text: 'Quão alerta você se sente durante a primeira meia hora após acordar de manhã?', options: [{ label: 'Nada alerta' }, { label: 'Levemente alerta' }, { label: 'Razoavelmente alerta' }, { label: 'Muito alerta' }] },
+        meq6:  { text: 'Como está o seu apetite durante a primeira meia hora após acordar de manhã?', options: [{ label: 'Muito ruim' }, { label: 'Razoavelmente ruim' }, { label: 'Razoavelmente bom' }, { label: 'Muito bom' }] },
+        meq7:  { text: 'Durante a primeira meia hora após acordar de manhã, quão cansado(a) você se sente?', options: [{ label: 'Muito cansado(a)' }, { label: 'Razoavelmente cansado(a)' }, { label: 'Razoavelmente descansado(a)' }, { label: 'Muito descansado(a)' }] },
+        meq8:  { text: 'Quando não tem compromissos no dia seguinte, em que horário você vai dormir comparado ao seu horário habitual?', options: [{ label: 'Raramente ou nunca mais tarde' }, { label: 'Menos de uma hora mais tarde' }, { label: '1–2 horas mais tarde' }, { label: 'Mais de duas horas mais tarde' }] },
+        meq9:  { text: 'Um amigo sugere que vocês se exercitem juntos das 7h às 8h duas vezes por semana. Como você acha que se sairia?', options: [{ label: 'Estaria em boa forma' }, { label: 'Estaria em forma razoável' }, { label: 'Acharia difícil' }, { label: 'Acharia muito difícil' }] },
+        meq10: { text: 'A que horas da noite você se sente cansado(a) e com necessidade de dormir?', options: [{ label: '20h–21h' }, { label: '21h–22h15' }, { label: '22h15–0h45' }, { label: '0h45–2h' }, { label: '2h–3h' }] },
+        meq11: { text: 'Você quer atingir o seu pico para um teste mentalmente exigente de 2 horas. Qual horário você escolheria?', options: [{ label: '8h–10h' }, { label: '11h–13h' }, { label: '15h–17h' }, { label: '19h–21h' }] },
+        meq12: { text: 'Se você fosse dormir às 23h, qual seria o seu nível de cansaço?', options: [{ label: 'Nada cansado(a)' }, { label: 'Um pouco cansado(a)' }, { label: 'Razoavelmente cansado(a)' }, { label: 'Muito cansado(a)' }] },
+        meq13: { text: 'Você foi dormir algumas horas mais tarde que o habitual, mas não precisa acordar em hora específica. Qual das alternativas é mais provável?', options: [{ label: 'Acordará no horário habitual e não voltará a dormir' }, { label: 'Acordará no horário habitual e depois cochilará' }, { label: 'Acordará no horário habitual, mas voltará a dormir' }, { label: 'Não acordará até mais tarde que o habitual' }] },
+        meq14: { text: 'Em uma noite, você precisará ficar acordado(a) das 4h às 6h para uma vigia. Qual alternativa lhe convém mais?', options: [{ label: 'Não dormiria até terminar a vigia' }, { label: 'Cochilaria antes e dormiria depois' }, { label: 'Dormiria bem antes e cochilaria depois' }, { label: 'Dormiria todo o tempo antes da vigia' }] },
+        meq15: { text: 'Você precisa fazer duas horas de trabalho físico pesado. Que horário escolheria?', options: [{ label: '8h–10h' }, { label: '11h–13h' }, { label: '15h–17h' }, { label: '19h–21h' }] },
+        meq16: { text: 'Um amigo sugere que vocês se exercitem juntos das 22h às 23h duas vezes por semana. Como você acha que se sairia?', options: [{ label: 'Estaria em boa forma' }, { label: 'Estaria em forma razoável' }, { label: 'Acharia difícil' }, { label: 'Acharia muito difícil' }] },
+        meq17: { text: 'Suponha que você possa escolher seu próprio horário de trabalho. Trabalha 5 horas por dia e é pago(a) por resultado. A que horas começaria?', options: [{ label: '5 horas a partir das 4h–8h' }, { label: '5 horas a partir das 8h–9h' }, { label: '5 horas a partir das 9h–14h' }, { label: '5 horas a partir das 14h–17h' }, { label: '5 horas a partir das 17h–4h' }] },
+        meq18: { text: 'A que horas do dia você acha que atinge seu pico de "sentir-se bem"?', options: [{ label: '5h–8h' }, { label: '8h–10h' }, { label: '10h–17h' }, { label: '17h–22h' }, { label: '22h–5h' }] },
+        meq19: { text: 'Fala-se em pessoas do tipo "matutino" e "vespertino". Qual desses tipos você considera ser?', options: [{ label: 'Definitivamente matutino(a)' }, { label: 'Mais matutino(a) que vespertino(a)' }, { label: 'Mais vespertino(a) que matutino(a)' }, { label: 'Definitivamente vespertino(a)' }] },
+      },
+      scoreBands: [
+        { label: 'Definitivamente matutino(a)', description: 'Tipo definitivamente matutino (madrugador).' },
+        { label: 'Moderadamente matutino(a)',   description: 'Preferência moderada pelo período matutino.' },
+        { label: 'Tipo intermediário',          description: 'Cronotipo intermediário — nem fortemente matutino nem vespertino.' },
+        { label: 'Moderadamente vespertino(a)', description: 'Preferência moderada pelo período vespertino.' },
+        { label: 'Definitivamente vespertino(a)', description: 'Tipo definitivamente vespertino (coruja).' },
+      ],
+    },
   },
 };
 
@@ -315,6 +420,36 @@ export const PSQI = {
     if (score <= 10) return { label: 'Poor sleep quality',       color: '#F59E0B', description: 'Poor sleep quality. Consider sleep hygiene improvements.' };
     return                 { label: 'Severe sleep difficulties', color: '#DC2626', description: 'Severe sleep difficulties. Recommend medical evaluation.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'As questões a seguir referem-se aos seus hábitos de sono habituais somente durante o último mês. Suas respostas devem indicar a resposta mais precisa para a maioria dos dias e noites do último mês.',
+      items: {
+        psqi1:  { text: 'Durante o último mês, qual foi normalmente o horário em que você foi deitar à noite?' },
+        psqi2:  { text: 'Durante o último mês, quanto tempo (em minutos) normalmente levou para você pegar no sono?' },
+        psqi3:  { text: 'Durante o último mês, qual foi normalmente o horário em que você acordou de manhã?' },
+        psqi4:  { text: 'Durante o último mês, quantas horas de sono de fato você dormiu por noite?' },
+        psqi5a: { text: 'Durante o último mês, com que frequência você teve problemas para dormir porque não conseguia pegar no sono em até 30 minutos?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5b: { text: 'Com que frequência você teve problemas para dormir porque acordou no meio da noite ou de madrugada?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5c: { text: 'Com que frequência você teve problemas para dormir porque precisou ir ao banheiro?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5d: { text: 'Com que frequência você teve problemas para dormir porque não conseguia respirar confortavelmente?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5e: { text: 'Com que frequência você teve problemas para dormir porque tossia ou roncava alto?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5f: { text: 'Com que frequência você teve problemas para dormir porque sentia muito frio?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5g: { text: 'Com que frequência você teve problemas para dormir porque sentia muito calor?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5h: { text: 'Com que frequência você teve problemas para dormir porque tinha pesadelos?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi5i: { text: 'Com que frequência você teve problemas para dormir porque sentia dor?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi6:  { text: 'Durante o último mês, com que frequência você tomou remédio para dormir (prescrito ou por conta própria)?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi7:  { text: 'Durante o último mês, com que frequência você teve dificuldade em ficar acordado(a) enquanto dirigia, comia ou realizava atividades sociais?', options: [{ label: 'Nenhuma vez no último mês' }, { label: 'Menos de uma vez por semana' }, { label: 'Uma ou duas vezes por semana' }, { label: 'Três vezes ou mais por semana' }] },
+        psqi8:  { text: 'Durante o último mês, quanto de problema foi para você manter disposição suficiente para realizar as suas atividades?', options: [{ label: 'Nenhum problema' }, { label: 'Problema muito pequeno' }, { label: 'Algum problema' }, { label: 'Um problema muito grande' }] },
+        psqi9:  { text: 'Durante o último mês, como você avaliaria a qualidade do seu sono de uma maneira geral?', options: [{ label: 'Muito boa' }, { label: 'Boa' }, { label: 'Ruim' }, { label: 'Muito ruim' }] },
+      },
+      scoreBands: [
+        { label: 'Boa qualidade de sono',          description: 'Boa qualidade de sono geral.' },
+        { label: 'Má qualidade de sono',           description: 'Má qualidade de sono. Considere melhorias na higiene do sono.' },
+        { label: 'Dificuldades graves de sono',    description: 'Dificuldades graves de sono. Recomenda-se avaliação médica.' },
+      ],
+    },
+  },
 };
 
 // ─── RU-SATED ─────────────────────────────────────────────────────────────────
@@ -360,6 +495,25 @@ export const RUSATED = {
     if (score >= 17) return { label: 'Good sleep health',     color: '#2E7D32', description: 'Good multidimensional sleep health.' };
     if (score >= 9)  return { label: 'Moderate sleep health', color: '#F59E0B', description: 'Moderate sleep health. There may be room for improvement.' };
     return                 { label: 'Poor sleep health',      color: '#DC2626', description: 'Poor sleep health across multiple dimensions.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'As afirmações a seguir referem-se ao seu sono durante o último mês. Por favor, indique a resposta que melhor se aplica a cada afirmação.',
+      items: {
+        rus1: { text: 'Eu vou dormir e acordo aproximadamente no mesmo horário todos os dias.' },
+        rus2: { text: 'Eu durmo 7 a 9 horas por noite.' },
+        rus3: { text: 'O meio do meu período de sono ocorre entre 2h e 4h da manhã.' },
+        rus4: { text: 'Fico acordado(a) por menos de 30 minutos entre o momento em que vou para a cama e o momento em que me levanto.' },
+        rus5: { text: 'Fico acordado(a) o dia todo sem cochilar.' },
+        rus6: { text: 'Estou satisfeito(a) com o meu sono.' },
+      },
+      scoreBands: [
+        { label: 'Boa saúde do sono',      description: 'Boa saúde do sono em múltiplas dimensões.' },
+        { label: 'Saúde do sono moderada', description: 'Saúde do sono moderada. Pode haver espaço para melhoria.' },
+        { label: 'Má saúde do sono',       description: 'Má saúde do sono em múltiplas dimensões.' },
+      ],
+    },
   },
 };
 
@@ -407,6 +561,27 @@ export const STOPBANG = {
     if (score <= 2) return { label: 'Low OSA risk',          color: '#2E7D32', description: 'Low risk for obstructive sleep apnoea.' };
     if (score <= 4) return { label: 'Intermediate OSA risk', color: '#F59E0B', description: 'Intermediate OSA risk. Consider further evaluation.' };
     return                { label: 'High OSA risk',          color: '#DC2626', description: 'High OSA risk. Recommend medical evaluation.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Por favor, responda SIM ou NÃO a cada uma das questões a seguir. Este questionário avalia o risco de apneia obstrutiva do sono.',
+      items: {
+        sb_s: { text: 'Você ronca alto (mais alto do que ao falar, ou alto o suficiente para ser ouvido através de portas fechadas)?' },
+        sb_t: { text: 'Você frequentemente se sente cansado(a), fatigado(a) ou com sono durante o dia?' },
+        sb_o: { text: 'Alguém já observou você parar de respirar, engasgar ou ofegar durante o sono?' },
+        sb_p: { text: 'Você tem ou está sendo tratado(a) por pressão alta?' },
+        sb_b: { text: 'Seu IMC é maior que 35 kg/m²?' },
+        sb_a: { text: 'Você tem mais de 50 anos?' },
+        sb_n: { text: 'Sua circunferência cervical é maior que 40 cm?' },
+        sb_g: { text: 'Você é do sexo masculino?' },
+      },
+      scoreBands: [
+        { label: 'Baixo risco de AOS',           description: 'Baixo risco de apneia obstrutiva do sono.' },
+        { label: 'Risco intermediário de AOS',   description: 'Risco intermediário de AOS. Considere avaliação adicional.' },
+        { label: 'Alto risco de AOS',            description: 'Alto risco de AOS. Recomenda-se avaliação médica.' },
+      ],
+    },
   },
 };
 
@@ -461,6 +636,32 @@ export const KSS = {
     if (score === 6) return { label: 'Onset of sleepiness', color: '#F59E0B', description: 'Early signs of sleepiness. Caution for safety-critical tasks.' };
     if (score <= 8)  return { label: 'Moderate sleepiness', color: '#EA580C', description: 'Moderate sleepiness — performance impairment likely.' };
     return                 { label: 'Severe sleepiness',    color: '#DC2626', description: 'Severe sleepiness — significant risk of performance failure.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Usando a escala abaixo, indique o quanto você está com sono agora, neste momento.',
+      items: {
+        kss1: { text: 'Com quanto sono você está agora?', options: [
+          { label: 'Extremamente alerta' },
+          { label: 'Muito alerta' },
+          { label: 'Alerta' },
+          { label: 'Razoavelmente alerta' },
+          { label: 'Nem alerta nem com sono' },
+          { label: 'Com alguns sinais de sono' },
+          { label: 'Com sono, mas sem dificuldade em manter-se acordado(a)' },
+          { label: 'Com sono, com algum esforço para se manter acordado(a)' },
+          { label: 'Muito com sono, grande esforço para se manter acordado(a), lutando contra o sono' },
+          { label: 'Extremamente com sono, não consegue se manter acordado(a)' },
+        ]},
+      },
+      scoreBands: [
+        { label: 'Alerta',                    description: 'Adequadamente alerta para a maioria das tarefas.' },
+        { label: 'Início da sonolência',       description: 'Sinais iniciais de sonolência. Cuidado com tarefas de segurança crítica.' },
+        { label: 'Sonolência moderada',        description: 'Sonolência moderada — provável comprometimento do desempenho.' },
+        { label: 'Sonolência grave',           description: 'Sonolência grave — risco significativo de falha no desempenho.' },
+      ],
+    },
   },
 };
 

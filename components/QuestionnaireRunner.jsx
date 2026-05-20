@@ -17,7 +17,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
-import t from '../i18n';
+import t, { locale } from '../i18n';
+import { localise }   from '../data/questionnaires/utils';
 
 const C = {
   primary:      COLOURS.primary,
@@ -257,8 +258,9 @@ const isAnswered = (item, value) => {
 };
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export default function QuestionnaireRunner({ questionnaire, onComplete, onBack }) {
+export default function QuestionnaireRunner({ questionnaire: questionnaireProp, onComplete, onBack }) {
   const insets = useSafeAreaInsets();
+  const questionnaire = localise(questionnaireProp, locale);
   const [answers, setAnswers]           = useState(() => buildInitialAnswers(questionnaire?.items ?? []));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [result, setResult]             = useState(null);

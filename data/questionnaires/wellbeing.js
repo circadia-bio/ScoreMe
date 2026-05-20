@@ -97,6 +97,46 @@ export const WHOQOL_BREF = {
     if (s <= 80) return { label: 'Good QoL',      color: '#F59E0B', description: 'Good quality of life.' };
     return             { label: 'Very good QoL',  color: '#2E7D32', description: 'Very good quality of life.' };
   },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Este questionário pergunta como você avalia a sua qualidade de vida, saúde ou outras áreas de sua vida. Por favor, responda a todas as perguntas pensando em sua vida nas últimas duas semanas.',
+      items: {
+        whoqol_1:  { text: 'Como você avaliaria a sua qualidade de vida?', options: [{ label: 'Péssima' }, { label: 'Ruim' }, { label: 'Nem ruim nem boa' }, { label: 'Boa' }, { label: 'Ótima' }] },
+        whoqol_2:  { text: 'Quão satisfeito(a) você está com a sua saúde?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_3:  { text: 'Em que medida você acha que sua dor (física) impede você de fazer o que precisa?', hint: 'Pontuado inversamente.' },
+        whoqol_4:  { text: 'O quanto você precisa de algum tratamento médico para levar sua vida diária?', hint: 'Pontuado inversamente.' },
+        whoqol_5:  { text: 'O quanto você aproveita a vida?' },
+        whoqol_6:  { text: 'Em que medida você acha que sua vida tem sentido?' },
+        whoqol_7:  { text: 'O quanto você consegue se concentrar?' },
+        whoqol_8:  { text: 'Quão seguro(a) você se sente em sua vida diária?' },
+        whoqol_9:  { text: 'Quão saudável é o seu ambiente físico (clima, barulho, poluição, atrativo)?' },
+        whoqol_10: { text: 'Você tem energia suficiente para o seu dia a dia?' },
+        whoqol_11: { text: 'Você é capaz de aceitar sua aparência física?' },
+        whoqol_12: { text: 'Você tem dinheiro suficiente para satisfazer suas necessidades?' },
+        whoqol_13: { text: 'Quão disponíveis para você estão as informações que precisa no seu dia a dia?' },
+        whoqol_14: { text: 'Em que medida você tem oportunidades de atividade de lazer?' },
+        whoqol_15: { text: 'Quão bem você é capaz de se locomover?' },
+        whoqol_16: { text: 'Quão satisfeito(a) você está com seu sono?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_17: { text: 'Quão satisfeito(a) você está com sua capacidade de desempenhar as atividades do seu dia a dia?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_18: { text: 'Quão satisfeito(a) você está com sua capacidade para o trabalho?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_19: { text: 'Quão satisfeito(a) você está consigo mesmo(a)?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_20: { text: 'Quão satisfeito(a) você está com suas relações pessoais?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_21: { text: 'Quão satisfeito(a) você está com sua vida sexual?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_22: { text: 'Quão satisfeito(a) você está com o apoio que recebe de seus amigos?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_23: { text: 'Quão satisfeito(a) você está com as condições do local onde mora?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_24: { text: 'Quão satisfeito(a) você está com o seu acesso aos serviços de saúde?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_25: { text: 'Quão satisfeito(a) você está com o seu meio de transporte?', options: [{ label: 'Muito insatisfeito(a)' }, { label: 'Insatisfeito(a)' }, { label: 'Nem satisfeito(a) nem insatisfeito(a)' }, { label: 'Satisfeito(a)' }, { label: 'Muito satisfeito(a)' }] },
+        whoqol_26: { text: 'Com que frequência você tem sentimentos negativos como mau humor, desespero, ansiedade, depressão?', hint: 'Pontuado inversamente.', options: [{ label: 'Nunca' }, { label: 'Raramente' }, { label: 'Com certa frequência' }, { label: 'Com muita frequência' }, { label: 'Sempre' }] },
+      },
+      scoreBands: [
+        { label: 'QV ruim',         description: 'Qualidade de vida ruim.' },
+        { label: 'QV moderada',     description: 'Qualidade de vida moderada.' },
+        { label: 'QV boa',          description: 'Qualidade de vida boa.' },
+        { label: 'QV muito boa',    description: 'Qualidade de vida muito boa.' },
+      ],
+    },
+  },
 };
 
 // ─── MacArthur SSS ────────────────────────────────────────────────────────────
@@ -132,6 +172,21 @@ export const MACARTHUR_SSS = {
     if (score <= 8)  return { label: 'Low social status',      color: '#EA580C', description: 'Low perceived social status.' };
     if (score <= 14) return { label: 'Moderate social status', color: '#F59E0B', description: 'Moderate perceived social status.' };
     return                 { label: 'High social status',      color: '#2E7D32', description: 'High perceived social status.' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'Pense nessa escada como representando onde as pessoas se posicionam na sua comunidade. As pessoas no topo são as mais bem-sucedidas — têm mais dinheiro, mais educação e os empregos mais respeitados. As pessoas na base estão nas piores condições. Onde você se colocaria nessa escada?',
+      items: {
+        mac_sss_society:   { text: 'Escada da sociedade: Pense nessa escada como representando onde as pessoas estão na sociedade como um todo. Onde você se colocaria?' },
+        mac_sss_community: { text: 'Escada da comunidade: Pense nessa escada como representando onde as pessoas estão em sua comunidade local. Onde você se colocaria?' },
+      },
+      scoreBands: [
+        { label: 'Status social baixo',     description: 'Baixo status social percebido.' },
+        { label: 'Status social moderado',  description: 'Status social percebido moderado.' },
+        { label: 'Status social elevado',   description: 'Elevado status social percebido.' },
+      ],
+    },
   },
 };
 
