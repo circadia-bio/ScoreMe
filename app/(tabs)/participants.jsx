@@ -22,6 +22,13 @@ import { fmtScore } from '../../storage/scoreFormat';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 import t from '../../i18n';
 
+// Safely translate a stored sex key; falls back to raw value for legacy data
+const tSex = (val) => {
+  if (!val) return val;
+  const translated = t(`participants.sexOptions.${val}`);
+  return translated.startsWith('participants.sexOptions.') ? val : translated;
+};
+
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
 const interpLabel = (q, score) => { try { return q.interpret(score).label; } catch { return '—'; } };
@@ -236,7 +243,7 @@ function DetailPanel({ p, onScore, onClose, onEdit, allQs }) {
       {(p.age || p.sex || p.bmi || p.group || p.site || p.session || p.diagnosis || p.medication || p.referral || p.notes || (p.customFields?.length > 0)) && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
           {p.age      ? <View style={dp.chip}><Text style={dp.chipText}>{t('participants.fieldAge')} {p.age}</Text></View> : null}
-          {p.sex      ? <View style={dp.chip}><Text style={dp.chipText}>{t(`participants.sexOptions.${p.sex}`)}</Text></View> : null}
+          {p.sex      ? <View style={dp.chip}><Text style={dp.chipText}>{tSex(p.sex)}</Text></View> : null}
           {p.bmi      ? <View style={dp.chip}><Text style={dp.chipText}>{t('participants.fieldBmi')} {p.bmi}</Text></View> : null}
           {p.group    ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.group}</Text></View> : null}
           {p.site     ? <View style={[dp.chip, dp.chipStudy]}><Text style={[dp.chipText, dp.chipStudyText]}>{p.site}</Text></View> : null}

@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant, deleteParticipant, getLatestResult, getAllResults } from '../../storage/storage';
+import t from '../../i18n';
 import { fmtScore } from '../../storage/scoreFormat';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
@@ -23,7 +24,20 @@ const formatDate = (iso) =>
 const formatScore = (q, score) => fmtScore(score);
 
 // ─── Inline edit form helpers ────────────────────────────────────────────────────
-const SEX_OPTIONS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+const SEX_OPTIONS = [
+  { key: 'male',      label: () => t('participants.sexOptions.male')      },
+  { key: 'female',    label: () => t('participants.sexOptions.female')    },
+  { key: 'nonBinary', label: () => t('participants.sexOptions.nonBinary') },
+  { key: 'preferNot', label: () => t('participants.sexOptions.preferNot') },
+];
+
+// Safely translate a stored sex key; falls back to raw value for legacy data
+const tSex = (val) => {
+  if (!val) return val;
+  const translated = t(`participants.sexOptions.${val}`);
+  // t() returns the key path if not found — detect that and fall back to raw
+  return translated.startsWith('participants.sexOptions.') ? val : translated;
+};
 
 function FieldRow({ label, value, onChange, placeholder, keyboardType, multiline }) {
   return (
@@ -129,10 +143,10 @@ export default function ParticipantScreen() {
             <Text style={s.fieldLabel}>Sex</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
               {SEX_OPTIONS.map(opt => (
-                <TouchableOpacity key={opt}
-                  style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, backgroundColor: ef.sex === opt ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderColor: ef.sex === opt ? COLOURS.primary : 'rgba(74,123,181,0.2)' }}
-                  onPress={() => setF('sex', ef.sex === opt ? '' : opt)}>
-                  <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: ef.sex === opt ? '#fff' : COLOURS.primaryDark }}>{opt}</Text>
+                <TouchableOpacity key={opt.key}
+                  style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, backgroundColor: ef.sex === opt.key ? COLOURS.primary : 'rgba(255,255,255,0.72)', borderColor: ef.sex === opt.key ? COLOURS.primary : 'rgba(74,123,181,0.2)' }}
+                  onPress={() => setF('sex', ef.sex === opt.key ? '' : opt.key)}>
+                  <Text style={{ fontSize: 13, fontFamily: FONTS.bodyMedium, color: ef.sex === opt.key ? '#fff' : COLOURS.primaryDark }}>{opt.label()}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -196,7 +210,7 @@ export default function ParticipantScreen() {
         {!editing && (participant.age || participant.sex || participant.bmi || participant.group || participant.site || participant.session || participant.diagnosis || participant.medication || participant.referral || participant.notes || participant.customFields?.length > 0) && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
             {participant.age       ? <View style={s.chip}><Text style={s.chipText}>Age: {participant.age}</Text></View> : null}
-            {participant.sex       ? <View style={s.chip}><Text style={s.chipText}>{participant.sex}</Text></View> : null}
+            {participant.sex       ? <View style={s.chip}><Text style={s.chipText}>{tSex(participant.sex)}</Text></View> : null}
             {participant.bmi       ? <View style={s.chip}><Text style={s.chipText}>BMI: {participant.bmi}</Text></View> : null}
             {participant.group     ? <View style={[s.chip, s.chipStudy]}><Text style={[s.chipText, s.chipStudyText]}>{participant.group}</Text></View> : null}
             {participant.site      ? <View style={[s.chip, s.chipStudy]}><Text style={[s.chipText, s.chipStudyText]}>{participant.site}</Text></View> : null}
