@@ -19,14 +19,19 @@ const formatDate = (iso) =>
   iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
 const formatScore = (q, score) => {
-  if (typeof score === 'object' && score !== null) {
-    if (score.msfsc !== undefined) {
-      const h = Math.floor(score.msfsc); const m = Math.round((score.msfsc % 1) * 60);
+  // Score may have been stored as a JSON string if saved before the fix
+  let s = score;
+  if (typeof s === 'string') {
+    try { s = JSON.parse(s); } catch { /* leave as string */ }
+  }
+  if (typeof s === 'object' && s !== null) {
+    if (s.msfsc !== undefined) {
+      const h = Math.floor(s.msfsc); const m = Math.round((s.msfsc % 1) * 60);
       return `${pad(h)}:${pad(m)} MSFsc`;
     }
-    return JSON.stringify(score);
+    return JSON.stringify(s);
   }
-  return String(score);
+  return String(s);
 };
 
 // ─── Inline edit form helpers ────────────────────────────────────────────────────
