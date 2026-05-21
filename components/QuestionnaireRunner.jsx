@@ -181,8 +181,8 @@ const ResultScreen = ({ questionnaire, score, onClose }) => {
   const interpretation = questionnaire.interpret(score);
   let scoreDisplay = '', scoreMax = '';
   if (typeof score === 'object' && score !== null) {
-    if (score.msf_sc !== undefined) {
-      const h = Math.floor(score.msf_sc); const m = Math.round((score.msf_sc % 1) * 60);
+    if (score.msfsc !== undefined) {
+      const h = Math.floor(score.msfsc); const m = Math.round((score.msfsc % 1) * 60);
       scoreDisplay = `${pad(h)}:${pad(m)}`; scoreMax = 'MSFsc';
     } else scoreDisplay = JSON.stringify(score);
   } else {
