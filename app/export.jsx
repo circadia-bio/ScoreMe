@@ -16,21 +16,12 @@ import ScreenBackground from '../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../theme/responsive';
 import { loadParticipants, participantsToCSV, participantsToJSON, loadCustomQuestionnaires, loadDisabledQs, getLatestResult } from '../storage/storage';
+import { fmtScore } from '../storage/scoreFormat';
 import { QUESTIONNAIRES } from '../data/questionnaires';
 import t from '../i18n';
 
-const pad = (n) => String(n).padStart(2, '0');
-
-const formatScore = (q, score) => {
-  if (typeof score === 'object' && score !== null) {
-    if (score.msfsc !== undefined) {
-      const h = Math.floor(score.msfsc); const m = Math.round((score.msfsc % 1) * 60);
-      return `${pad(h)}:${pad(m)}`;
-    }
-    return JSON.stringify(score);
-  }
-  return String(score);
-};
+// Compact format for table cells — omits the " MSFsc" label suffix.
+const formatScore = (q, score) => fmtScore(score, { compact: true });
 
 async function doExport(content, filename, mime) {
   if (Platform.OS === 'web') {

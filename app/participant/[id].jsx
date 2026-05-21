@@ -12,27 +12,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParticipant, deleteParticipant, getLatestResult, getAllResults } from '../../storage/storage';
+import { fmtScore } from '../../storage/scoreFormat';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
 const pad = (n) => String(n).padStart(2, '0');
 const formatDate = (iso) =>
   iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
-const formatScore = (q, score) => {
-  // Score may have been stored as a JSON string if saved before the fix
-  let s = score;
-  if (typeof s === 'string') {
-    try { s = JSON.parse(s); } catch { /* leave as string */ }
-  }
-  if (typeof s === 'object' && s !== null) {
-    if (s.msfsc !== undefined) {
-      const h = Math.floor(s.msfsc); const m = Math.round((s.msfsc % 1) * 60);
-      return `${pad(h)}:${pad(m)} MSFsc`;
-    }
-    return JSON.stringify(s);
-  }
-  return String(s);
-};
+// formatScore: delegates to shared fmtScore; also handles the _scoreDisplay
+// override that may be set by the questionnaire runner for composite scores.
+const formatScore = (q, score) => fmtScore(score);
 
 // ─── Inline edit form helpers ────────────────────────────────────────────────────
 const SEX_OPTIONS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];

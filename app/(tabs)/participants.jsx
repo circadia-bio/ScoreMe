@@ -18,23 +18,14 @@ import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { loadParticipants, addParticipant, deleteParticipant, saveResult, updateParticipant, getLatestResult } from '../../storage/storage';
 import { loadCustomQuestionnaires } from '../../storage/storage';
 import { loadDisabledQs } from '../../storage/storage';
+import { fmtScore } from '../../storage/scoreFormat';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 import t from '../../i18n';
 
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
 const interpLabel = (q, score) => { try { return q.interpret(score).label; } catch { return '—'; } };
-const fmtScore    = (score) => {
-  if (typeof score === 'object' && score !== null) {
-    if (score.msfsc !== undefined) {
-      const h = Math.floor(score.msfsc);
-      const m = Math.round((score.msfsc % 1) * 60);
-      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} MSFsc`;
-    }
-    return '—';
-  }
-  return String(score);
-};
+
 const hasResult   = (p, qid) => !!getLatestResult(p, qid);
 
 // ─── Desktop list row ─────────────────────────────────────────────────────────
