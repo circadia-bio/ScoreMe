@@ -23,8 +23,8 @@ const pad = (n) => String(n).padStart(2, '0');
 
 const formatScore = (q, score) => {
   if (typeof score === 'object' && score !== null) {
-    if (score.msf_sc !== undefined) {
-      const h = Math.floor(score.msf_sc); const m = Math.round((score.msf_sc % 1) * 60);
+    if (score.msfsc !== undefined) {
+      const h = Math.floor(score.msfsc); const m = Math.round((score.msfsc % 1) * 60);
       return `${pad(h)}:${pad(m)}`;
     }
     return JSON.stringify(score);
