@@ -103,7 +103,7 @@ function QRow({ q, selected, onPress, onDelete, disabled, onToggle }) {
             </View>
             <Text style={[qr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} {t('questionnaires.items').toLowerCase()}{q.domain ? ` · ${q.domain}` : ''}</Text>
           </View>
-          <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
+          <Toggle value={!disabled} onValueChange={(enabled) => onToggle(!enabled)} />
           {onDelete && (
             <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />
@@ -329,7 +329,7 @@ function MobileQRow({ q, isLast, onDelete, disabled, onToggle }) {
           </View>
           <Text style={[mr.meta, disabled && { color: COLOURS.textMuted }]}>{q.shortTitle} · {q.items?.length ?? '?'} {t('questionnaires.items').toLowerCase()}</Text>
         </View>
-        <Toggle value={!disabled} onValueChange={(val) => onToggle(!val)} />
+        <Toggle value={!disabled} onValueChange={(enabled) => onToggle(!enabled)} />
         {onDelete && (
           <TouchableOpacity onPress={onDelete} style={qr.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Ionicons name="trash-outline" size={15} color={COLOURS.danger} />

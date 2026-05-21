@@ -60,7 +60,7 @@ export default function ParticipantScreen() {
   const router   = useRouter();
   const insets   = useSafeAreaInsets();
   const [participant, setParticipant] = useState(null);
-  const [allQs, setAllQs]             = useState(QUESTIONNAIRES);
+  const [allQs, setAllQs]             = useState([]);
   const [editing, setEditing]         = useState(false);
   const EMPTY = { code: '', name: '', age: '', sex: '', bmi: '', group: '', site: '', session: '', diagnosis: '', medication: '', referral: '', notes: '', customFields: [] };
   const [ef, setEF]                   = useState(EMPTY);
