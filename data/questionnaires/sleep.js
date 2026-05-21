@@ -665,4 +665,165 @@ export const KSS = {
   },
 };
 
-export const SLEEP_QUESTIONNAIRES = [ESS, ISI, DBAS16, MEQ, PSQI, RUSATED, STOPBANG, KSS];
+// ─── MCTQ ─────────────────────────────────────────────────────────────────────
+export const MCTQ = {
+  id: 'mctq',
+  title: 'Munich Chronotype Questionnaire',
+  shortTitle: 'MCTQ',
+  version: 'MCTQ',
+  domain: 'Sleep',
+
+  construct: 'Chronotype',
+  constructDescription: 'Assesses chronotype and social jetlag using self-reported sleep timing on workdays and free days. The corrected mid-sleep on free days (MSFsc) is the primary chronotype indicator; social jetlag (SJL) quantifies the discrepancy between biological and social clock.',
+  timeframe: 'Typical workday and free day',
+  languages: ['English', 'Portuguese'],
+
+  instructions: 'The following questions ask about your typical sleep timing on workdays (days when you have work, school, or other fixed obligations) and on free days (days with no fixed obligations). Please answer based on your habits over the past four weeks, ignoring exceptional circumstances.',
+
+  reference: 'Roenneberg, T., Wirz-Justice, A., & Merrow, M. (2003). Life between clocks: Daily temporal patterns of human chronotypes. Journal of Biological Rhythms, 18(1), 80-90.',
+  credit: 'Till Roenneberg, Ludwig-Maximilians-Universitat Munchen.',
+  copyright: '© Till Roenneberg. Available for non-commercial research use.',
+
+  maxScore: null,
+  scoringMethod: { type: 'composite' },
+  scoringNote: 'Returns a named object: msfsc (corrected mid-sleep on free days, decimal hours), sjl (absolute social jetlag, hours), sjl_rel (signed social jetlag, hours), msw (mid-sleep on workdays), msf (mid-sleep on free days), sd_w (sleep duration workdays, hours), sd_f (sleep duration free days, hours), sd_week (weighted average sleep duration, hours), alarm_w (alarm used on workdays, boolean), alarm_f (alarm used on free days, boolean).',
+  scoreBands: [
+    { min: 0,    max: 0.49, label: 'Extremely early chronotype', color: '#F59E0B', description: 'Extremely early chronotype.' },
+    { min: 0.5,  max: 2.49, label: 'Early chronotype',           color: '#84CC16', description: 'Early chronotype.' },
+    { min: 2.5,  max: 3.49, label: 'Intermediate chronotype',    color: '#2E7D32', description: 'Intermediate chronotype — neither strongly morning nor evening.' },
+    { min: 3.5,  max: 5.49, label: 'Late chronotype',            color: '#6366F1', description: 'Late chronotype.' },
+    { min: 5.5,  max: 24,   label: 'Extremely late chronotype',  color: '#7C3AED', description: 'Extremely late chronotype.' },
+  ],
+
+  items: [
+    // ── Workdays ──────────────────────────────────────────────────────────────
+    {
+      id: 'wd', number: 1,
+      text: 'How many days per week do you have fixed obligations (work, school, or other commitments that determine when you have to get up)?',
+      type: 'number', min: 0, max: 7, defaultValue: 5, unit: 'days',
+    },
+    {
+      id: 'bt_w', number: 2,
+      text: 'On workdays, at what time do you usually go to bed (lights off, trying to sleep)?',
+      type: 'time', defaultValue: { hour: 23, minute: 0 },
+    },
+    {
+      id: 'sl_w', number: 3,
+      text: 'On workdays, how long does it usually take you to fall asleep after lights out?',
+      type: 'duration_min', defaultValue: 15, min: 0, max: 120, unit: 'min',
+    },
+    {
+      id: 'wt_w', number: 4,
+      text: 'On workdays, at what time do you usually wake up?',
+      type: 'time', defaultValue: { hour: 7, minute: 0 },
+    },
+    {
+      id: 'alarm_w', number: 5,
+      text: 'On workdays, do you use an alarm clock (or any other device) to wake up?',
+      type: 'yes_no',
+    },
+    // ── Free days ─────────────────────────────────────────────────────────────
+    {
+      id: 'bt_f', number: 6,
+      text: 'On free days, at what time do you usually go to bed (lights off, trying to sleep)?',
+      type: 'time', defaultValue: { hour: 0, minute: 0 },
+    },
+    {
+      id: 'sl_f', number: 7,
+      text: 'On free days, how long does it usually take you to fall asleep after lights out?',
+      type: 'duration_min', defaultValue: 15, min: 0, max: 120, unit: 'min',
+    },
+    {
+      id: 'wt_f', number: 8,
+      text: 'On free days, at what time do you usually wake up?',
+      type: 'time', defaultValue: { hour: 8, minute: 0 },
+    },
+    {
+      id: 'alarm_f', number: 9,
+      text: 'On free days, do you use an alarm clock (or any other device) to wake up?',
+      type: 'yes_no',
+    },
+  ],
+
+  score: (answers) => {
+    const parseHM = (v, defaultH = 0) => {
+      if (v == null) return defaultH;
+      if (typeof v === 'object' && 'hour' in v) return v.hour + (v.minute ?? 0) / 60;
+      return Number(v);
+    };
+
+    const btW  = parseHM(answers.bt_w, 23);
+    const slW  = (answers.sl_w  ?? 15) / 60;
+    const wtW  = parseHM(answers.wt_w, 7);
+    const btF  = parseHM(answers.bt_f, 0);
+    const slF  = (answers.sl_f  ?? 15) / 60;
+    const wtF  = parseHM(answers.wt_f, 8);
+    const wd   = Number(answers.wd ?? 5);
+    const fd   = 7 - wd;
+
+    const soW  = btW + slW;
+    let   sdW  = wtW - soW;  if (sdW <= 0)  sdW  += 24;
+    const msw  = (soW + sdW / 2) % 24;
+
+    const soF  = btF + slF;
+    let   sdF  = wtF - soF;  if (sdF <= 0)  sdF  += 24;
+    const msf  = (soF + sdF / 2) % 24;
+
+    const sdWeek  = (sdW * wd + sdF * fd) / 7;
+    const deficit = sdWeek - sdW;
+    const msfsc   = deficit > 0 ? (msf - deficit / 2 + 24) % 24 : msf;
+
+    const sjl    = Math.abs(msf - msw);
+    const sjlRel = msfsc - msw;
+
+    const round2 = (x) => Math.round(x * 100) / 100;
+
+    return {
+      msfsc:   round2(msfsc),
+      sjl:     round2(sjl),
+      sjl_rel: round2(sjlRel),
+      msw:     round2(msw),
+      msf:     round2(msf),
+      sd_w:    round2(sdW),
+      sd_f:    round2(sdF),
+      sd_week: round2(sdWeek),
+      alarm_w: answers.alarm_w === 'yes' ? true : answers.alarm_w === 'no' ? false : null,
+      alarm_f: answers.alarm_f === 'yes' ? true : answers.alarm_f === 'no' ? false : null,
+    };
+  },
+
+  interpret: (score) => {
+    const msfsc = typeof score === 'object' ? score.msfsc : Number(score);
+    if (msfsc < 0.5)  return { label: 'Extremely early chronotype', color: '#F59E0B', description: 'Extremely early chronotype (very strong morning preference).' };
+    if (msfsc < 2.5)  return { label: 'Early chronotype',           color: '#84CC16', description: 'Early chronotype.' };
+    if (msfsc < 3.5)  return { label: 'Intermediate chronotype',    color: '#2E7D32', description: 'Intermediate chronotype — neither strongly morning nor evening.' };
+    if (msfsc < 5.5)  return { label: 'Late chronotype',            color: '#6366F1', description: 'Late chronotype.' };
+    return                   { label: 'Extremely late chronotype',  color: '#7C3AED', description: 'Extremely late chronotype (very strong evening preference).' };
+  },
+
+  translations: {
+    'pt-BR': {
+      instructions: 'As questoes a seguir perguntam sobre seus horarios de sono tipicos em dias de trabalho (dias com obrigacoes fixas, como trabalho, escola ou outros compromissos que determinam quando voce precisa acordar) e em dias livres (dias sem obrigacoes fixas). Responda com base em seus habitos nas ultimas quatro semanas, desconsiderando situacoes excepcionais.',
+      items: {
+        wd:      { text: 'Quantos dias por semana voce tem obrigacoes fixas (trabalho, escola ou outros compromissos que determinam quando precisa acordar)?' },
+        bt_w:    { text: 'Nos dias de trabalho, a que horas voce costuma ir para a cama (apagar a luz e tentar dormir)?' },
+        sl_w:    { text: 'Nos dias de trabalho, quanto tempo voce leva normalmente para pegar no sono apos apagar a luz?' },
+        wt_w:    { text: 'Nos dias de trabalho, a que horas voce costuma acordar?' },
+        alarm_w: { text: 'Nos dias de trabalho, voce usa despertador (ou outro dispositivo) para acordar?' },
+        bt_f:    { text: 'Nos dias livres, a que horas voce costuma ir para a cama (apagar a luz e tentar dormir)?' },
+        sl_f:    { text: 'Nos dias livres, quanto tempo voce leva normalmente para pegar no sono apos apagar a luz?' },
+        wt_f:    { text: 'Nos dias livres, a que horas voce costuma acordar?' },
+        alarm_f: { text: 'Nos dias livres, voce usa despertador (ou outro dispositivo) para acordar?' },
+      },
+      scoreBands: [
+        { label: 'Cronotipo extremamente matutino', description: 'Cronotipo extremamente matutino.' },
+        { label: 'Cronotipo matutino',              description: 'Cronotipo matutino.' },
+        { label: 'Cronotipo intermediario',         description: 'Cronotipo intermediario — nem fortemente matutino nem vespertino.' },
+        { label: 'Cronotipo vespertino',            description: 'Cronotipo vespertino.' },
+        { label: 'Cronotipo extremamente vespertino', description: 'Cronotipo extremamente vespertino.' },
+      ],
+    },
+  },
+};
+
+export const SLEEP_QUESTIONNAIRES = [ESS, ISI, DBAS16, MEQ, PSQI, RUSATED, STOPBANG, KSS, MCTQ];
