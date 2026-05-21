@@ -107,12 +107,22 @@ export async function saveResult(participantId, questionnaireId, answers, score)
 /**
  * Returns the most recent result for a questionnaire, or null.
  * Handles both legacy single-object and new array formats.
+ * For composite scores (e.g. MCTQ), adds a pre-formatted scoreDisplay string.
  */
 export function getLatestResult(participant, questionnaireId) {
   const entry = participant?.results?.[questionnaireId];
   if (!entry) return null;
-  if (Array.isArray(entry)) return entry[entry.length - 1];
-  return entry; // legacy
+  const result = Array.isArray(entry) ? entry[entry.length - 1] : entry;
+  if (!result) return null;
+  // Attach a pre-formatted display string for composite scores
+  if (result.score && typeof result.score === 'object') {
+    if (result.score.msfsc !== undefined) {
+      const h = Math.floor(result.score.msfsc);
+      const m = Math.round((result.score.msfsc % 1) * 60);
+      result._scoreDisplay = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} MSFsc`;
+    }
+  }
+  return result;
 }
 
 /**

@@ -24,7 +24,17 @@ import t from '../../i18n';
 const formatDate  = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const interpColor = (q, score) => { try { return q.interpret(score).color; } catch { return COLOURS.textMuted; } };
 const interpLabel = (q, score) => { try { return q.interpret(score).label; } catch { return '—'; } };
-const fmtScore    = (score) => typeof score === 'object' ? '—' : String(score);
+const fmtScore    = (score) => {
+  if (typeof score === 'object' && score !== null) {
+    if (score.msfsc !== undefined) {
+      const h = Math.floor(score.msfsc);
+      const m = Math.round((score.msfsc % 1) * 60);
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} MSFsc`;
+    }
+    return '—';
+  }
+  return String(score);
+};
 const hasResult   = (p, qid) => !!getLatestResult(p, qid);
 
 // ─── Desktop list row ─────────────────────────────────────────────────────────
