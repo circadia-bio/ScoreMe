@@ -236,7 +236,16 @@ export default function ParticipantScreen() {
                         <Text style={s.qTitle}>{q.title}</Text>
                         <View style={[s.badge, { backgroundColor: interp.color + '18', shadowColor: interp.color, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 }]}>
                           <Text style={[s.badgeText, { color: interp.color }]}>
-                            {formatScore(q, result.score)} — {interp.label}
+                            {(() => {
+                              const sc = result.score;
+                              const parsed = (typeof sc === 'string') ? (() => { try { return JSON.parse(sc); } catch { return sc; } })() : sc;
+                              if (parsed && typeof parsed === 'object' && parsed.msfsc !== undefined) {
+                                const h = Math.floor(parsed.msfsc);
+                                const m = Math.round((parsed.msfsc % 1) * 60);
+                                return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} MSFsc`;
+                              }
+                              return formatScore(q, sc);
+                            })()} — {interp.label}
                           </Text>
                         </View>
                         <Text style={s.resultDate}>
