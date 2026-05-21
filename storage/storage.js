@@ -9,7 +9,7 @@
  *   scoreme:custom_qs      → JSON array of user-imported questionnaire objects
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { compileQuestionnaire } from '../data/questionnaires';
+import { compileQuestionnaire, QUESTIONNAIRES } from '../data/questionnaires';
 
 const KEYS = {
   participants: 'scoreme:participants',
@@ -150,7 +150,11 @@ export async function markOnboardingComplete() {
 export async function loadDisabledQs() {
   try {
     const raw = await AsyncStorage.getItem(KEYS.disabledQs);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
+    if (raw !== null) return new Set(JSON.parse(raw));
+    // First launch — seed with all built-in IDs so everything is off by default
+    const allIds = QUESTIONNAIRES.map(q => q.id);
+    await AsyncStorage.setItem(KEYS.disabledQs, JSON.stringify(allIds));
+    return new Set(allIds);
   } catch {
     return new Set();
   }
