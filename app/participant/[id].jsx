@@ -15,7 +15,6 @@ import { loadParticipants, loadCustomQuestionnaires, loadDisabledQs, updateParti
 import { fmtScore } from '../../storage/scoreFormat';
 import { QUESTIONNAIRES } from '../../data/questionnaires';
 
-const pad = (n) => String(n).padStart(2, '0');
 const formatDate = (iso) =>
   iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
