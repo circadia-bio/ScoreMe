@@ -3,10 +3,20 @@
  * Pure stat helpers — no React, no RN imports.
  */
 
-/** Extract numeric score from a result (returns null for object/missing) */
-export function numericScore(result) {
+/**
+ * Extract numeric score from a result.
+ * For composite/time scores (e.g. MCTQ), pass the questionnaire object
+ * as the second argument so the correct sub-field is extracted.
+ * Returns null for unscored or non-numeric results.
+ */
+export function numericScore(result, q = null) {
   if (!result) return null;
   if (typeof result.score === 'number') return result.score;
+  // Composite object score: extract the designated scoreKey if provided
+  if (typeof result.score === 'object' && result.score !== null && q?.scoreKey) {
+    const v = result.score[q.scoreKey];
+    return typeof v === 'number' ? v : null;
+  }
   return null;
 }
 
@@ -52,13 +62,13 @@ export function groupBy(participants, field) {
 }
 
 /** Collect numeric scores for a questionnaire across participants (latest result only) */
-export function collectScores(participants, qid) {
+export function collectScores(participants, qid, q = null) {
   return participants
     .map(p => {
       const entry = p.results?.[qid];
       if (!entry) return null;
       const r = Array.isArray(entry) ? entry[entry.length - 1] : entry;
-      return numericScore(r);
+      return numericScore(r, q);
     })
     .filter(x => x !== null);
 }
@@ -82,3 +92,14 @@ export function groupColor(index) {
 }
 
 export function round2(x) { return Math.round(x * 100) / 100; }
+
+/**
+ * Format decimal hours as HH:MM (e.g. 3.5 → "03:30").
+ * Used for time-axis instruments like MCTQ.
+ */
+export function decimalHoursToHHMM(h) {
+  const total = Math.round(h * 60);
+  const hh = Math.floor(total / 60) % 24;
+  const mm = total % 60;
+  return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+}

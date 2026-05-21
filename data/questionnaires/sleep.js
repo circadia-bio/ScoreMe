@@ -685,6 +685,10 @@ export const MCTQ = {
   copyright: '© Till Roenneberg. Available for non-commercial research use.',
 
   maxScore: null,
+  scoreType: 'time',   // primary output is a clock time (decimal hours)
+  scoreKey:  'msfsc',  // which field of the composite score to plot
+  axisMin:   0,        // earliest plausible MSFsc (00:00)
+  axisMax:   8,        // latest plausible MSFsc (08:00) covers the full chronotype range
   scoringMethod: { type: 'composite' },
   scoringNote: 'Returns a named object: msfsc (corrected mid-sleep on free days, decimal hours), sjl (absolute social jetlag, hours), sjl_rel (signed social jetlag, hours), msw (mid-sleep on workdays), msf (mid-sleep on free days), sd_w (sleep duration workdays, hours), sd_f (sleep duration free days, hours), sd_week (weighted average sleep duration, hours), alarm_w (alarm used on workdays, boolean), alarm_f (alarm used on free days, boolean).',
   scoreBands: [

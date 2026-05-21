@@ -3,28 +3,32 @@
  *
  * SVG box-and-whisker plot. Supports multiple groups side by side.
  * Props:
- *   groups  — [{ label, stats, color }]  where stats = describe() output
- *   maxVal  — axis max (questionnaire maxScore)
- *   width   — SVG width
- *   height  — SVG height (default 160)
+ *   groups      — [{ label, stats, color }]  where stats = describe() output
+ *   maxVal      — axis max (questionnaire maxScore or axisMax)
+ *   minVal      — axis min (default 0)
+ *   tickFormat  — optional (val) => string for Y-axis labels (default: String)
+ *   width       — SVG width
+ *   height      — SVG height (default 160)
  */
 import React from 'react';
 import { View, Text } from 'react-native';
 import Svg, { Line, Rect, Circle, Text as SvgText } from 'react-native-svg';
 import { FONTS, COLOURS } from '../../theme/typography';
 
-const PAD = { top: 12, bottom: 32, left: 28, right: 8 };
+const PAD = { top: 12, bottom: 32, left: 36, right: 8 };
 
-export default function BoxPlot({ groups, maxVal, width, height = 160 }) {
+export default function BoxPlot({ groups, maxVal, minVal = 0, tickFormat, width, height = 160 }) {
   if (!groups?.length) return null;
 
   const plotW = width - PAD.left - PAD.right;
   const plotH = height - PAD.top - PAD.bottom;
+  const range = maxVal - minVal;
 
-  const toY = val => PAD.top + plotH - (val / maxVal) * plotH;
+  const toY = val => PAD.top + plotH - ((val - minVal) / range) * plotH;
+  const fmt  = tickFormat ?? (v => String(v));
 
-  // Axis ticks — 5 evenly spaced
-  const ticks = Array.from({ length: 5 }, (_, i) => Math.round((maxVal / 4) * i));
+  // Axis ticks — 5 evenly spaced across [minVal, maxVal]
+  const ticks = Array.from({ length: 5 }, (_, i) => minVal + (range / 4) * i);
 
   // Box width & spacing
   const slotW = plotW / groups.length;
@@ -40,7 +44,7 @@ export default function BoxPlot({ groups, maxVal, width, height = 160 }) {
             <Line x1={PAD.left - 4} y1={y} x2={width - PAD.right} y2={y}
               stroke="rgba(74,123,181,0.10)" strokeWidth={1} />
             <SvgText x={PAD.left - 6} y={y + 4} fontSize={9} fontFamily={FONTS.bodyMedium}
-              fill={COLOURS.textMuted} textAnchor="end">{t}</SvgText>
+              fill={COLOURS.textMuted} textAnchor="end">{fmt(t)}</SvgText>
           </React.Fragment>
         );
       })}

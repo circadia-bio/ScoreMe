@@ -13,7 +13,7 @@ import { BlurView } from 'expo-blur';
 
 import ScreenBackground from '../../components/ScreenBackground';
 import BoxPlot          from '../../components/charts/BoxPlot';
-import { describe, groupBy, collectScores, completionRate, groupColor, round2 }
+import { describe, groupBy, collectScores, completionRate, groupColor, round2, decimalHoursToHHMM }
   from '../../components/charts/chartUtils';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
@@ -45,7 +45,7 @@ const GROUP_OPTIONS = [
 ];
 
 // ─── Stats table ──────────────────────────────────────────────────────────────
-function StatRow({ label, color, stats }) {
+function StatRow({ label, color, stats, fmtVal = round2 }) {
   return (
     <View style={st.row}>
       <View style={[st.dot, { backgroundColor: color }]} />
@@ -53,9 +53,9 @@ function StatRow({ label, color, stats }) {
       {stats ? (
         <>
           <Text style={st.cell}>{stats.n}</Text>
-          <Text style={st.cell}>{round2(stats.mean)} ± {round2(stats.sd)}</Text>
-          <Text style={st.cell}>{round2(stats.median)}</Text>
-          <Text style={st.cell}>{round2(stats.min)}–{round2(stats.max)}</Text>
+          <Text style={st.cell}>{fmtVal(stats.mean)} ± {fmtVal(stats.sd)}</Text>
+          <Text style={st.cell}>{fmtVal(stats.median)}</Text>
+          <Text style={st.cell}>{fmtVal(stats.min)}–{fmtVal(stats.max)}</Text>
         </>
       ) : (
         <Text style={[st.cell, { flex: 4, color: COLOURS.textMuted, fontStyle: 'italic' }]}>No data</Text>
@@ -75,16 +75,22 @@ const st = StyleSheet.create({
 
 // ─── Per-questionnaire card ───────────────────────────────────────────────────
 function QCard({ q, participants, groupField, chartWidth }) {
+  const isTime   = q.scoreType === 'time';
+  const fmtVal   = isTime ? decimalHoursToHHMM : round2;
+  const axisMax  = isTime ? (q.axisMax ?? 8)  : q.maxScore;
+  const axisMin  = isTime ? (q.axisMin ?? 0)  : 0;
+
   const groups = Object.entries(groupBy(participants, groupField)).map(([label, ps], i) => ({
     label,
     color: groupColor(i),
-    stats: describe(collectScores(ps, q.id)),
+    stats: describe(collectScores(ps, q.id, q)),
     rate:  completionRate(ps, q.id),
   }));
 
   const overallRate = completionRate(participants, q.id);
   const hasData     = groups.some(g => g.stats !== null);
   const rateColor   = overallRate >= 0.8 ? COLOURS.success : overallRate >= 0.5 ? COLOURS.warning : COLOURS.textMuted;
+  const showPlot    = hasData && (isTime || typeof q.maxScore === 'number');
 
   return (
     <GlassCard style={{ marginBottom: 14 }}>
@@ -107,10 +113,17 @@ function QCard({ q, participants, groupField, chartWidth }) {
       ) : (
         <>
           {/* Box plot */}
-          {typeof q.maxScore === 'number' && (
+          {showPlot && (
             <View style={{ paddingHorizontal: 14, paddingTop: 12, paddingBottom: 4 }}>
-              <Text style={qc.sectionLabel}>DISTRIBUTION</Text>
-              <BoxPlot groups={groups.filter(g => g.stats)} maxVal={q.maxScore} width={chartWidth - 28} height={150} />
+              <Text style={qc.sectionLabel}>DISTRIBUTION{isTime ? '  (MSFsc)' : ''}</Text>
+              <BoxPlot
+                groups={groups.filter(g => g.stats)}
+                maxVal={axisMax}
+                minVal={axisMin}
+                tickFormat={isTime ? decimalHoursToHHMM : undefined}
+                width={chartWidth - 28}
+                height={150}
+              />
               {groups.length > 1 && (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 6 }}>
                   {groups.filter(g => g.stats).map(g => (
@@ -130,7 +143,7 @@ function QCard({ q, participants, groupField, chartWidth }) {
 
           {/* Stats table */}
           <View>
-            <Text style={[qc.sectionLabel, { paddingHorizontal: 14, paddingTop: 10 }]}>STATISTICS</Text>
+            <Text style={[qc.sectionLabel, { paddingHorizontal: 14, paddingTop: 10 }]}>STATISTICS{isTime ? '  (MSFsc, HH:MM)' : ''}</Text>
             <View style={st.headerRow}>
               <View style={{ width: 16 }} />
               <Text style={[st.headerCell, { flex: 1.4 }]}>Group</Text>
@@ -139,7 +152,7 @@ function QCard({ q, participants, groupField, chartWidth }) {
               <Text style={[st.headerCell, { flex: 1.4, textAlign: 'right' }]}>Median</Text>
               <Text style={[st.headerCell, { flex: 1.4, textAlign: 'right' }]}>Range</Text>
             </View>
-            {groups.map(g => <StatRow key={g.label} {...g} />)}
+            {groups.map(g => <StatRow key={g.label} {...g} fmtVal={fmtVal} />)}
           </View>
 
           {/* Per-group completion */}
