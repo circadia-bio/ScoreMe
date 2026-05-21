@@ -15,7 +15,7 @@ import ScreenBackground from '../../components/ScreenBackground';
 import { FONTS, SIZES, COLOURS } from '../../theme/typography';
 import { useLayout, SIDEBAR_TOTAL } from '../../theme/responsive';
 import { QUESTIONNAIRES, compileQuestionnaire } from '../../data/questionnaires';
-import { loadCustomQuestionnaires, saveCustomQuestionnaire, deleteCustomQuestionnaire, loadDisabledQs, setQDisabled } from '../../storage/storage';
+import { loadCustomQuestionnaires, saveCustomQuestionnaire, deleteCustomQuestionnaire, loadDisabledQs, setQDisabled, setQsDisabled } from '../../storage/storage';
 import t from '../../i18n';
 
 async function importJSON(onDone) {
@@ -397,7 +397,7 @@ export default function QuestionnairesScreen() {
   }, []);
 
   const handleToggleAll = useCallback(async (qs, disable) => {
-    await Promise.all(qs.map(q => setQDisabled(q.id, disable)));
+    await setQsDisabled(qs.map(q => q.id), disable);
     setDisabledQs(prev => {
       const next = new Set(prev);
       qs.forEach(q => disable ? next.add(q.id) : next.delete(q.id));

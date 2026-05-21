@@ -166,6 +166,18 @@ export async function setQDisabled(id, disabled) {
   await AsyncStorage.setItem(KEYS.disabledQs, JSON.stringify([...set]));
 }
 
+/**
+ * Atomically disable or enable a batch of IDs in a single read-modify-write.
+ * Use this instead of Promise.all(ids.map(setQDisabled)) to avoid races.
+ */
+export async function setQsDisabled(ids, disabled) {
+  const set = await loadDisabledQs();
+  for (const id of ids) {
+    if (disabled) set.add(id); else set.delete(id);
+  }
+  await AsyncStorage.setItem(KEYS.disabledQs, JSON.stringify([...set]));
+}
+
 // ─── Custom questionnaires ─────────────────────────────────────────────────────
 
 export async function loadCustomQuestionnaires() {
