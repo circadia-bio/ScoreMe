@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "ScoreMe"
+version: 1.0.0
+date-released: 2026-01-01
+url: "https://github.com/circadia-bio/ScoreMe"
+repository-code: "https://github.com/circadia-bio/ScoreMe"
+license: MIT
+abstract: >
+  A cross-platform research questionnaire scorer for administering and
+  scoring 25 validated clinical and sleep health questionnaires across
+  multiple research participants. Built with React Native and Expo,
+  running as a web app, iOS app, and Android app from the same codebase.
+authors:
+  - family-names: França
+    given-names: Lucas
+    affiliation: Northumbria University
+    orcid: "https://orcid.org/0000-0003-0853-1319"
+  - family-names: Leocadio-Miguel
+    given-names: Mario
+    orcid: "https://orcid.org/0000-0002-7248-3529"
+keywords:
+  - questionnaires
+  - sleep research
+  - React Native
+  - Expo
+  - PWA
+  - chronobiology
+  - clinical assessment

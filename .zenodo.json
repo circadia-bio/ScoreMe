@@ -1,0 +1,34 @@
+{
+  "title": "ScoreMe",
+  "description": "A cross-platform research questionnaire scorer for administering and scoring 25 validated clinical and sleep health questionnaires across multiple research participants. Built with React Native and Expo, running as a web app, iOS app, and Android app from the same codebase.",
+  "creators": [
+    {
+      "name": "França, Lucas",
+      "affiliation": "Northumbria University",
+      "orcid": "0000-0003-0853-1319"
+    },
+    {
+      "name": "Leocadio-Miguel, Mario",
+      "affiliation": "Northumbria University",
+      "orcid": "0000-0002-7248-3529"
+    }
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": [
+    "questionnaires",
+    "sleep research",
+    "React Native",
+    "Expo",
+    "chronobiology",
+    "Circadia Lab"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/circadia-bio/ScoreMe",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ]
+}
